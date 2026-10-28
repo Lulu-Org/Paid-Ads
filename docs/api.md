@@ -81,11 +81,19 @@ interface AdsProvider {
 | GET/POST | `/automations`, PATCH/DELETE `/automations/:id` | Rules | automations.* |
 | GET | `/automations/activity` | What the rules did, newest first | automations.view |
 | GET/PUT | `/campaign-defaults` | Guardrails for new campaigns: consent required, auto-tag links, policy validation | settings.view / edit |
-| GET/PUT | `/spend-limit` | Workspace monthly limit and alert | billing.view / edit |
-| GET/PUT | `/approval-policy` | Threshold and approver role | billing.view / edit |
-| GET | `/approvals`, POST `/approvals/:id/approve`, `/reject` | Approval requests | billing.approve |
+| GET/PUT | `/spend-limit` | Monthly limit, alert share (0.7 / 0.8 / 0.9), `notifyBeforeLimit`; GET adds `used` this month | billing.view / edit |
+| GET/PUT | `/approval-policy` | `scope` (`budget_and_launch`, `all_changes`, `creative_only`, `none`), `threshold`, `approverRole` (a Paid Ads role) | billing.view / edit |
+| GET | `/billing/payment-method` | Card brand, last four digits and status only. Card details are entered at the payment provider (Lulu billing / Stripe), never in this module | billing.view |
+| GET | `/billing/statements` | Monthly charges per platform | billing.view |
+| GET | `/approvals`, POST `/approvals/:id/approve`, `/reject` | Approval requests; a person cannot approve their own | billing.approve |
+| POST | `/approvals` | Ask for an approval: `{ kind, campaignId, payload }`. An open request for the same kind and campaign is returned instead of a second one | campaigns.edit |
 | GET/PUT | `/settings/permissions` | Role permissions | settings.edit |
-| GET | `/operations` | Sync health, jobs today, recent `SyncRun`s and failures | integrations.view |
+| GET | `/team` | Teammates with their Paid Ads role (`owner`, `editor`, `reviewer`, `analyst`), channel scope and creative approval right | settings.view |
+| POST | `/team/invitations` | Invite by email with a role (not owner); `CONFLICT` if already in the team | settings.edit |
+| PATCH | `/team/:userId` | Change role, scope or creative approval; the owner cannot be changed (`FORBIDDEN`) | settings.edit |
+| GET | `/operations` | Sync health, providers, last sync, jobs today, success rate, incidents, webhook events, reconciled share | integrations.view |
+| POST | `/operations/incidents/:id/retry` | Queues the failed job again | integrations.edit |
+| POST | `/operations/reconcile` | Compares spend, conversions and status with each platform; returns the updated summary | integrations.edit |
 | GET | `/operations/sync-runs` | Sync history, newest first (`SyncRun`) | integrations.view |
 
 ## Events

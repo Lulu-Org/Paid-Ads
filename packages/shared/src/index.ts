@@ -10,3 +10,5 @@ export * from "./campaign";
 export * from "./library";
 export * from "./controls";
 export * from "./metrics";
+export * from "./team";
+export * from "./checklist";

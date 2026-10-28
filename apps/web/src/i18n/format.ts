@@ -40,5 +40,7 @@ export function useFormat() {
       format.dateTime(new Date(value), { day: "numeric", month: "short" }),
     // Weekday name for dates later this week ("Friday", "Freitag", "星期五").
     weekday: (value: Date | string) => format.dateTime(new Date(value), { weekday: "long" }),
+    // "June 2026", "Juni 2026", "2026年6月".
+    monthYear: (value: Date | string) => format.dateTime(new Date(value), { month: "long", year: "numeric", timeZone: "UTC" }),
   };
 }

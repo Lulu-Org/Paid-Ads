@@ -1,5 +1,18 @@
 import {
   adAccountConnectResultSchema,
+  approvalPolicySchema,
+  approvalRequestSchema,
+  campaignChecklistSchema,
+  operationsSummarySchema,
+  paymentMethodSchema,
+  spendLimitSchema,
+  statementSchema,
+  teamMemberSchema,
+  type ApprovalPolicy,
+  type ApprovalRequestCreateInput,
+  type SpendLimitUpdateInput,
+  type TeamInviteInput,
+  type TeamMemberUpdateInput,
   campaignListItemSchema,
   type CampaignListQuery,
   adAccountSchema,
@@ -34,6 +47,28 @@ export const realApi = {
 
   campaigns: {
     list: (query: Partial<CampaignListQuery> = {}) => getList(campaignListItemSchema, "/campaigns", query),
+    checklist: (id: string) => getOne(campaignChecklistSchema, `/campaigns/${id}/checklist`),
+  },
+
+  approvals: {
+    list: () => getList(approvalRequestSchema, "/approvals"),
+    request: (input: ApprovalRequestCreateInput) => write(approvalRequestSchema, "POST", "/approvals", input),
+  },
+
+  billing: {
+    spendLimit: () => getOne(spendLimitSchema, "/spend-limit"),
+    updateSpendLimit: (input: SpendLimitUpdateInput) => write(spendLimitSchema, "PUT", "/spend-limit", input),
+    approvalPolicy: () => getOne(approvalPolicySchema, "/approval-policy"),
+    updateApprovalPolicy: (input: ApprovalPolicy) => write(approvalPolicySchema, "PUT", "/approval-policy", input),
+    paymentMethod: () => getOne(paymentMethodSchema, "/billing/payment-method"),
+    statements: () => getList(statementSchema, "/billing/statements"),
+  },
+
+  team: {
+    list: () => getList(teamMemberSchema, "/team"),
+    invite: (input: TeamInviteInput) => write(teamMemberSchema, "POST", "/team/invitations", input),
+    update: (userId: string, input: TeamMemberUpdateInput) =>
+      write(teamMemberSchema, "PATCH", `/team/${userId}`, input),
   },
 
   adAccounts: {
@@ -68,6 +103,9 @@ export const realApi = {
   },
 
   operations: {
+    summary: () => getOne(operationsSummarySchema, "/operations"),
     syncRuns: () => getList(syncRunSchema, "/operations/sync-runs"),
+    retry: (incidentId: string) => post(`/operations/incidents/${incidentId}/retry`),
+    reconcile: () => write(operationsSummarySchema, "POST", "/operations/reconcile", {}),
   },
 };

@@ -422,5 +422,285 @@
       "policyValidationHint": "Anzeigen vor dem Start gegen Plattformrichtlinien prüfen.",
       "saved": "Leitplanken gespeichert."
     }
+  },
+  "checklist": {
+    "campaign": "Kampagne",
+    "eyebrow": "Prüfung vor dem Start",
+    "title": "Jede Kampagne durchläuft dieselben Sicherheitsprüfungen.",
+    "description": "Nichts startet, bevor Daten, Assets, Berechtigungen und Freigaben bereit sind.",
+    "score": "{passed} / {total}",
+    "completed": "Prüfungen erledigt",
+    "complete": "Erledigt",
+    "open": "Offen",
+    "request": "Anfordern",
+    "approvalRequested": "Freigabe angefordert.",
+    "shared": "Link zur Checkliste für die Freigebenden kopiert.",
+    "shareFailed": "Link konnte nicht kopiert werden.",
+    "decision": {
+      "eyebrow": "Startentscheidung",
+      "title": "Was blockiert den Start?",
+      "ready": "Bereit",
+      "needsReview": "Zu prüfen",
+      "next": "Nächster Schritt",
+      "nothing": "Nichts offen.",
+      "readyToLaunch": "Alle Prüfungen bestanden. Die Kampagne kann starten.",
+      "share": "Checkliste teilen",
+      "requestApprovals": "Freigaben anfordern"
+    },
+    "items": {
+      "account_connected": {
+        "label": "Werbekonto verbunden",
+        "hint": "Das Plattformkonto ist freigegeben und die Berechtigungen sind geprüft.",
+        "next": "Werbekonto unter Integrationen verbinden."
+      },
+      "budget_set": {
+        "label": "Budget festgelegt",
+        "hint": "Die Kampagne hat ein Budget über null.",
+        "next": "Budget für die Kampagne festlegen."
+      },
+      "schedule_set": {
+        "label": "Zeitplan festgelegt",
+        "hint": "Die Kampagne hat ein Startdatum.",
+        "next": "Startdatum wählen."
+      },
+      "audience_set": {
+        "label": "Zielgruppe beschrieben",
+        "hint": "Für wen die Kampagne ist, ist beschrieben.",
+        "next": "Zielgruppe der Kampagne beschreiben."
+      },
+      "creative_approved": {
+        "label": "Creative-Richtlinienprüfung",
+        "hint": "Jedes Asset der Kampagne ist freigegeben.",
+        "next": "Marketing bitten, die offenen Assets freizugeben."
+      },
+      "tracking_ready": {
+        "label": "Conversion-Ereignis zugeordnet",
+        "hint": "Conversions erreichen Lulu und die Plattformen.",
+        "next": "Tracking unter Tracking reparieren."
+      },
+      "consent_checked": {
+        "label": "Einwilligung der Zielgruppe geprüft",
+        "hint": "Synchronisierte Kontakte haben eine gültige Einwilligung.",
+        "next": "Zielgruppe mit Einwilligungsgrundlage für diese Plattform anlegen."
+      },
+      "landing_page_ready": {
+        "label": "Landingpage bereit",
+        "hint": "Anzeigen führen zu einer funktionierenden Seite oder einem Profil.",
+        "next": "Landingpage oder Profil hinzufügen."
+      },
+      "approval_granted": {
+        "label": "Budgetfreigabe",
+        "hint": "Die Freigabe über dem Schwellenwert liegt vor.",
+        "next": "Budgetfreigabe beim Freigebenden anfordern."
+      },
+      "owner_assigned": {
+        "label": "Verantwortliche Person",
+        "hint": "Jemand ist für die Kampagne verantwortlich.",
+        "next": "Verantwortliche Person zuweisen."
+      }
+    }
+  },
+  "operations": {
+    "health": {
+      "label": "Sync-Status der Anbieter",
+      "healthy": "Gesund",
+      "unhealthy": "Braucht Aufmerksamkeit",
+      "note": "{count, plural, one {# Anbieter} other {# Anbieter}} · letzter Sync {time}"
+    },
+    "jobs": {
+      "label": "Heute verarbeitete Jobs",
+      "note": "{rate} erfolgreich abgeschlossen",
+      "eyebrow": "Sync-Jobs",
+      "title": "Jeder Anbietervorgang ist nachvollziehbar.",
+      "description": "Richtung, Umfang, Zeitpunkte und Wiederholungen sehen, bevor sich Daten erneut ändern.",
+      "refresh": "Jobs aktualisieren",
+      "provider": "Anbieter",
+      "operation": "Vorgang",
+      "direction": "Richtung",
+      "status": "Status",
+      "lastRun": "Letzter Lauf"
+    },
+    "attention": {
+      "label": "Braucht Aufmerksamkeit",
+      "value": "{count, plural, one {# Vorfall} other {# Vorfälle}}",
+      "note": "Unten wiederholen oder prüfen"
+    },
+    "scopes": {
+      "campaign_performance": "Kampagnenleistung",
+      "audiences": "Zielgruppen-Sync",
+      "conversion_events": "Conversion-Ereignisse",
+      "creatives": "Creatives"
+    },
+    "directions": {
+      "sync": "Anbieter → Lulu",
+      "push": "Lulu → Anbieter",
+      "both": "Lulu ↔ Anbieter"
+    },
+    "statuses": {
+      "queued": "Wartet",
+      "running": "Läuft",
+      "succeeded": "Erfolgreich",
+      "failed": "Fehlgeschlagen",
+      "retry_queued": "Wiederholung geplant"
+    },
+    "incidents": {
+      "eyebrow": "Vorfälle und Wiederholungen",
+      "title": "Nichts scheitert unbemerkt.",
+      "none": "Keine offenen Vorfälle.",
+      "retryAt": "Wiederholung {time}",
+      "actionRequired": "Handlung erforderlich",
+      "retry": "Wiederholen",
+      "review": "Prüfen",
+      "retried": "Wiederholung angefordert.",
+      "kinds": {
+        "rate_limited": "Der Anbieter hat vorübergehend die Anfragen begrenzt.",
+        "consent_review": "Die Einwilligungszuordnung muss vor dem nächsten Sync geprüft werden.",
+        "auth_expired": "Die Kontofreigabe ist abgelaufen. Erneut verbinden.",
+        "sync_failed": "Der Sync ist fehlgeschlagen. Wiederholen oder Konto prüfen."
+      }
+    },
+    "webhooks": {
+      "eyebrow": "Webhook-Ereignisse",
+      "title": "Von Anbietern empfangene Ereignisse."
+    },
+    "reconcile": {
+      "eyebrow": "Abgleich",
+      "title": "Anbieter und Lulu vergleichen.",
+      "description": "Prüfen, ob Ausgaben, Conversions und Status übereinstimmen, bevor der Tag abgeschlossen wird.",
+      "share": "der Datensätze abgeglichen",
+      "run": "Abgleich starten",
+      "done": "Abgleich abgeschlossen."
+    }
+  },
+  "billing": {
+    "roles": {
+      "owner": "Workspace-Inhaber",
+      "editor": "Marketingleitung",
+      "reviewer": "Finanzprüfung"
+    },
+    "limit": {
+      "eyebrow": "Ausgabenlimit des Workspace",
+      "perMonth": "{amount} / Monat",
+      "used": "Genutztes Ausgabenlimit",
+      "usage": "{used} genutzt · {remaining} übrig",
+      "edit": "Limit bearbeiten"
+    },
+    "policy": {
+      "eyebrow": "Freigabeschwelle",
+      "perChange": "{amount} pro Änderung",
+      "edit": "Richtlinie bearbeiten",
+      "summary": {
+        "budget_and_launch": "Budget- und Startänderungen über diesem Betrag brauchen die Freigabe der {role}.",
+        "all_changes": "Jede Kampagnenänderung über diesem Betrag braucht die Freigabe der {role}.",
+        "creative_only": "Creative-Änderungen brauchen die Freigabe der {role}.",
+        "none": "Es sind keine Freigaben nötig."
+      }
+    },
+    "payment": {
+      "eyebrow": "Zahlungsstatus",
+      "status": {
+        "active": "Aktiv",
+        "missing": "Keine Zahlungsmethode",
+        "failed": "Zahlung fehlgeschlagen"
+      },
+      "card": "{brand} ···· {last4}",
+      "noCard": "Keine Karte hinterlegt.",
+      "canSpend": "Alle verbundenen Werbekonten können ausgeben.",
+      "cannotSpend": "Werbekonten können erst nach Klärung der Zahlung ausgeben.",
+      "managedByBilling": "Zahlungsmethoden werden in der Lulu-Abrechnung verwaltet, nicht hier, damit Kartendaten nie durch dieses Modul laufen."
+    },
+    "history": {
+      "eyebrow": "Abrechnungsverlauf",
+      "title": "Plattformkosten leicht prüfen.",
+      "statement": "Abrechnung",
+      "provider": "Anbieter",
+      "amount": "Betrag",
+      "status": "Status",
+      "statuses": {
+        "paid": "Bezahlt",
+        "due": "Fällig",
+        "failed": "Fehlgeschlagen"
+      }
+    },
+    "limitForm": {
+      "eyebrow": "Ausgabenkontrolle",
+      "title": "Das Werbebudget schützen.",
+      "description": "Monatslimit und Warnzeitpunkt festlegen.",
+      "monthly": "Monatslimit des Workspace ({currency})",
+      "alertAt": "Warnschwelle",
+      "alertOption": "{share} des Limits",
+      "notify": "Finanzen vor Erreichen des Limits benachrichtigen",
+      "invalid": "Limit über 0 eingeben.",
+      "saved": "Ausgabenlimit gespeichert."
+    },
+    "policyForm": {
+      "eyebrow": "Freigaberichtlinie",
+      "title": "Freigaben ausdrücklich machen.",
+      "description": "Festlegen, welche Ausgaben-, Start- und Creative-Änderungen eine zweite Prüfung brauchen.",
+      "scope": "Freigabe erforderlich für",
+      "scopes": {
+        "budget_and_launch": "Budget- und Startänderungen",
+        "all_changes": "Alle Kampagnenänderungen",
+        "creative_only": "Nur Creative-Änderungen",
+        "none": "Nichts"
+      },
+      "role": "Freigebende Rolle",
+      "threshold": "Mindestbetrag der Änderung ({currency})",
+      "invalid": "Betrag ab 0 eingeben.",
+      "draftHint": "✦ Änderungen bleiben Entwurf, bis Berechtigungen, Einwilligung und Freigaben vollständig sind.",
+      "saved": "Freigaberichtlinie gespeichert."
+    }
+  },
+  "team": {
+    "invite": "Teammitglied einladen",
+    "membersLabel": "Teammitglieder",
+    "invited": "Eingeladen",
+    "changeRole": "Rolle",
+    "allowed": "Erlaubt:",
+    "notAllowed": "Nicht erlaubt:",
+    "roleChanged": "{name} ist jetzt {role}.",
+    "roles": {
+      "owner": "Inhaber",
+      "editor": "Bearbeitung",
+      "reviewer": "Prüfung",
+      "analyst": "Analyse"
+    },
+    "highlights": {
+      "allChannels": "Alle Kanäle",
+      "budgetApproval": "Budgetfreigabe",
+      "launch": "Kampagnen starten",
+      "campaignsCreatives": "Kampagnen und Creatives",
+      "reports": "Berichte",
+      "billing": "Abrechnungskontrollen"
+    },
+    "matrix": {
+      "eyebrow": "Rollenmatrix",
+      "title": "Berechtigungen bleiben eindeutig.",
+      "role": "Rolle",
+      "view": "Ansehen",
+      "edit": "Bearbeiten",
+      "budget": "Budget",
+      "launch": "Starten",
+      "request": "Anfragen"
+    },
+    "inviteForm": {
+      "eyebrow": "Teammitglied einladen",
+      "title": "Jemandem den richtigen Zugang geben.",
+      "description": "Rolle wählen und den Zugang auf benötigte Kanäle oder Aktionen beschränken.",
+      "email": "E-Mail-Adresse",
+      "emailPlaceholder": "kollege@firma.de",
+      "role": "Rolle",
+      "scope": "Kanalumfang",
+      "scopes": {
+        "all": "Alle verbundenen Kanäle",
+        "google_ads": "Nur Google Ads",
+        "meta_ads": "Nur Meta Ads",
+        "reports_only": "Nur Berichte"
+      },
+      "creatives": "Creative-Freigaben erlauben",
+      "invalid": "Gültige E-Mail-Adresse eingeben.",
+      "submit": "Einladung senden",
+      "sent": "Einladung an {email} gesendet."
+    }
   }
 }

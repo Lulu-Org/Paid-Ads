@@ -422,5 +422,285 @@
       "policyValidationHint": "Check ads against platform policies before launch.",
       "saved": "Guardrails saved."
     }
+  },
+  "checklist": {
+    "campaign": "Campaign",
+    "eyebrow": "Pre-launch governance",
+    "title": "Every campaign passes the same safety checks.",
+    "description": "Nothing launches until data, assets, permissions and approvals are ready.",
+    "score": "{passed} / {total}",
+    "completed": "checks completed",
+    "complete": "Complete",
+    "open": "Open",
+    "request": "Request",
+    "approvalRequested": "Approval requested.",
+    "shared": "Checklist link copied for the approvers.",
+    "shareFailed": "Could not copy the link.",
+    "decision": {
+      "eyebrow": "Launch decision",
+      "title": "What is blocking launch?",
+      "ready": "Ready",
+      "needsReview": "Needs review",
+      "next": "Next action",
+      "nothing": "Nothing open.",
+      "readyToLaunch": "All checks pass. The campaign can launch.",
+      "share": "Share checklist",
+      "requestApprovals": "Request approvals"
+    },
+    "items": {
+      "account_connected": {
+        "label": "Ad account connected",
+        "hint": "The platform account is authorized and permissions reviewed.",
+        "next": "Connect the ad account under Integrations."
+      },
+      "budget_set": {
+        "label": "Budget set",
+        "hint": "The campaign has a budget above zero.",
+        "next": "Set a budget for the campaign."
+      },
+      "schedule_set": {
+        "label": "Schedule set",
+        "hint": "The campaign has a start date.",
+        "next": "Choose a start date."
+      },
+      "audience_set": {
+        "label": "Audience defined",
+        "hint": "Who the campaign is for is described.",
+        "next": "Describe the campaign's audience."
+      },
+      "creative_approved": {
+        "label": "Creative policy review",
+        "hint": "Every asset in the campaign is approved.",
+        "next": "Ask Marketing to approve the open assets."
+      },
+      "tracking_ready": {
+        "label": "Conversion event mapped",
+        "hint": "Conversions reach Lulu and the platforms.",
+        "next": "Fix tracking under Tracking."
+      },
+      "consent_checked": {
+        "label": "Audience consent checked",
+        "hint": "Synced contacts have a valid consent basis.",
+        "next": "Add an audience with a consent basis for this platform."
+      },
+      "landing_page_ready": {
+        "label": "Landing page ready",
+        "hint": "Ads point to a page or profile that works.",
+        "next": "Add the landing page or profile."
+      },
+      "approval_granted": {
+        "label": "Budget approval",
+        "hint": "Approval above the threshold is granted.",
+        "next": "Request the budget approval from the approver."
+      },
+      "owner_assigned": {
+        "label": "Owner assigned",
+        "hint": "Someone is responsible for the campaign.",
+        "next": "Assign an owner."
+      }
+    }
+  },
+  "operations": {
+    "health": {
+      "label": "Provider sync health",
+      "healthy": "Healthy",
+      "unhealthy": "Needs attention",
+      "note": "{count, plural, one {# provider} other {# providers}} · last sync {time}"
+    },
+    "jobs": {
+      "label": "Jobs processed today",
+      "note": "{rate} completed successfully",
+      "eyebrow": "Sync jobs",
+      "title": "Every provider operation is observable.",
+      "description": "See direction, scope, timestamps and retry state before data changes again.",
+      "refresh": "Refresh jobs",
+      "provider": "Provider",
+      "operation": "Operation",
+      "direction": "Direction",
+      "status": "Status",
+      "lastRun": "Last run"
+    },
+    "attention": {
+      "label": "Needs attention",
+      "value": "{count, plural, one {# incident} other {# incidents}}",
+      "note": "Retry or investigate below"
+    },
+    "scopes": {
+      "campaign_performance": "Campaign performance",
+      "audiences": "Audience sync",
+      "conversion_events": "Conversion events",
+      "creatives": "Creatives"
+    },
+    "directions": {
+      "sync": "Provider → Lulu",
+      "push": "Lulu → Provider",
+      "both": "Lulu ↔ Provider"
+    },
+    "statuses": {
+      "queued": "Queued",
+      "running": "Running",
+      "succeeded": "Success",
+      "failed": "Failed",
+      "retry_queued": "Retry queued"
+    },
+    "incidents": {
+      "eyebrow": "Incidents and retries",
+      "title": "Nothing fails silently.",
+      "none": "No open incidents.",
+      "retryAt": "Retry {time}",
+      "actionRequired": "Action required",
+      "retry": "Retry",
+      "review": "Review",
+      "retried": "Retry requested.",
+      "kinds": {
+        "rate_limited": "The provider returned a temporary rate-limit response.",
+        "consent_review": "Consent mapping needs review before the next sync.",
+        "auth_expired": "The account authorization has expired. Connect it again.",
+        "sync_failed": "The sync failed. Retry, or check the account."
+      }
+    },
+    "webhooks": {
+      "eyebrow": "Webhook events",
+      "title": "Events received from providers."
+    },
+    "reconcile": {
+      "eyebrow": "Reconciliation",
+      "title": "Compare provider and Lulu.",
+      "description": "Check whether spend, conversions and statuses match before closing the day.",
+      "share": "records reconciled",
+      "run": "Run reconciliation",
+      "done": "Reconciliation finished."
+    }
+  },
+  "billing": {
+    "roles": {
+      "owner": "Workspace owner",
+      "editor": "Marketing lead",
+      "reviewer": "Finance reviewer"
+    },
+    "limit": {
+      "eyebrow": "Workspace spend limit",
+      "perMonth": "{amount} / month",
+      "used": "Spend limit used",
+      "usage": "{used} used · {remaining} remaining",
+      "edit": "Edit limit"
+    },
+    "policy": {
+      "eyebrow": "Approval threshold",
+      "perChange": "{amount} per change",
+      "edit": "Edit policy",
+      "summary": {
+        "budget_and_launch": "Budget and launch changes above this amount need {role} approval.",
+        "all_changes": "Every campaign change above this amount needs {role} approval.",
+        "creative_only": "Creative changes need {role} approval.",
+        "none": "No approvals are required."
+      }
+    },
+    "payment": {
+      "eyebrow": "Payment status",
+      "status": {
+        "active": "Active",
+        "missing": "No payment method",
+        "failed": "Payment failed"
+      },
+      "card": "{brand} ···· {last4}",
+      "noCard": "No card on file.",
+      "canSpend": "All connected ad accounts can spend.",
+      "cannotSpend": "Ad accounts cannot spend until payment is fixed.",
+      "managedByBilling": "Payment methods are managed in Lulu billing, not here, so card details never pass through this module."
+    },
+    "history": {
+      "eyebrow": "Billing history",
+      "title": "Keep platform charges easy to review.",
+      "statement": "Statement",
+      "provider": "Provider",
+      "amount": "Amount",
+      "status": "Status",
+      "statuses": {
+        "paid": "Paid",
+        "due": "Due",
+        "failed": "Failed"
+      }
+    },
+    "limitForm": {
+      "eyebrow": "Spend control",
+      "title": "Protect the advertising budget.",
+      "description": "Set the monthly limit and when to warn.",
+      "monthly": "Monthly workspace limit ({currency})",
+      "alertAt": "Warning threshold",
+      "alertOption": "{share} of limit",
+      "notify": "Notify Finance before the limit is reached",
+      "invalid": "Enter a limit above 0.",
+      "saved": "Spend limit saved."
+    },
+    "policyForm": {
+      "eyebrow": "Approval policy",
+      "title": "Make approvals explicit.",
+      "description": "Define which spend, launch and creative changes need a second review.",
+      "scope": "Approval required for",
+      "scopes": {
+        "budget_and_launch": "Budget and launch changes",
+        "all_changes": "All campaign changes",
+        "creative_only": "Creative changes only",
+        "none": "Nothing"
+      },
+      "role": "Approver role",
+      "threshold": "Minimum change amount ({currency})",
+      "invalid": "Enter an amount of 0 or more.",
+      "draftHint": "✦ Changes stay in draft until the required permissions, consent and approvals are complete.",
+      "saved": "Approval policy saved."
+    }
+  },
+  "team": {
+    "invite": "Invite teammate",
+    "membersLabel": "Team members",
+    "invited": "Invited",
+    "changeRole": "Role",
+    "allowed": "Allowed:",
+    "notAllowed": "Not allowed:",
+    "roleChanged": "{name} is now {role}.",
+    "roles": {
+      "owner": "Owner",
+      "editor": "Editor",
+      "reviewer": "Reviewer",
+      "analyst": "Analyst"
+    },
+    "highlights": {
+      "allChannels": "All channels",
+      "budgetApproval": "Budget approval",
+      "launch": "Launch campaigns",
+      "campaignsCreatives": "Campaigns and creatives",
+      "reports": "Reports",
+      "billing": "Billing controls"
+    },
+    "matrix": {
+      "eyebrow": "Role matrix",
+      "title": "Permissions stay explicit.",
+      "role": "Role",
+      "view": "View",
+      "edit": "Edit",
+      "budget": "Budget",
+      "launch": "Launch",
+      "request": "Request"
+    },
+    "inviteForm": {
+      "eyebrow": "Invite teammate",
+      "title": "Give someone the right access.",
+      "description": "Choose a role and limit access to the channels or actions they need.",
+      "email": "Email address",
+      "emailPlaceholder": "teammate@company.com",
+      "role": "Role",
+      "scope": "Channel scope",
+      "scopes": {
+        "all": "All connected channels",
+        "google_ads": "Google Ads only",
+        "meta_ads": "Meta Ads only",
+        "reports_only": "Reports only"
+      },
+      "creatives": "Allow creative approvals",
+      "invalid": "Enter a valid email address.",
+      "submit": "Send invite",
+      "sent": "Invite sent to {email}."
+    }
   }
 }

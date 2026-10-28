@@ -22,7 +22,7 @@ Team: Sudais (PM), Abdul (Samteck), Franklin, theLady.
 | F1 | App shell to match the design (rail, top bar, page heading, Create campaign pop-up), Overview, Campaigns + campaign drawer | Abdul | open | P1 |
 | F2 | Planning, Audiences, Creatives, Reports views with their pop-ups | Abdul | open | F1 |
 | F3 | Tracking, Attribution & Data, Automations, Integrations, Platform Setup views | Sudais | in review | P1 |
-| F4 | Launch Checklist, Operations, Billing & Controls, Team & Permissions views | Sudais | open | F3 |
+| F4 | Launch Checklist, Operations, Billing & Controls, Team & Permissions views | Sudais | in review | F3 |
 
 ## Phases 1–4: the ad platforms, in Dave's order
 
