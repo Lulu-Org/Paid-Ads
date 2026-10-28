@@ -1,6 +1,6 @@
 # API: Lulu Paid Ads
 
-Base path `/api/v1`. JSON in and out, in the format from `AGENTS.md`. Every route except `POST /auth/login` and `GET /health` needs a bearer token, and every route checks the role's permission (`packages/shared/src/permissions.ts`). Lists take `page`, `pageSize` (max 100), `sort` (`field` or `-field`) and `q`.
+Base path `/api/v1`. Request and response shapes are the Zod schemas in `packages/shared/src/` (`campaign.ts`, `library.ts`, `controls.ts`, `metrics.ts`); money travels as `{ amount, currency }`. JSON in and out, in the format from `AGENTS.md`. Every route except `POST /auth/login` and `GET /health` needs a bearer token, and every route checks the role's permission (`packages/shared/src/permissions.ts`). Lists take `page`, `pageSize` (max 100), `sort` (`field` or `-field`) and `q`.
 
 ## Platform (done, same as the CRM)
 

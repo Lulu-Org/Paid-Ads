@@ -24,9 +24,9 @@ Platform tables (already in `apps/api/prisma/schema.prisma`, same as the CRM): `
 | CampaignMetricDay | campaignId, date, impressions, clicks, conversions, leads, spendAmount, revenueAmount, currency | One row per campaign per day, written by `ads.sync`. Totals, CTR (clicks ÷ impressions), CPL (spend ÷ leads) and ROAS (revenue ÷ spend) are computed, never stored. No soft delete. |
 | CampaignPlanStep | campaignId, order, label, detail, status (`PlanStepStatus`) | The design's campaign plan timeline. |
 | Audience | name, source (`crm_segment`, `website_visitors`, `customer_list`, `lookalike`), sizeEstimate, consentBasis, platforms (`AdPlatform`[]), lastSyncedAt | |
-| Creative | name, type (`search_ad`, `image`, `video`, `carousel`, `document`, `lead_form`, `landing_page`, `extension`), fileUrl, meta (JSON: formats, lengths), approvalStatus, approvedById | |
+| Creative | name, type (`search_ad`, `image`, `video`, `carousel`, `document`, `lead_form`, `landing_page`, `extension`, `profile`), fileUrl, meta (JSON: formats, lengths), approvalStatus, approvedById | |
 | CampaignCreative | campaignId, creativeId, variant (`A`, `B`, …) | Which creatives run where. No soft delete. |
-| ConversionEvent | name, source (`crm`, `accounting`, `website`, `call`), valueAmount, valueCurrency, platforms (`AdPlatform`[]), health (`mapped`, `needs_attention`) | The design's "Event mapping". |
+| ConversionEvent | name, source (`crm`, `calendar`, `accounting`, `website`, `call`), valueAmount, valueCurrency (both null = dynamic, the value comes with each conversion), platforms (`AdPlatform`[]), health (`mapped`, `needs_attention`) | The design's "Event mapping". |
 | AutomationRule | name, trigger (JSON), condition (JSON), action (`notify`, `recommend`, `pause_campaign`, `shift_budget`), enabled | Budget actions always go through an approval. |
 | SpendLimit | monthlyAmount, currency, alertAt (fraction, e.g. 0.8) | One per workspace. |
 | ApprovalPolicy | thresholdAmount, currency, approverRole | Changes above the threshold need approval. |

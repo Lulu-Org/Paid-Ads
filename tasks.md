@@ -14,7 +14,7 @@ Team: Sudais (PM), Abdul (Samteck), Franklin, theLady.
 | --- | --- | --- | --- | --- |
 | PM | Repo, invites, task board, daily status for Dave | Sudais | in progress | |
 | P0 | Repo from the CRM base: platform kept, CRM removed, 15 view routes, translations, docs | Sudais | done | |
-| P1 | Contract: shared Zod schemas for every table in `docs/data-model.md`, mock fixtures from the design | Sudais | open | |
+| P1 | Contract: shared Zod schemas for every table in `docs/data-model.md`, mock fixtures from the design | Sudais | in review | |
 | B1 | Database: Prisma tables and migration from `docs/data-model.md`, seed with the design's sample data | Franklin | open | P1 |
 | B2 | Campaigns API (list, detail, create, edit, plan, checklist), Overview API, metric maths (CTR, CPL, ROAS) with tests | Franklin | open | B1 |
 | B3 | Audiences, Creatives, Conversion events, Tracking health, Attribution API | theLady | open | B1 |
