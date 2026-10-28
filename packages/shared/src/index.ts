@@ -6,3 +6,7 @@ export * from "./api";
 export * from "./user";
 export * from "./audit";
 export * from "./permissions";
+export * from "./campaign";
+export * from "./library";
+export * from "./controls";
+export * from "./metrics";
