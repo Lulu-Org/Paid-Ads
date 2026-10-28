@@ -1,0 +1,17 @@
+# Build-context exclusions: everything the image builds itself or never needs.
+**/node_modules
+**/dist
+.next
+**/.next
+.git
+.env
+**/.env
+design
+docs
+coverage
+**/coverage
+*.log
+**/*.tsbuildinfo
+apps/api/src/generated
+.DS_Store
+opencode-rules.txt

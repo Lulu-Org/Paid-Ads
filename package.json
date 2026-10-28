@@ -1,0 +1,28 @@
+{
+  "name": "lulu-paid-ads",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w @lulu/web",
+    "build:web": "npm run build -w @lulu/web",
+    "lint:web": "npm run lint -w @lulu/web",
+    "dev:api": "npm run dev -w @lulu/api",
+    "build:api": "npm run build -w @lulu/api",
+    "lint:api": "npm run lint -w @lulu/api",
+    "typecheck:api": "npm run typecheck -w @lulu/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format:check": "npm run format:check -w @lulu/api",
+    "test:unit": "npm run test --workspaces --if-present",
+    "test:int": "npm run test:int -w @lulu/api",
+    "build": "npm run build -w @lulu/api",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:unit && npm run test:int && npm run build",
+    "test": "npm run test --workspaces --if-present",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v"
+  }
+}

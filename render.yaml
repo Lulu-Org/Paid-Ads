@@ -1,0 +1,39 @@
+# Render Blueprint for the API (render.com → New → Blueprint, pick this repo).
+# The web app is on Vercel and forwards /api/v1 here (API_PROXY_TARGET, apps/web/next.config.ts).
+# Values marked sync: false are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: lulu-paid-ads-api
+    runtime: docker
+    plan: free
+    branch: main
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/live
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "4000"
+      # Neon connection string (postgresql://...)
+      - key: DATABASE_URL
+        sync: false
+      # Upstash URL (rediss://...)
+      - key: REDIS_URL
+        sync: false
+      # The Vercel link of the web app
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      # "true" loads the design's sample data on every start (the entrypoint runs the seed).
+      # Off since Oct 23, 2026: the live workspace was emptied of sample data at Dave's request.
+      - key: SEED_ON_START
+        value: "false"
+      - key: SEED_OWNER_PASSWORD
+        sync: false
+      - key: SEED_MEMBER_PASSWORD
+        sync: false
+      - key: AI_PROVIDER
+        value: simulated

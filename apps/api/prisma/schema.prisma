@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  owner
+  admin
+  member
+}
+
+model Workspace {
+  id              String    @id @default(uuid())
+  name            String
+  defaultCurrency String    @default("EUR")
+  defaultLanguage String    @default("en")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  users       User[]
+  settings    Setting[]
+  permissions Permission[]
+
+  @@map("workspaces")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  workspaceId  String
+  name         String
+  email        String    @unique
+  passwordHash String?
+  language     String    @default("en")
+  role         Role      @default(member)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@map("users")
+}
+
+// Paid Ads tables (ad accounts, campaigns, metrics, ...) are added by task P1, following
+// docs/data-model.md. Every table has workspaceId (AGENTS.md rule 2).
+
+model Setting {
+  id          String    @id @default(uuid())
+  workspaceId String
+  key         String
+  value       Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, key])
+  @@map("settings")
+}
+
+model Permission {
+  id          String    @id @default(uuid())
+  workspaceId String
+  role        Role
+  resource    String
+  actions     String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, role, resource])
+  @@map("permissions")
+}
+
+// ---------------------------------------------------------------------------------------------
+// Platform alignment (Lulu platform architecture, Oct 23, 2026): audit log and domain-event outbox.
+// Both are written by the database layer for every change to a CRM record (src/db/audit.ts), so no
+// service can forget them. They keep a plain workspaceId (no foreign key): records of a workspace
+// must outlive the rows they describe. They are append-only and never soft deleted.
+
+enum AuditActorType {
+  user
+  ai
+  system
+
+  @@map("audit_actor_type")
+}
+
+enum OutboxStatus {
+  pending
+  dispatched
+  failed
+
+  @@map("outbox_status")
+}
+
+model AuditLog {
+  id            String         @id @default(uuid())
+  workspaceId   String
+  actorType     AuditActorType
+  actorId       String?
+  // create, update or delete (soft deletes count as delete).
+  action        String
+  // The record type, e.g. contact or ai_insight, and its id (null for bulk changes).
+  entityType    String
+  entityId      String?
+  // The fields the change set, with secrets left out.
+  changes       Json           @default("{}")
+  correlationId String
+  createdAt     DateTime       @default(now())
+
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, entityType, entityId])
+  @@map("audit_logs")
+}
+
+// One row per domain event (e.g. contact.updated), written next to the change and published by
+// the outbox dispatcher (src/jobs/outbox.ts). Consumers must be idempotent: delivery is at least once.
+model OutboxEvent {
+  id            String       @id @default(uuid())
+  workspaceId   String
+  eventType     String
+  schemaVersion Int          @default(1)
+  aggregateType String
+  aggregateId   String?
+  actorType     AuditActorType
+  actorId       String?
+  correlationId String
+  payload       Json         @default("{}")
+  occurredAt    DateTime     @default(now())
+  status        OutboxStatus @default(pending)
+  attempts      Int          @default(0)
+  lastError     String?
+  dispatchedAt  DateTime?
+
+  @@index([status, occurredAt])
+  @@index([workspaceId, occurredAt])
+  @@map("outbox_events")
+}

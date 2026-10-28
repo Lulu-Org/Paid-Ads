@@ -1,0 +1,63 @@
+# One-command local stack: npm run docker:up (see root package.json / README.md)
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: lulu
+      POSTGRES_PASSWORD: lulu_dev_password
+      POSTGRES_DB: lulu
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      # -h 127.0.0.1 forces TCP: initdb's temporary server only listens on the
+      # unix socket, so without it the healthcheck passes before the real
+      # server is up and the api's migrations fail with P1001 on a fresh volume.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U lulu -d lulu"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 2s
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    # The entrypoint (migrate + idempotent seed) is safe to retry, so a
+    # transient dependency blip self-heals instead of leaving the stack dead.
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: "4000"
+      DATABASE_URL: postgresql://lulu:lulu_dev_password@postgres:5432/lulu
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      SEED_ON_START: ${SEED_ON_START:-true}
+      JWT_SECRET: ${JWT_SECRET:-}
+      AI_PROVIDER: ${AI_PROVIDER:-simulated}
+      AI_API_KEY: ${AI_API_KEY:-}
+
+volumes:
+  pg-data:
+  redis-data:

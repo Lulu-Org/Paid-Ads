@@ -1,0 +1,154 @@
+{
+  "app": {
+    "title": "Lulu Paid Ads",
+    "module": "Paid Ads"
+  },
+  "nav": {
+    "overview": "Übersicht",
+    "campaigns": "Kampagnen",
+    "planning": "Planung",
+    "audiences": "Zielgruppen",
+    "creatives": "Creatives",
+    "tracking": "Tracking",
+    "attribution": "Attribution & Daten",
+    "reports": "Berichte",
+    "automations": "Automationen",
+    "integrations": "Integrationen",
+    "setup": "Plattform-Einrichtung",
+    "checklist": "Launch-Checkliste",
+    "operations": "Betrieb",
+    "billing": "Abrechnung & Kontrollen",
+    "team": "Team & Berechtigungen"
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "search": "Suchen",
+    "close": "Schließen",
+    "loading": "Wird geladen…",
+    "comingSoon": "Diese Seite folgt in Kürze",
+    "language": "Sprache",
+    "error": "Etwas ist schiefgelaufen",
+    "retry": "Erneut versuchen",
+    "previous": "Vorherige Seite",
+    "next": "Nächste Seite",
+    "selectAll": "Alle auswählen",
+    "selectRow": "{name} auswählen",
+    "confirm": "Bestätigen",
+    "noResults": "Keine Ergebnisse"
+  },
+  "layout": {
+    "tagline": "Growth OS",
+    "workspace": "Arbeitsbereich",
+    "modules": "Module",
+    "active": "Aktiv",
+    "workspaceOwner": "Inhaber des Arbeitsbereichs",
+    "searchWorkspace": "Diesen Arbeitsbereich durchsuchen",
+    "help": "Hilfe",
+    "notifications": "Benachrichtigungen",
+    "menu": "Menü",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "breadcrumb": "Navigationspfad",
+    "profileMenu": "Profilmenü",
+    "role": {
+      "owner": "Workspace-Inhaber",
+      "admin": "Admin",
+      "member": "Mitglied"
+    },
+    "paidAds": "Paid Ads"
+  },
+  "modules": {
+    "onlinePresence": "Online-Präsenz",
+    "accounting": "Buchhaltung",
+    "email": "E-Mail",
+    "calendar": "Kalender",
+    "crm": "CRM",
+    "marketplace": "Marktplatz",
+    "workspaceSettings": "Einstellungen",
+    "paidAds": "Paid Ads"
+  },
+  "pages": {
+    "eyebrow": "Lulu Paid Ads · {page}",
+    "overview": {
+      "description": "Aus Aufmerksamkeit wird Wachstum."
+    },
+    "campaigns": {
+      "description": "Jede Kampagne klar im Blick."
+    },
+    "planning": {
+      "description": "Budget planen, bevor es ausgegeben wird."
+    },
+    "audiences": {
+      "description": "Zielgruppen, die über alle Kanäle funktionieren."
+    },
+    "creatives": {
+      "description": "Jedes Creative erstellen, vergleichen und verbessern."
+    },
+    "tracking": {
+      "description": "Wissen, was aus jedem Klick wird."
+    },
+    "attribution": {
+      "description": "Geschäftsergebnisse mit jeder Kampagne verbinden."
+    },
+    "reports": {
+      "description": "Jeden Euro leichter verständlich machen."
+    },
+    "automations": {
+      "description": "Der Workspace behält die Details im Blick."
+    },
+    "integrations": {
+      "description": "Jedes Werbekonto verbunden halten."
+    },
+    "setup": {
+      "description": "Jeden Kanal einrichten, ohne die Kontrolle zu verlieren."
+    },
+    "checklist": {
+      "description": "Jede Kampagne vor dem Start prüfen."
+    },
+    "operations": {
+      "description": "Syncs, Webhooks und Vorfälle sichtbar halten."
+    },
+    "billing": {
+      "description": "Ausgaben und Freigaben unter Kontrolle halten."
+    },
+    "team": {
+      "description": "Jedem Teammitglied die richtigen Rechte geben."
+    }
+  },
+  "errors": {
+    "NETWORK_ERROR": "Server nicht erreichbar. Bitte Verbindung prüfen.",
+    "UNKNOWN_ERROR": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+    "VALIDATION_ERROR": "Einige Felder müssen geprüft werden",
+    "UNAUTHORIZED": "Bitte melden Sie sich erneut an",
+    "FORBIDDEN": "Dafür fehlt Ihnen die Berechtigung",
+    "NOT_FOUND": "Nicht gefunden",
+    "CONFLICT": "Dies steht im Konflikt mit etwas, das bereits existiert",
+    "RATE_LIMITED": "Zu viele Anfragen. Bitte kurz warten und erneut versuchen.",
+    "INTERNAL_ERROR": "Auf unserer Seite ist etwas schiefgelaufen. Bitte versuche es erneut."
+  },
+  "time": {
+    "todayAt": "Heute, {time}",
+    "yesterdayAt": "Gestern, {time}",
+    "weekdayAt": "{day}, {time}"
+  },
+  "auth": {
+    "brand": "Lulu",
+    "eyebrow": "Lulu CRM",
+    "title": "Bei deinem Arbeitsbereich anmelden",
+    "intro": "Verwende die E-Mail-Adresse und das Passwort deines Lulu-Kontos.",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "checking": "Sitzung wird geprüft…",
+    "signOut": "Abmelden",
+    "mockHint": "Beispieldaten-Modus: Melde dich als {email} mit einem beliebigen Passwort an.",
+    "errors": {
+      "missing": "Gib deine E-Mail-Adresse und dein Passwort ein.",
+      "wrong": "E-Mail-Adresse oder Passwort ist falsch."
+    }
+  }
+}

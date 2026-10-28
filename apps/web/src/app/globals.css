@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens, taken from design/src/components/generated/LuluCRM.css.
+ * Change a colour here, not in components.
+ */
+:root {
+  /* Surfaces */
+  --color-bg: #f7f7fb;
+  --color-surface: #ffffff;
+  --color-surface-soft: #fcfbff;
+  --color-surface-muted: #f0eff5;
+
+  /* Text */
+  --color-text: #29263d;
+  --color-text-strong: #4b4758;
+  --color-text-muted: #777587;
+  --color-text-subtle: #9996a7;
+  --color-text-faint: #aaa8b7;
+
+  /* Borders */
+  --color-border: #e9e9f1;
+  --color-border-strong: #e5e3ec;
+
+  /* Brand */
+  --color-primary: #5f54e8;
+  --color-primary-hover: #5c53bd;
+  --color-primary-soft: #eeecff;
+  --color-primary-light: #b897ff;
+  --color-accent: #75eef2;
+
+  /* Left rail */
+  --color-rail: #17182c;
+  --color-rail-text: #aeb5ce;
+  --color-rail-label: #7980a6;
+  --color-rail-hover: #26345e;
+  --color-rail-active: #302e50;
+  --color-rail-indicator: #9b8cff;
+
+  /* Status */
+  --color-success: #3f946a;
+  --color-success-soft: #e3f5ea;
+  --color-warning: #a7742f;
+  --color-warning-soft: #fff1dc;
+  --color-info: #60a7de;
+  --color-info-soft: #e6f4fb;
+  --color-neutral: #777486;
+  --color-neutral-soft: #f2f1f5;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+
+  /* Shadows */
+  --shadow-card: 0 8px 22px #24243a05;
+  --shadow-raised: 0 9px 20px #24243a09;
+  --shadow-brand: 0 9px 20px #5f54e84a;
+
+  /* Layout */
+  --rail-width: 270px;
+}
+
+/* Expose the tokens to Tailwind: bg-bg, text-text-muted, border-border, rounded-lg ... */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-soft: var(--color-surface-soft);
+  --color-surface-muted: var(--color-surface-muted);
+
+  --color-text: var(--color-text);
+  --color-text-strong: var(--color-text-strong);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-subtle: var(--color-text-subtle);
+  --color-text-faint: var(--color-text-faint);
+
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-primary-light: var(--color-primary-light);
+  --color-accent: var(--color-accent);
+
+  --color-rail: var(--color-rail);
+  --color-rail-text: var(--color-rail-text);
+  --color-rail-label: var(--color-rail-label);
+  --color-rail-hover: var(--color-rail-hover);
+  --color-rail-active: var(--color-rail-active);
+  --color-rail-indicator: var(--color-rail-indicator);
+
+  --color-success: var(--color-success);
+  --color-success-soft: var(--color-success-soft);
+  --color-warning: var(--color-warning);
+  --color-warning-soft: var(--color-warning-soft);
+  --color-info: var(--color-info);
+  --color-info-soft: var(--color-info-soft);
+  --color-neutral: var(--color-neutral);
+  --color-neutral-soft: var(--color-neutral-soft);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-brand: var(--shadow-brand);
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}

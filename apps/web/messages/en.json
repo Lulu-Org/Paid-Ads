@@ -1,0 +1,154 @@
+{
+  "app": {
+    "title": "Lulu Paid Ads",
+    "module": "Paid Ads"
+  },
+  "nav": {
+    "overview": "Overview",
+    "campaigns": "Campaigns",
+    "planning": "Planning",
+    "audiences": "Audiences",
+    "creatives": "Creatives",
+    "tracking": "Tracking",
+    "attribution": "Attribution & Data",
+    "reports": "Reports",
+    "automations": "Automations",
+    "integrations": "Integrations",
+    "setup": "Platform Setup",
+    "checklist": "Launch Checklist",
+    "operations": "Operations",
+    "billing": "Billing & Controls",
+    "team": "Team & Permissions"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "close": "Close",
+    "loading": "Loading…",
+    "comingSoon": "This page is coming soon",
+    "language": "Language",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "previous": "Previous page",
+    "next": "Next page",
+    "selectAll": "Select all",
+    "selectRow": "Select {name}",
+    "confirm": "Confirm",
+    "noResults": "No results"
+  },
+  "layout": {
+    "tagline": "Growth OS",
+    "workspace": "Workspace",
+    "modules": "Modules",
+    "active": "Active",
+    "workspaceOwner": "Workspace owner",
+    "searchWorkspace": "Search this workspace",
+    "help": "Help",
+    "notifications": "Notifications",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "breadcrumb": "Breadcrumb",
+    "profileMenu": "Profile menu",
+    "role": {
+      "owner": "Workspace owner",
+      "admin": "Admin",
+      "member": "Member"
+    },
+    "paidAds": "Paid Ads"
+  },
+  "modules": {
+    "onlinePresence": "Online Presence",
+    "accounting": "Accounting",
+    "email": "Email",
+    "calendar": "Calendar",
+    "crm": "CRM",
+    "marketplace": "Marketplace",
+    "workspaceSettings": "Settings",
+    "paidAds": "Paid Ads"
+  },
+  "pages": {
+    "eyebrow": "Lulu Paid Ads · {page}",
+    "overview": {
+      "description": "Turn attention into growth."
+    },
+    "campaigns": {
+      "description": "Every campaign, clearly in view."
+    },
+    "planning": {
+      "description": "Plan spend before it happens."
+    },
+    "audiences": {
+      "description": "Build audiences that travel across channels."
+    },
+    "creatives": {
+      "description": "Create, compare and improve every creative."
+    },
+    "tracking": {
+      "description": "Know exactly what every click becomes."
+    },
+    "attribution": {
+      "description": "Connect business outcomes to every campaign."
+    },
+    "reports": {
+      "description": "Make every euro easier to understand."
+    },
+    "automations": {
+      "description": "Let the workspace watch the details."
+    },
+    "integrations": {
+      "description": "Keep every ad account connected."
+    },
+    "setup": {
+      "description": "Configure every channel without losing control."
+    },
+    "checklist": {
+      "description": "Validate every campaign before it goes live."
+    },
+    "operations": {
+      "description": "Keep syncs, webhooks and incidents visible."
+    },
+    "billing": {
+      "description": "Keep spend and approvals under control."
+    },
+    "team": {
+      "description": "Give every teammate the right access."
+    }
+  },
+  "errors": {
+    "NETWORK_ERROR": "Can't reach the server. Check your connection.",
+    "UNKNOWN_ERROR": "Something went wrong. Please try again.",
+    "VALIDATION_ERROR": "Some fields need attention",
+    "UNAUTHORIZED": "Please sign in again",
+    "FORBIDDEN": "You don't have permission to do this",
+    "NOT_FOUND": "Not found",
+    "CONFLICT": "This conflicts with something that already exists",
+    "RATE_LIMITED": "Too many requests. Please wait a moment and try again.",
+    "INTERNAL_ERROR": "Something went wrong on our side. Please try again."
+  },
+  "time": {
+    "todayAt": "Today, {time}",
+    "yesterdayAt": "Yesterday, {time}",
+    "weekdayAt": "{day}, {time}"
+  },
+  "auth": {
+    "brand": "Lulu",
+    "eyebrow": "Lulu CRM",
+    "title": "Sign in to your workspace",
+    "intro": "Use the email and password of your Lulu account.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "checking": "Checking your session…",
+    "signOut": "Sign out",
+    "mockHint": "Sample data mode: sign in as {email} with any password.",
+    "errors": {
+      "missing": "Enter your email and password.",
+      "wrong": "Email or password is incorrect."
+    }
+  }
+}
