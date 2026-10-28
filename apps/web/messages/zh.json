@@ -150,5 +150,277 @@
       "missing": "请输入邮箱和密码。",
       "wrong": "邮箱或密码不正确。"
     }
+  },
+  "platforms": {
+    "google_ads": {
+      "name": "Google Ads",
+      "detail": "搜索、展示与 YouTube"
+    },
+    "google_lsa": {
+      "name": "Google LSA",
+      "detail": "本地服务广告"
+    },
+    "meta_ads": {
+      "name": "Meta Ads",
+      "detail": "Facebook 与 Instagram"
+    },
+    "linkedin_ads": {
+      "name": "LinkedIn Ads",
+      "detail": "B2B 受众广告活动"
+    }
+  },
+  "eventSources": {
+    "crm": "CRM",
+    "calendar": "日历",
+    "accounting": "会计",
+    "website": "网站",
+    "call": "电话"
+  },
+  "tracking": {
+    "health": {
+      "label": "跟踪状态",
+      "healthy": "正常",
+      "unhealthy": "需检查",
+      "note": "所有活跃渠道均在接收事件"
+    },
+    "today": {
+      "label": "今日事件",
+      "note": "较昨日 {change}"
+    },
+    "attention": {
+      "label": "需要关注",
+      "value": "{count, plural, other {# 个事件}}",
+      "note": "检查线下转化映射"
+    },
+    "events": {
+      "eyebrow": "转化事件",
+      "title": "什么算作结果。",
+      "add": "添加事件",
+      "event": "事件",
+      "source": "来源",
+      "lastReceived": "最近接收",
+      "status": "状态",
+      "never": "尚未接收"
+    },
+    "eventHealth": {
+      "mapped": "正常",
+      "needs_attention": "需检查"
+    },
+    "utm": {
+      "eyebrow": "UTM 生成器",
+      "title": "让每次点击都可归因。",
+      "url": "落地页",
+      "source": "来源",
+      "campaign": "广告活动",
+      "content": "内容",
+      "link": "跟踪链接",
+      "invalidUrl": "请输入完整地址，例如 https://example.com/",
+      "copy": "复制跟踪链接",
+      "copied": "已复制跟踪链接。",
+      "copyFailed": "无法复制，请手动选择并复制链接。"
+    },
+    "addEvent": {
+      "eyebrow": "转化事件",
+      "title": "定义什么算作结果。",
+      "description": "将业务结果映射到应接收它的来源和平台。",
+      "name": "事件名称",
+      "namePlaceholder": "例如：合格线索",
+      "source": "来源",
+      "value": "价值（欧元）",
+      "valuePlaceholder": "留空 = 动态",
+      "platforms": "发送到",
+      "invalid": "请输入名称，至少选择一个平台，价值需为 0 或以上。",
+      "submit": "添加事件",
+      "saved": "已添加事件。"
+    }
+  },
+  "attribution": {
+    "quality": {
+      "label": "数据质量",
+      "note": "事件已关联到真实结果"
+    },
+    "revenue": {
+      "label": "归因收入",
+      "note": "来自 CRM 和会计"
+    },
+    "unmapped": {
+      "label": "未映射事件",
+      "note": "下次报告前请检查"
+    },
+    "model": {
+      "eyebrow": "归因模型",
+      "title": "选择价值如何分配。",
+      "description": "在模型影响广告决策之前进行比较。",
+      "label": "归因模型",
+      "byPlatform": "各平台归因收入"
+    },
+    "models": {
+      "data_driven": "数据驱动",
+      "last_touch": "最终触点",
+      "first_touch": "首次触点",
+      "linear": "线性"
+    },
+    "mapping": {
+      "eyebrow": "事件映射",
+      "title": "业务结果，全面连接。",
+      "value": "价值",
+      "health": "状态",
+      "dynamic": "动态",
+      "status": {
+        "mapped": "已映射",
+        "needs_attention": "需检查"
+      }
+    },
+    "lineage": {
+      "eyebrow": "数据来源",
+      "title": "数字从何而来。",
+      "adClick": "广告点击",
+      "websiteForm": "网站表单",
+      "crmLead": "CRM 线索",
+      "calendarBooking": "日历预约",
+      "revenue": "收入"
+    }
+  },
+  "automations": {
+    "create": "创建规则",
+    "rulesLabel": "自动化规则",
+    "on": "开启",
+    "off": "已暂停",
+    "edit": "编辑",
+    "editRule": "编辑 {name}",
+    "pause": "暂停",
+    "resume": "恢复",
+    "paused": "已暂停 {name}。",
+    "resumed": "已恢复 {name}。",
+    "rule": {
+      "when": "当{metric}在 {window} 内{operator} {value} 时，{action}。",
+      "digest": "按计划向团队发送渠道对比和归因变化。",
+      "allChannels": "所有渠道",
+      "metrics": {
+        "cpl": "单个线索成本",
+        "ctr": "点击率",
+        "roas": "ROAS",
+        "spend": "花费",
+        "leads": "线索数"
+      },
+      "operators": {
+        "above": "高于",
+        "below": "低于"
+      },
+      "window": {
+        "hours": "{count, plural, other {# 小时}}",
+        "days": "{count, plural, other {# 天}}"
+      },
+      "actions": {
+        "notify": "通知广告活动负责人",
+        "recommend": "通知负责人并申请预算审核",
+        "pause_campaign": "暂停广告活动并创建事件",
+        "shift_budget": "申请调整预算的审批",
+        "send_digest": "发送每周摘要"
+      }
+    },
+    "form": {
+      "eyebrow": "新建自动化",
+      "editEyebrow": "编辑自动化",
+      "title": "把信号变成行动。",
+      "description": "设置触发条件和安全的操作。预算变更始终需要审批。",
+      "name": "规则名称",
+      "namePlaceholder": "例如：保护目标 CPL",
+      "metric": "指标",
+      "operator": "为",
+      "value": "数值",
+      "window": "持续",
+      "unit": "单位",
+      "units": {
+        "hours": "小时",
+        "days": "天"
+      },
+      "action": "然后",
+      "approvalHint": "此操作会先申请审批，不会自动更改。",
+      "platforms": "平台",
+      "allPlatformsHint": "不勾选 = 所有平台。",
+      "invalid": "请输入名称、数值，以及 1 到 90 之间的时长。",
+      "submit": "创建规则",
+      "save": "保存规则",
+      "created": "已创建规则。",
+      "updated": "已保存规则。"
+    },
+    "activity": {
+      "eyebrow": "最近的自动化活动",
+      "title": "每个自动决策都清晰可见。",
+      "rule": "规则",
+      "action": "操作",
+      "campaign": "广告活动",
+      "time": "时间",
+      "allChannels": "所有渠道",
+      "empty": "暂无自动操作。",
+      "outcomes": {
+        "review_requested": "已申请审核",
+        "paused": "已暂停广告活动",
+        "notified": "已通知负责人",
+        "digest_sent": "已发送给团队",
+        "budget_shifted": "已调整预算"
+      }
+    }
+  },
+  "integrations": {
+    "platformsLabel": "广告平台",
+    "statusConnected": "已连接",
+    "statusNotConnected": "未连接",
+    "scopes": {
+      "campaigns": "广告活动",
+      "assets": "广告和素材",
+      "performance": "效果数据"
+    },
+    "lastSync": "上次同步 {time} · 权限已审核",
+    "needsAuthorization": "需要账户授权",
+    "connect": "连接",
+    "syncNow": "立即同步",
+    "connected": "已连接 {platform}。",
+    "syncQueued": "已开始同步 {platform}。",
+    "history": {
+      "eyebrow": "同步记录",
+      "title": "平台操作始终可追踪。",
+      "empty": "暂无同步记录。",
+      "status": {
+        "queued": "排队中",
+        "running": "进行中",
+        "succeeded": "成功",
+        "failed": "失败"
+      },
+      "kind": {
+        "sync": "广告活动、花费和转化",
+        "push": "已发送广告活动更改"
+      }
+    }
+  },
+  "setup": {
+    "connectProvider": "＋ 连接平台",
+    "channelsLabel": "渠道",
+    "account": "账户",
+    "tracking": "跟踪",
+    "trackingHealthy": "正常",
+    "trackingReview": "需检查",
+    "permissions": "权限",
+    "permissionList": "广告活动 · 受众 · 转化",
+    "policy": "政策状态",
+    "noIssues": "✓ 无问题",
+    "connectedAgo": "已连接 · {time}",
+    "notConnected": "未连接",
+    "on": "开启",
+    "off": "关闭",
+    "defaults": {
+      "eyebrow": "默认设置",
+      "title": "应用于新广告活动的保护规则。",
+      "edit": "编辑保护规则 →",
+      "description": "适用于所有平台上的每个新广告活动。",
+      "consentRequired": "需要同意",
+      "consentRequiredHint": "受众必须具有同意依据。",
+      "autoTagLinks": "自动添加链接标签",
+      "autoTagLinksHint": "为每个广告链接添加 UTM 标签。",
+      "policyValidation": "政策验证",
+      "policyValidationHint": "上线前根据平台政策检查广告。",
+      "saved": "已保存保护规则。"
+    }
   }
 }

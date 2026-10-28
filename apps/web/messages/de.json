@@ -150,5 +150,277 @@
       "missing": "Gib deine E-Mail-Adresse und dein Passwort ein.",
       "wrong": "E-Mail-Adresse oder Passwort ist falsch."
     }
+  },
+  "platforms": {
+    "google_ads": {
+      "name": "Google Ads",
+      "detail": "Suche, Display & YouTube"
+    },
+    "google_lsa": {
+      "name": "Google LSA",
+      "detail": "Local Services Ads"
+    },
+    "meta_ads": {
+      "name": "Meta Ads",
+      "detail": "Facebook & Instagram"
+    },
+    "linkedin_ads": {
+      "name": "LinkedIn Ads",
+      "detail": "B2B-Zielgruppenkampagnen"
+    }
+  },
+  "eventSources": {
+    "crm": "CRM",
+    "calendar": "Kalender",
+    "accounting": "Buchhaltung",
+    "website": "Website",
+    "call": "Anruf"
+  },
+  "tracking": {
+    "health": {
+      "label": "Tracking-Status",
+      "healthy": "Gesund",
+      "unhealthy": "Prüfen",
+      "note": "Alle aktiven Kanäle empfangen Ereignisse"
+    },
+    "today": {
+      "label": "Ereignisse heute",
+      "note": "{change} gegenüber gestern"
+    },
+    "attention": {
+      "label": "Braucht Aufmerksamkeit",
+      "value": "{count, plural, one {# Ereignis} other {# Ereignisse}}",
+      "note": "Offline-Conversion-Zuordnung prüfen"
+    },
+    "events": {
+      "eyebrow": "Conversion-Ereignisse",
+      "title": "Was als Ergebnis zählt.",
+      "add": "Ereignis hinzufügen",
+      "event": "Ereignis",
+      "source": "Quelle",
+      "lastReceived": "Zuletzt empfangen",
+      "status": "Status",
+      "never": "Noch nicht"
+    },
+    "eventHealth": {
+      "mapped": "Gesund",
+      "needs_attention": "Prüfen"
+    },
+    "utm": {
+      "eyebrow": "UTM-Builder",
+      "title": "Jeden Klick zuordenbar halten.",
+      "url": "Landingpage",
+      "source": "Quelle",
+      "campaign": "Kampagne",
+      "content": "Inhalt",
+      "link": "Tracking-Link",
+      "invalidUrl": "Vollständige Adresse eingeben, z. B. https://example.com/",
+      "copy": "Tracking-Link kopieren",
+      "copied": "Tracking-Link kopiert.",
+      "copyFailed": "Kopieren fehlgeschlagen. Link markieren und kopieren."
+    },
+    "addEvent": {
+      "eyebrow": "Conversion-Ereignis",
+      "title": "Festlegen, was als Ergebnis zählt.",
+      "description": "Ein Geschäftsergebnis den Quellen und Plattformen zuordnen, die es erhalten sollen.",
+      "name": "Name des Ereignisses",
+      "namePlaceholder": "z. B. Qualifizierter Lead",
+      "source": "Quelle",
+      "value": "Wert (EUR)",
+      "valuePlaceholder": "Leer = dynamisch",
+      "platforms": "Senden an",
+      "invalid": "Namen eingeben, mindestens eine Plattform wählen und einen Wert ab 0.",
+      "submit": "Ereignis hinzufügen",
+      "saved": "Ereignis hinzugefügt."
+    }
+  },
+  "attribution": {
+    "quality": {
+      "label": "Datenqualität",
+      "note": "Ereignisse mit echten Ergebnissen verknüpft"
+    },
+    "revenue": {
+      "label": "Zugeordneter Umsatz",
+      "note": "Aus CRM und Buchhaltung"
+    },
+    "unmapped": {
+      "label": "Nicht zugeordnete Ereignisse",
+      "note": "Vor dem nächsten Bericht prüfen"
+    },
+    "model": {
+      "eyebrow": "Attributionsmodell",
+      "title": "Festlegen, wie Wert zugeordnet wird.",
+      "description": "Modelle vergleichen, bevor sie Kampagnenentscheidungen beeinflussen.",
+      "label": "Attributionsmodell",
+      "byPlatform": "Zugeordneter Umsatz nach Plattform"
+    },
+    "models": {
+      "data_driven": "Datengetrieben",
+      "last_touch": "Letzter Kontakt",
+      "first_touch": "Erster Kontakt",
+      "linear": "Linear"
+    },
+    "mapping": {
+      "eyebrow": "Ereigniszuordnung",
+      "title": "Geschäftsergebnisse, verbunden.",
+      "value": "Wert",
+      "health": "Status",
+      "dynamic": "Dynamisch",
+      "status": {
+        "mapped": "Zugeordnet",
+        "needs_attention": "Prüfen"
+      }
+    },
+    "lineage": {
+      "eyebrow": "Datenherkunft",
+      "title": "Woher die Zahl kommt.",
+      "adClick": "Anzeigenklick",
+      "websiteForm": "Website-Formular",
+      "crmLead": "CRM-Lead",
+      "calendarBooking": "Kalenderbuchung",
+      "revenue": "Umsatz"
+    }
+  },
+  "automations": {
+    "create": "Regel erstellen",
+    "rulesLabel": "Automatisierungsregeln",
+    "on": "An",
+    "off": "Pausiert",
+    "edit": "Bearbeiten",
+    "editRule": "{name} bearbeiten",
+    "pause": "Pausieren",
+    "resume": "Fortsetzen",
+    "paused": "{name} pausiert.",
+    "resumed": "{name} fortgesetzt.",
+    "rule": {
+      "when": "Wenn {metric} {operator} {value} liegt, für {window}: {action}.",
+      "digest": "Nach Zeitplan Kanalvergleich und Attributionsänderungen an das Team senden.",
+      "allChannels": "Alle Kanäle",
+      "metrics": {
+        "cpl": "die Kosten pro Lead",
+        "ctr": "die Klickrate",
+        "roas": "der ROAS",
+        "spend": "die Ausgaben",
+        "leads": "die Leads"
+      },
+      "operators": {
+        "above": "über",
+        "below": "unter"
+      },
+      "window": {
+        "hours": "{count, plural, one {# Stunde} other {# Stunden}}",
+        "days": "{count, plural, one {# Tag} other {# Tage}}"
+      },
+      "actions": {
+        "notify": "Kampagnenverantwortliche benachrichtigen",
+        "recommend": "Verantwortliche benachrichtigen und Budgetprüfung anfordern",
+        "pause_campaign": "Kampagne pausieren und Vorfall anlegen",
+        "shift_budget": "Freigabe für Budgetverschiebung anfordern",
+        "send_digest": "Wochenübersicht senden"
+      }
+    },
+    "form": {
+      "eyebrow": "Neue Automatisierung",
+      "editEyebrow": "Automatisierung bearbeiten",
+      "title": "Aus einem Signal wird eine Aktion.",
+      "description": "Auslöser, Bedingung und sichere Aktion festlegen. Budgetänderungen brauchen immer eine Freigabe.",
+      "name": "Name der Regel",
+      "namePlaceholder": "z. B. Ziel-CPL schützen",
+      "metric": "Kennzahl",
+      "operator": "Ist",
+      "value": "Wert",
+      "window": "Für",
+      "unit": "Einheit",
+      "units": {
+        "hours": "Stunden",
+        "days": "Tage"
+      },
+      "action": "Dann",
+      "approvalHint": "Dies fordert zuerst eine Freigabe an; nichts ändert sich von selbst.",
+      "platforms": "Plattformen",
+      "allPlatformsHint": "Keine gewählt = alle Plattformen.",
+      "invalid": "Namen, Wert und einen Zeitraum von 1 bis 90 eingeben.",
+      "submit": "Regel erstellen",
+      "save": "Regel speichern",
+      "created": "Regel erstellt.",
+      "updated": "Regel gespeichert."
+    },
+    "activity": {
+      "eyebrow": "Letzte Automatisierungen",
+      "title": "Jede automatische Entscheidung ist sichtbar.",
+      "rule": "Regel",
+      "action": "Aktion",
+      "campaign": "Kampagne",
+      "time": "Zeit",
+      "allChannels": "Alle Kanäle",
+      "empty": "Noch keine automatischen Aktionen.",
+      "outcomes": {
+        "review_requested": "Prüfung angefordert",
+        "paused": "Kampagne pausiert",
+        "notified": "Verantwortliche benachrichtigt",
+        "digest_sent": "An Team gesendet",
+        "budget_shifted": "Budget verschoben"
+      }
+    }
+  },
+  "integrations": {
+    "platformsLabel": "Werbeplattformen",
+    "statusConnected": "Verbunden",
+    "statusNotConnected": "Nicht verbunden",
+    "scopes": {
+      "campaigns": "Kampagnen",
+      "assets": "Anzeigen und Assets",
+      "performance": "Leistungsdaten"
+    },
+    "lastSync": "Letzter Sync {time} · Berechtigungen geprüft",
+    "needsAuthorization": "Kontofreigabe erforderlich",
+    "connect": "Verbinden",
+    "syncNow": "Jetzt synchronisieren",
+    "connected": "{platform} verbunden.",
+    "syncQueued": "Sync für {platform} gestartet.",
+    "history": {
+      "eyebrow": "Sync-Verlauf",
+      "title": "Anbietervorgänge bleiben nachvollziehbar.",
+      "empty": "Noch keine Syncs.",
+      "status": {
+        "queued": "Wartet",
+        "running": "Läuft",
+        "succeeded": "Erfolgreich",
+        "failed": "Fehlgeschlagen"
+      },
+      "kind": {
+        "sync": "Kampagnen, Ausgaben und Conversions",
+        "push": "Kampagnenänderungen gesendet"
+      }
+    }
+  },
+  "setup": {
+    "connectProvider": "＋ Anbieter verbinden",
+    "channelsLabel": "Kanäle",
+    "account": "Konto",
+    "tracking": "Tracking",
+    "trackingHealthy": "Gesund",
+    "trackingReview": "Prüfen",
+    "permissions": "Berechtigungen",
+    "permissionList": "Kampagnen · Zielgruppen · Conversions",
+    "policy": "Richtlinienstatus",
+    "noIssues": "✓ Keine Probleme",
+    "connectedAgo": "Verbunden · {time}",
+    "notConnected": "Nicht verbunden",
+    "on": "An",
+    "off": "Aus",
+    "defaults": {
+      "eyebrow": "Standards",
+      "title": "Leitplanken für neue Kampagnen.",
+      "edit": "Leitplanken bearbeiten →",
+      "description": "Gilt für jede neue Kampagne auf jeder Plattform.",
+      "consentRequired": "Einwilligung erforderlich",
+      "consentRequiredHint": "Zielgruppen brauchen eine Einwilligungsgrundlage.",
+      "autoTagLinks": "Links automatisch taggen",
+      "autoTagLinksHint": "UTM-Tags an jeden Anzeigenlink anhängen.",
+      "policyValidation": "Richtlinienprüfung",
+      "policyValidationHint": "Anzeigen vor dem Start gegen Plattformrichtlinien prüfen.",
+      "saved": "Leitplanken gespeichert."
+    }
   }
 }

@@ -2,13 +2,17 @@ import type {
   AdAccount,
   ApprovalPolicy,
   Audience,
+  Attribution,
+  AutomationActivity,
   AutomationRule,
+  CampaignDefaults,
   Campaign,
   CampaignMetricDay,
   CampaignPlanStep,
   ConversionEvent,
   Creative,
   SyncRun,
+  TrackingHealth,
   User,
 } from "@lulu/shared";
 
@@ -43,10 +47,10 @@ const account = (id: string, platform: AdAccount["platform"], name: string, last
 });
 
 export const demoAdAccounts: AdAccount[] = [
-  account("account_google_ads", "google_ads", "Lulu Studio · Google Ads", "2026-10-28T08:52:00.000Z"),
-  account("account_google_lsa", "google_lsa", "Lulu Studio · Local Services", "2026-10-28T08:52:00.000Z"),
-  account("account_meta", "meta_ads", "Lulu Studio · Meta", "2026-10-28T08:52:00.000Z"),
-  account("account_linkedin", "linkedin_ads", "Lulu Studio · LinkedIn", null),
+  account("account_google_ads", "google_ads", "Lulu Growth · 123-456", "2026-10-28T08:52:00.000Z"),
+  account("account_google_lsa", "google_lsa", "Lulu Berlin Local", "2026-10-28T08:52:00.000Z"),
+  account("account_meta", "meta_ads", "Lulu Studio Business", "2026-10-28T08:52:00.000Z"),
+  account("account_linkedin", "linkedin_ads", "Lulu Intelligence Page", null),
 ];
 
 // ---------- Campaigns ----------
@@ -282,10 +286,25 @@ export const demoAudiences: Audience[] = [
 // ---------- Tracking ----------
 
 export const demoConversionEvents: ConversionEvent[] = [
-  { ...base, id: "event_qualified_lead", name: "Qualified lead", source: "crm", value: eur(120), platforms: ["google_ads", "meta_ads", "linkedin_ads"], health: "mapped" },
-  { ...base, id: "event_booked_consultation", name: "Booked consultation", source: "calendar", value: eur(340), platforms: ["google_ads", "google_lsa"], health: "mapped" },
-  { ...base, id: "event_offline_sale", name: "Offline sale", source: "accounting", value: null, platforms: ["google_ads", "meta_ads"], health: "needs_attention" },
+  { ...base, id: "event_qualified_lead", name: "Qualified lead", source: "crm", value: eur(120), platforms: ["google_ads", "meta_ads", "linkedin_ads"], health: "mapped", lastReceivedAt: "2026-10-28T08:58:00.000Z" },
+  { ...base, id: "event_booked_consultation", name: "Booked consultation", source: "calendar", value: eur(340), platforms: ["google_ads", "google_lsa"], health: "mapped", lastReceivedAt: "2026-10-28T08:49:00.000Z" },
+  { ...base, id: "event_offline_sale", name: "Offline sale", source: "accounting", value: null, platforms: ["google_ads", "meta_ads"], health: "needs_attention", lastReceivedAt: "2026-10-27T16:20:00.000Z" },
 ];
+
+export const demoTrackingHealth: TrackingHealth = { healthy: true, eventsToday: 8420, changeVsYesterday: 0.114, needsAttention: 2 };
+
+// Revenue by platform as in the design (the campaigns' attributed revenue).
+export const demoAttribution: Attribution = {
+  model: "data_driven",
+  dataQuality: 0.986,
+  revenue: eur(42640),
+  unmappedEvents: 2,
+  byPlatform: [
+    { platform: "google_ads", revenue: eur(20480) },
+    { platform: "meta_ads", revenue: eur(18920) },
+    { platform: "google_lsa", revenue: eur(11520) },
+  ],
+};
 
 // ---------- Automations ----------
 
@@ -294,21 +313,38 @@ export const demoAutomationRules: AutomationRule[] = [
     ...base,
     id: "rule_protect_cpl",
     name: "Protect target CPL",
-    trigger: { platforms: ["google_ads", "meta_ads"] },
-    condition: { metric: "cpl", operator: "above", value: 28, days: 3 },
+    trigger: { platforms: ["google_ads", "meta_ads"], schedule: null },
+    condition: { metric: "cpl", operator: "above", value: 28, window: { amount: 3, unit: "days" } },
     action: "recommend",
+    enabled: true,
+  },
+  {
+    ...base,
+    id: "rule_weekly_digest",
+    name: "Weekly performance digest",
+    // Every Monday at 08:00 UTC.
+    trigger: { platforms: [], schedule: "0 8 * * 1" },
+    condition: null,
+    action: "send_digest",
     enabled: true,
   },
   {
     ...base,
     id: "rule_tracking_failure",
     name: "Pause on tracking failure",
-    trigger: { platforms: [] },
-    condition: { metric: "leads", operator: "below", value: 1, days: 1 },
+    trigger: { platforms: [], schedule: null },
+    condition: { metric: "leads", operator: "below", value: 1, window: { amount: 12, unit: "hours" } },
     action: "pause_campaign",
     enabled: false,
   },
 ];
+
+export const demoAutomationActivity: AutomationActivity[] = [
+  { id: "activity_1", ruleId: "rule_protect_cpl", outcome: "review_requested", campaignId: "campaign_studio_awareness", at: "2026-10-28T08:52:00.000Z" },
+  { id: "activity_2", ruleId: "rule_weekly_digest", outcome: "digest_sent", campaignId: null, at: "2026-10-27T08:00:00.000Z" },
+];
+
+export const demoCampaignDefaults: CampaignDefaults = { consentRequired: true, autoTagLinks: true, policyValidation: true };
 
 // ---------- Billing & controls ----------
 
