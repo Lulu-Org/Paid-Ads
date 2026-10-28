@@ -2,7 +2,7 @@ import { z } from "zod";
 import { adPlatformSchema } from "./campaign";
 import { baseRecordSchema, fractionSchema, idSchema, moneySchema, timestampSchema } from "./common";
 import { approvalStatusSchema } from "./library";
-import { roleSchema } from "./user";
+import { adsRoleSchema } from "./team";
 
 // Automations, spend controls, approvals, reports and sync runs (docs/data-model.md, docs/api.md).
 
@@ -53,14 +53,19 @@ export const spendLimitSchema = z.object({
   monthly: moneySchema,
   // Alert when this share of the limit is used, e.g. 0.8.
   alertAt: fractionSchema,
+  // Tell Finance (reviewers) before the limit is reached.
+  notifyBeforeLimit: z.boolean(),
   // Spend so far this month, computed.
   used: moneySchema,
 });
-export const spendLimitUpdateSchema = spendLimitSchema.pick({ monthly: true, alertAt: true });
+export const spendLimitUpdateSchema = spendLimitSchema.pick({ monthly: true, alertAt: true, notifyBeforeLimit: true });
 
+// What needs a second review (design: "Approval policy"), who approves, and from which amount.
+export const approvalScopeSchema = z.enum(["budget_and_launch", "all_changes", "creative_only", "none"]);
 export const approvalPolicySchema = z.object({
+  scope: approvalScopeSchema,
   threshold: moneySchema,
-  approverRole: roleSchema,
+  approverRole: adsRoleSchema.exclude(["analyst"]),
 });
 
 export const approvalKindSchema = z.enum(["budget_change", "launch", "creative"]);
@@ -74,6 +79,13 @@ export const approvalRequestSchema = baseRecordSchema.extend({
   requestedById: idSchema,
   decidedById: idSchema.nullable(),
   decidedAt: timestampSchema.nullable(),
+});
+
+// POST /approvals: ask for an approval (e.g. from the launch checklist).
+export const approvalRequestCreateSchema = z.object({
+  kind: approvalKindSchema,
+  campaignId: idSchema.nullable(),
+  payload: z.record(z.string(), z.unknown()).default({}),
 });
 
 // Guardrails applied to new campaigns (design: Platform Setup, "Defaults"). GET/PUT /campaign-defaults.
@@ -101,14 +113,18 @@ export const reportUpdateSchema = reportCreateSchema.partial();
 
 // ---------- Operations ----------
 
-export const syncStatusSchema = z.enum(["queued", "running", "succeeded", "failed"]);
+export const syncStatusSchema = z.enum(["queued", "running", "succeeded", "failed", "retry_queued"]);
+// What a sync moved (design: "Sync jobs").
+export const syncScopeSchema = z.enum(["campaign_performance", "audiences", "conversion_events", "creatives"]);
 
 export const syncRunSchema = z.object({
   id: idSchema,
   workspaceId: idSchema,
   adAccountId: idSchema,
   platform: adPlatformSchema,
-  kind: z.enum(["sync", "push"]),
+  // sync = provider → Lulu, push = Lulu → provider, both = audiences kept in step both ways.
+  kind: z.enum(["sync", "push", "both"]),
+  scope: syncScopeSchema,
   status: syncStatusSchema,
   startedAt: timestampSchema,
   finishedAt: timestampSchema.nullable(),
@@ -116,6 +132,69 @@ export const syncRunSchema = z.object({
   error: z.string().nullable(),
 });
 
+// Something that failed and needs a retry or a person (design: "Incidents and retries").
+export const incidentKindSchema = z.enum(["rate_limited", "consent_review", "auth_expired", "sync_failed"]);
+export const incidentSchema = z.object({
+  id: idSchema,
+  platform: adPlatformSchema,
+  kind: incidentKindSchema,
+  // What it is about, e.g. "Offline conversion event" or an audience name (data, shown as is).
+  subject: z.string().min(1),
+  // When the automatic retry runs; null = a person has to act.
+  retryAt: timestampSchema.nullable(),
+});
+
+// Events the platforms sent us (design: "Webhook events").
+export const webhookEventSchema = z.object({
+  id: idSchema,
+  platform: adPlatformSchema,
+  eventType: z.string().min(1),
+  campaignId: idSchema.nullable(),
+  receivedAt: timestampSchema,
+});
+
+// GET /operations.
+export const operationsSummarySchema = z.object({
+  healthy: z.boolean(),
+  providers: z.number().int().min(0),
+  lastSyncAt: timestampSchema.nullable(),
+  jobsToday: z.number().int().min(0),
+  // Share of today's jobs that succeeded, 0 to 1.
+  successRate: z.number().min(0).max(1),
+  incidents: z.array(incidentSchema),
+  webhooks: z.array(webhookEventSchema),
+  // Share of records where Lulu and the platform agree (spend, conversions, status), 0 to 1.
+  reconciled: z.number().min(0).max(1),
+});
+
+// ---------- Billing ----------
+
+export const paymentMethodSchema = z.object({
+  status: z.enum(["active", "missing", "failed"]),
+  // Only the brand and last four digits; card details stay with the payment provider.
+  brand: z.string().nullable(),
+  last4: z.string().regex(/^\d{4}$/).nullable(),
+});
+
+export const statementSchema = z.object({
+  id: idSchema,
+  // "2026-06"
+  month: z.string().regex(/^\d{4}-\d{2}$/),
+  platform: adPlatformSchema,
+  amount: moneySchema,
+  status: z.enum(["paid", "due", "failed"]),
+  downloadUrl: z.url().nullable(),
+});
+
+export type ApprovalScope = z.infer<typeof approvalScopeSchema>;
+export type ApprovalRequestCreateInput = z.input<typeof approvalRequestCreateSchema>;
+export type SyncScope = z.infer<typeof syncScopeSchema>;
+export type IncidentKind = z.infer<typeof incidentKindSchema>;
+export type Incident = z.infer<typeof incidentSchema>;
+export type WebhookEvent = z.infer<typeof webhookEventSchema>;
+export type OperationsSummary = z.infer<typeof operationsSummarySchema>;
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>;
+export type Statement = z.infer<typeof statementSchema>;
 export type AutomationMetric = z.infer<typeof automationMetricSchema>;
 export type AutomationAction = z.infer<typeof automationActionSchema>;
 export type AutomationRule = z.infer<typeof automationRuleSchema>;

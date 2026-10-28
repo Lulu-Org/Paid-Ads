@@ -1,5 +1,12 @@
 import type {
   AdPlatform,
+  ApprovalPolicy,
+  ApprovalRequest,
+  ApprovalRequestCreateInput,
+  SpendLimitUpdateInput,
+  TeamInviteInput,
+  TeamMember,
+  TeamMemberUpdateInput,
   AttributionModel,
   AuthSession,
   AutomationRule,
@@ -13,10 +20,20 @@ import type {
   LoginInput,
   SyncRun,
 } from "@lulu/shared";
-import { campaignTotals } from "@lulu/shared";
+import { approvalRequestCreateSchema, campaignTotals, launchChecklist } from "@lulu/shared";
 import {
   DEMO_WORKSPACE_ID,
   demoAdAccounts,
+  demoApprovalPolicy,
+  demoApprovals,
+  demoAudiences,
+  demoCampaignCreatives,
+  demoCreatives,
+  demoOperations,
+  demoPaymentMethod,
+  demoSpendLimit,
+  demoStatements,
+  demoTeam,
   demoAttribution,
   demoAutomationActivity,
   demoAutomationRules,
@@ -51,7 +68,22 @@ const db = {
   activity: [...demoAutomationActivity],
   defaults: { ...demoCampaignDefaults },
   syncRuns: [...demoSyncRuns],
+  approvals: [...demoApprovals],
+  spendLimit: { ...demoSpendLimit },
+  policy: { ...demoApprovalPolicy },
+  team: demoTeam.map((m) => ({ ...m })),
+  operations: { ...demoOperations, incidents: [...demoOperations.incidents] },
 };
+
+// Spend so far this month: the campaigns' spend in the sample data.
+const usedThisMonth = () =>
+  demoCampaigns.reduce((sum, c) => sum + campaignTotals(demoMetricDays[c.id] ?? [], c.budget).spend.amount, 0);
+
+function findMember(userId: string) {
+  const member = db.team.find((m) => m.userId === userId);
+  if (!member) throw new ApiError("NOT_FOUND", 404);
+  return member;
+}
 
 const record = () => ({ workspaceId: DEMO_WORKSPACE_ID, createdAt: now(), updatedAt: now(), deletedAt: null });
 
@@ -83,6 +115,75 @@ export const mockApi = {
         .map((c) => ({ ...c, totals: campaignTotals(demoMetricDays[c.id] ?? [], c.budget) }));
       return delay(paginate(rows, query.page, query.pageSize));
     },
+    async checklist(id: string) {
+      const campaign = demoCampaigns.find((c) => c.id === id);
+      if (!campaign) throw new ApiError("NOT_FOUND", 404);
+      const creativeIds = demoCampaignCreatives[id] ?? [];
+      return delay(
+        launchChecklist({
+          campaign,
+          account: db.adAccounts.find((a) => a.id === campaign.adAccountId) ?? null,
+          creatives: demoCreatives.filter((c) => creativeIds.includes(c.id)),
+          audiences: demoAudiences,
+          trackingHealthy: demoTrackingHealth.healthy,
+          defaults: db.defaults,
+          policy: db.policy,
+          approvals: db.approvals,
+        }),
+      );
+    },
+  },
+
+  approvals: {
+    list: () => delay(paginate(db.approvals)),
+    async request(input: ApprovalRequestCreateInput): Promise<ApprovalRequest> {
+      const parsed = approvalRequestCreateSchema.parse(input);
+      const open = db.approvals.find((a) => a.kind === parsed.kind && a.campaignId === parsed.campaignId && a.status === "pending");
+      if (open) return delay(open);
+      const request: ApprovalRequest = {
+        ...record(),
+        id: newId("approval"),
+        ...parsed,
+        status: "pending",
+        requestedById: CURRENT_USER_ID,
+        decidedById: null,
+        decidedAt: null,
+      };
+      db.approvals.push(request);
+      return delay(request);
+    },
+  },
+
+  billing: {
+    spendLimit: () => delay({ ...db.spendLimit, used: { amount: usedThisMonth(), currency: db.spendLimit.monthly.currency } }),
+    async updateSpendLimit(input: SpendLimitUpdateInput) {
+      db.spendLimit = { ...input };
+      return mockApi.billing.spendLimit();
+    },
+    approvalPolicy: () => delay({ ...db.policy }),
+    async updateApprovalPolicy(input: ApprovalPolicy) {
+      db.policy = { ...input };
+      return delay({ ...db.policy });
+    },
+    paymentMethod: () => delay({ ...demoPaymentMethod }),
+    statements: () => delay(paginate(demoStatements)),
+  },
+
+  team: {
+    list: () => delay(paginate(db.team)),
+    async invite(input: TeamInviteInput): Promise<TeamMember> {
+      const email = input.email.trim().toLowerCase();
+      if (db.team.some((m) => m.email === email)) throw new ApiError("CONFLICT", 409);
+      const member: TeamMember = { ...input, userId: newId("user"), name: email, email, title: null, invited: true };
+      db.team.push(member);
+      return delay(member);
+    },
+    async update(userId: string, input: TeamMemberUpdateInput) {
+      const member = findMember(userId);
+      if (member.adsRole === "owner") throw new ApiError("FORBIDDEN", 403);
+      Object.assign(member, input);
+      return delay({ ...member });
+    },
   },
 
   adAccounts: {
@@ -103,6 +204,7 @@ export const mockApi = {
         adAccountId: id,
         platform: account.platform,
         kind: "sync",
+        scope: "campaign_performance",
         status: "succeeded",
         startedAt: now(),
         finishedAt: now(),
@@ -153,6 +255,14 @@ export const mockApi = {
   },
 
   operations: {
+    summary: () => delay({ ...db.operations, incidents: [...db.operations.incidents] }),
     syncRuns: () => delay(paginate(db.syncRuns)),
+    // The retry runs straight away in the mock and clears the incident.
+    async retry(incidentId: string) {
+      if (!db.operations.incidents.some((i) => i.id === incidentId)) throw new ApiError("NOT_FOUND", 404);
+      db.operations.incidents = db.operations.incidents.filter((i) => i.id !== incidentId);
+      return delay(undefined);
+    },
+    reconcile: () => delay({ ...db.operations, incidents: [...db.operations.incidents] }),
   },
 };

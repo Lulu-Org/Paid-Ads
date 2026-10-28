@@ -4,6 +4,7 @@ import type {
   Audience,
   Attribution,
   AutomationActivity,
+  ApprovalRequest,
   AutomationRule,
   CampaignDefaults,
   Campaign,
@@ -11,7 +12,11 @@ import type {
   CampaignPlanStep,
   ConversionEvent,
   Creative,
+  OperationsSummary,
+  PaymentMethod,
+  Statement,
   SyncRun,
+  TeamMember,
   TrackingHealth,
   User,
 } from "@lulu/shared";
@@ -348,22 +353,49 @@ export const demoCampaignDefaults: CampaignDefaults = { consentRequired: true, a
 
 // ---------- Billing & controls ----------
 
-export const demoSpendLimit = { monthly: eur(16000), alertAt: 0.8 };
-export const demoApprovalPolicy: ApprovalPolicy = { threshold: eur(2500), approverRole: "admin" };
+export const demoSpendLimit = { monthly: eur(16000), alertAt: 0.8, notifyBeforeLimit: true };
+export const demoApprovalPolicy: ApprovalPolicy = { scope: "budget_and_launch", threshold: eur(2500), approverRole: "reviewer" };
+
+export const demoPaymentMethod: PaymentMethod = { status: "active", brand: "Visa", last4: "2488" };
+
+export const demoStatements: Statement[] = [
+  { id: "statement_2026_06_google", month: "2026-06", platform: "google_ads", amount: eur(4280), status: "paid", downloadUrl: null },
+  { id: "statement_2026_06_meta", month: "2026-06", platform: "meta_ads", amount: eur(2660), status: "paid", downloadUrl: null },
+];
+
+export const demoApprovals: ApprovalRequest[] = [];
+
+// ---------- Team (design: "Team & Permissions") ----------
+
+export const demoTeam: TeamMember[] = [
+  { userId: "user_jamie", name: "Jamie Morgan", email: "jamie@lulu.demo", title: "Workspace owner", adsRole: "owner", channelScope: "all", canApproveCreatives: true, invited: false },
+  { userId: "user_alex", name: "Alex Rivera", email: "alex@lulu.demo", title: "Performance marketer", adsRole: "editor", channelScope: "all", canApproveCreatives: true, invited: false },
+  { userId: "user_samira", name: "Samira Khan", email: "samira@lulu.demo", title: "Finance reviewer", adsRole: "reviewer", channelScope: "reports_only", canApproveCreatives: false, invited: false },
+];
 
 // ---------- Operations ----------
 
-export const demoSyncRuns: SyncRun[] = demoAdAccounts
-  .filter((a) => a.lastSyncAt)
-  .map((a, i) => ({
-    id: `sync_${i + 1}`,
-    workspaceId: DEMO_WORKSPACE_ID,
-    adAccountId: a.id,
-    platform: a.platform,
-    kind: "sync",
-    status: "succeeded",
-    startedAt: "2026-10-28T08:50:00.000Z",
-    finishedAt: a.lastSyncAt,
-    recordsProcessed: 428,
-    error: null,
-  }));
+// The design's sync jobs, incidents, webhooks and numbers.
+export const demoSyncRuns: SyncRun[] = [
+  { id: "sync_1", workspaceId: DEMO_WORKSPACE_ID, adAccountId: "account_google_ads", platform: "google_ads", kind: "sync", scope: "campaign_performance", status: "succeeded", startedAt: "2026-10-28T08:51:00.000Z", finishedAt: "2026-10-28T08:52:00.000Z", recordsProcessed: 428, error: null },
+  { id: "sync_2", workspaceId: DEMO_WORKSPACE_ID, adAccountId: "account_meta", platform: "meta_ads", kind: "both", scope: "audiences", status: "succeeded", startedAt: "2026-10-28T08:48:00.000Z", finishedAt: "2026-10-28T08:49:00.000Z", recordsProcessed: 3, error: null },
+  { id: "sync_3", workspaceId: DEMO_WORKSPACE_ID, adAccountId: "account_linkedin", platform: "linkedin_ads", kind: "push", scope: "conversion_events", status: "retry_queued", startedAt: "2026-10-28T08:38:00.000Z", finishedAt: null, recordsProcessed: 0, error: "RATE_LIMITED" },
+];
+
+export const demoOperations: OperationsSummary = {
+  healthy: true,
+  providers: 4,
+  lastSyncAt: "2026-10-28T08:52:00.000Z",
+  jobsToday: 1284,
+  successRate: 0.996,
+  incidents: [
+    { id: "incident_linkedin_conversion", platform: "linkedin_ads", kind: "rate_limited", subject: "Offline conversion event", retryAt: "2026-10-28T09:04:00.000Z" },
+    { id: "incident_meta_audience", platform: "meta_ads", kind: "consent_review", subject: "Lookalike · Studio buyers", retryAt: null },
+  ],
+  webhooks: [
+    { id: "webhook_1", platform: "google_ads", eventType: "campaign.updated", campaignId: "campaign_spring_berlin", receivedAt: "2026-10-28T08:52:00.000Z" },
+    { id: "webhook_2", platform: "meta_ads", eventType: "lead.created", campaignId: "campaign_studio_awareness", receivedAt: "2026-10-28T08:48:00.000Z" },
+    { id: "webhook_3", platform: "linkedin_ads", eventType: "conversion.retrying", campaignId: "campaign_b2b_q4", receivedAt: "2026-10-28T08:38:00.000Z" },
+  ],
+  reconciled: 0.984,
+};

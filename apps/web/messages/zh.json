@@ -422,5 +422,285 @@
       "policyValidationHint": "上线前根据平台政策检查广告。",
       "saved": "已保存保护规则。"
     }
+  },
+  "checklist": {
+    "campaign": "广告活动",
+    "eyebrow": "上线前检查",
+    "title": "每个广告活动都经过相同的安全检查。",
+    "description": "在数据、素材、权限和审批就绪之前，不会上线任何内容。",
+    "score": "{passed} / {total}",
+    "completed": "项检查已完成",
+    "complete": "已完成",
+    "open": "未完成",
+    "request": "申请",
+    "approvalRequested": "已申请审批。",
+    "shared": "已为审批人复制检查清单链接。",
+    "shareFailed": "无法复制链接。",
+    "decision": {
+      "eyebrow": "上线决定",
+      "title": "是什么阻止了上线？",
+      "ready": "已就绪",
+      "needsReview": "需要审核",
+      "next": "下一步",
+      "nothing": "没有未完成项。",
+      "readyToLaunch": "所有检查已通过，广告活动可以上线。",
+      "share": "分享检查清单",
+      "requestApprovals": "申请审批"
+    },
+    "items": {
+      "account_connected": {
+        "label": "广告账户已连接",
+        "hint": "平台账户已授权，权限已审核。",
+        "next": "在集成中连接广告账户。"
+      },
+      "budget_set": {
+        "label": "已设置预算",
+        "hint": "广告活动的预算大于零。",
+        "next": "为广告活动设置预算。"
+      },
+      "schedule_set": {
+        "label": "已设置排期",
+        "hint": "广告活动有开始日期。",
+        "next": "选择开始日期。"
+      },
+      "audience_set": {
+        "label": "已定义受众",
+        "hint": "已说明广告活动面向的人群。",
+        "next": "描述广告活动的受众。"
+      },
+      "creative_approved": {
+        "label": "创意政策审核",
+        "hint": "广告活动中的每个素材均已批准。",
+        "next": "请市场团队批准未审核的素材。"
+      },
+      "tracking_ready": {
+        "label": "转化事件已映射",
+        "hint": "转化数据已到达 Lulu 和各平台。",
+        "next": "在跟踪页面修复跟踪问题。"
+      },
+      "consent_checked": {
+        "label": "受众同意已检查",
+        "hint": "同步的联系人具有有效的同意依据。",
+        "next": "为此平台添加具有同意依据的受众。"
+      },
+      "landing_page_ready": {
+        "label": "落地页已就绪",
+        "hint": "广告指向可用的页面或资料。",
+        "next": "添加落地页或资料。"
+      },
+      "approval_granted": {
+        "label": "预算审批",
+        "hint": "已获得超出阈值部分的审批。",
+        "next": "向审批人申请预算审批。"
+      },
+      "owner_assigned": {
+        "label": "已指定负责人",
+        "hint": "有人负责此广告活动。",
+        "next": "指定负责人。"
+      }
+    }
+  },
+  "operations": {
+    "health": {
+      "label": "平台同步状态",
+      "healthy": "正常",
+      "unhealthy": "需要关注",
+      "note": "{count, plural, other {# 个平台}} · 上次同步 {time}"
+    },
+    "jobs": {
+      "label": "今日处理的任务",
+      "note": "{rate} 成功完成",
+      "eyebrow": "同步任务",
+      "title": "每个平台操作都可追踪。",
+      "description": "在数据再次更改之前查看方向、范围、时间和重试状态。",
+      "refresh": "刷新任务",
+      "provider": "平台",
+      "operation": "操作",
+      "direction": "方向",
+      "status": "状态",
+      "lastRun": "上次运行"
+    },
+    "attention": {
+      "label": "需要关注",
+      "value": "{count, plural, other {# 个事件}}",
+      "note": "在下方重试或调查"
+    },
+    "scopes": {
+      "campaign_performance": "广告活动效果",
+      "audiences": "受众同步",
+      "conversion_events": "转化事件",
+      "creatives": "创意素材"
+    },
+    "directions": {
+      "sync": "平台 → Lulu",
+      "push": "Lulu → 平台",
+      "both": "Lulu ↔ 平台"
+    },
+    "statuses": {
+      "queued": "排队中",
+      "running": "进行中",
+      "succeeded": "成功",
+      "failed": "失败",
+      "retry_queued": "已排队重试"
+    },
+    "incidents": {
+      "eyebrow": "事件与重试",
+      "title": "任何失败都不会被忽略。",
+      "none": "没有未处理的事件。",
+      "retryAt": "{time}重试",
+      "actionRequired": "需要处理",
+      "retry": "重试",
+      "review": "审核",
+      "retried": "已申请重试。",
+      "kinds": {
+        "rate_limited": "平台返回了临时限流响应。",
+        "consent_review": "下次同步前需要审核同意映射。",
+        "auth_expired": "账户授权已过期，请重新连接。",
+        "sync_failed": "同步失败，请重试或检查账户。"
+      }
+    },
+    "webhooks": {
+      "eyebrow": "Webhook 事件",
+      "title": "从平台接收的事件。"
+    },
+    "reconcile": {
+      "eyebrow": "对账",
+      "title": "比较平台与 Lulu 的数据。",
+      "description": "在结束当天之前检查花费、转化和状态是否一致。",
+      "share": "的记录已对账",
+      "run": "运行对账",
+      "done": "对账已完成。"
+    }
+  },
+  "billing": {
+    "roles": {
+      "owner": "工作区所有者",
+      "editor": "市场负责人",
+      "reviewer": "财务审核人"
+    },
+    "limit": {
+      "eyebrow": "工作区花费上限",
+      "perMonth": "{amount} / 月",
+      "used": "已使用的花费上限",
+      "usage": "已用 {used} · 剩余 {remaining}",
+      "edit": "编辑上限"
+    },
+    "policy": {
+      "eyebrow": "审批阈值",
+      "perChange": "每次更改 {amount}",
+      "edit": "编辑政策",
+      "summary": {
+        "budget_and_launch": "超过此金额的预算和上线更改需要{role}审批。",
+        "all_changes": "超过此金额的所有广告活动更改需要{role}审批。",
+        "creative_only": "创意更改需要{role}审批。",
+        "none": "无需审批。"
+      }
+    },
+    "payment": {
+      "eyebrow": "付款状态",
+      "status": {
+        "active": "有效",
+        "missing": "无付款方式",
+        "failed": "付款失败"
+      },
+      "card": "{brand} ···· {last4}",
+      "noCard": "未绑定银行卡。",
+      "canSpend": "所有已连接的广告账户均可消费。",
+      "cannotSpend": "付款问题解决前，广告账户无法消费。",
+      "managedByBilling": "付款方式在 Lulu 账单中管理，而非此处，因此卡信息不会经过此模块。"
+    },
+    "history": {
+      "eyebrow": "账单记录",
+      "title": "轻松查看平台费用。",
+      "statement": "账单",
+      "provider": "平台",
+      "amount": "金额",
+      "status": "状态",
+      "statuses": {
+        "paid": "已付款",
+        "due": "待付款",
+        "failed": "失败"
+      }
+    },
+    "limitForm": {
+      "eyebrow": "花费控制",
+      "title": "保护广告预算。",
+      "description": "设置每月上限和提醒时间。",
+      "monthly": "工作区每月上限（{currency}）",
+      "alertAt": "提醒阈值",
+      "alertOption": "上限的 {share}",
+      "notify": "达到上限前通知财务",
+      "invalid": "请输入大于 0 的上限。",
+      "saved": "已保存花费上限。"
+    },
+    "policyForm": {
+      "eyebrow": "审批政策",
+      "title": "让审批清晰明确。",
+      "description": "定义哪些花费、上线和创意更改需要二次审核。",
+      "scope": "需要审批的范围",
+      "scopes": {
+        "budget_and_launch": "预算和上线更改",
+        "all_changes": "所有广告活动更改",
+        "creative_only": "仅创意更改",
+        "none": "无"
+      },
+      "role": "审批角色",
+      "threshold": "最低更改金额（{currency}）",
+      "invalid": "请输入 0 或以上的金额。",
+      "draftHint": "✦ 在所需权限、同意和审批完成之前，更改将保持草稿状态。",
+      "saved": "已保存审批政策。"
+    }
+  },
+  "team": {
+    "invite": "邀请成员",
+    "membersLabel": "团队成员",
+    "invited": "已邀请",
+    "changeRole": "角色",
+    "allowed": "允许：",
+    "notAllowed": "不允许：",
+    "roleChanged": "{name} 现在是{role}。",
+    "roles": {
+      "owner": "所有者",
+      "editor": "编辑",
+      "reviewer": "审核人",
+      "analyst": "分析师"
+    },
+    "highlights": {
+      "allChannels": "所有渠道",
+      "budgetApproval": "预算审批",
+      "launch": "上线广告活动",
+      "campaignsCreatives": "广告活动和创意",
+      "reports": "报告",
+      "billing": "账单控制"
+    },
+    "matrix": {
+      "eyebrow": "角色矩阵",
+      "title": "权限始终明确。",
+      "role": "角色",
+      "view": "查看",
+      "edit": "编辑",
+      "budget": "预算",
+      "launch": "上线",
+      "request": "申请"
+    },
+    "inviteForm": {
+      "eyebrow": "邀请成员",
+      "title": "为成员分配合适的权限。",
+      "description": "选择角色，并将访问限制在所需的渠道或操作。",
+      "email": "邮箱地址",
+      "emailPlaceholder": "teammate@company.com",
+      "role": "角色",
+      "scope": "渠道范围",
+      "scopes": {
+        "all": "所有已连接渠道",
+        "google_ads": "仅 Google Ads",
+        "meta_ads": "仅 Meta Ads",
+        "reports_only": "仅报告"
+      },
+      "creatives": "允许审批创意",
+      "invalid": "请输入有效的邮箱地址。",
+      "submit": "发送邀请",
+      "sent": "已向 {email} 发送邀请。"
+    }
   }
 }
