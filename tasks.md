@@ -2,9 +2,11 @@
 
 The PM (Sudais) keeps the Owner and Status columns up to date. To pick up or swap a task, say so in the group and the PM updates this file.
 
-Every task: one pull request, one review before merge, no hardcoded text (i18n), tests on risky parts. Read `AGENTS.md` and `docs/` before you start.
+Every task: one pull request, one review before merge, no hardcoded text (i18n), tests on risky parts. Read `AGENTS.md` and `docs/` before you start. What each task covers, in detail: `docs/tasks-guide.md`.
 
 Status values: `open`, `in progress`, `in review`, `done`.
+
+Team: Sudais (PM), Abdul (Samteck), Franklin, theLady.
 
 ## Phase 0: foundation (start now)
 
@@ -18,9 +20,9 @@ Status values: `open`, `in progress`, `in review`, `done`.
 | B3 | Audiences, Creatives, Conversion events, Tracking health, Attribution API | theLady | open | B1 |
 | B4 | Reports, Automations, Spend limit, Approval policy and approvals, Operations, Team permissions API | theLady | open | B1 |
 | F1 | App shell to match the design (rail, top bar, page heading, Create campaign pop-up), Overview, Campaigns + campaign drawer | Abdul | open | P1 |
-| F2 | Planning, Audiences, Creatives, Reports views with their pop-ups | Samteck | open | P1 |
-| F3 | Tracking, Attribution & Data, Automations, Integrations, Platform Setup views | Abdul | open | F1 |
-| F4 | Launch Checklist, Operations, Billing & Controls, Team & Permissions views | Samteck | open | F2 |
+| F2 | Planning, Audiences, Creatives, Reports views with their pop-ups | Abdul | open | F1 |
+| F3 | Tracking, Attribution & Data, Automations, Integrations, Platform Setup views | Sudais | open | P1 |
+| F4 | Launch Checklist, Operations, Billing & Controls, Team & Permissions views | Sudais | open | F3 |
 
 ## Phases 1–4: the ad platforms, in Dave's order
 
