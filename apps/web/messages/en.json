@@ -150,5 +150,277 @@
       "missing": "Enter your email and password.",
       "wrong": "Email or password is incorrect."
     }
+  },
+  "platforms": {
+    "google_ads": {
+      "name": "Google Ads",
+      "detail": "Search, Display & YouTube"
+    },
+    "google_lsa": {
+      "name": "Google LSA",
+      "detail": "Local Services Ads"
+    },
+    "meta_ads": {
+      "name": "Meta Ads",
+      "detail": "Facebook & Instagram"
+    },
+    "linkedin_ads": {
+      "name": "LinkedIn Ads",
+      "detail": "B2B audience campaigns"
+    }
+  },
+  "eventSources": {
+    "crm": "CRM",
+    "calendar": "Calendar",
+    "accounting": "Accounting",
+    "website": "Website",
+    "call": "Phone call"
+  },
+  "tracking": {
+    "health": {
+      "label": "Tracking health",
+      "healthy": "Healthy",
+      "unhealthy": "Needs review",
+      "note": "All active channels receiving events"
+    },
+    "today": {
+      "label": "Events today",
+      "note": "{change} compared to yesterday"
+    },
+    "attention": {
+      "label": "Needs attention",
+      "value": "{count, plural, one {# event} other {# events}}",
+      "note": "Review offline conversion mapping"
+    },
+    "events": {
+      "eyebrow": "Conversion events",
+      "title": "What counts as a result.",
+      "add": "Add event",
+      "event": "Event",
+      "source": "Source",
+      "lastReceived": "Last received",
+      "status": "Status",
+      "never": "Not yet"
+    },
+    "eventHealth": {
+      "mapped": "Healthy",
+      "needs_attention": "Review"
+    },
+    "utm": {
+      "eyebrow": "UTM builder",
+      "title": "Keep every click attributable.",
+      "url": "Landing page",
+      "source": "Source",
+      "campaign": "Campaign",
+      "content": "Content",
+      "link": "Tracking link",
+      "invalidUrl": "Enter a full address, e.g. https://example.com/",
+      "copy": "Copy tracking link",
+      "copied": "Tracking link copied.",
+      "copyFailed": "Could not copy. Select the link and copy it."
+    },
+    "addEvent": {
+      "eyebrow": "Conversion event",
+      "title": "Define what counts as a result.",
+      "description": "Map a business outcome to the sources and platforms that should receive it.",
+      "name": "Event name",
+      "namePlaceholder": "e.g. Qualified lead",
+      "source": "Source",
+      "value": "Value (EUR)",
+      "valuePlaceholder": "Empty = dynamic",
+      "platforms": "Send to",
+      "invalid": "Enter a name, choose at least one platform and a value of 0 or more.",
+      "submit": "Add event",
+      "saved": "Event added."
+    }
+  },
+  "attribution": {
+    "quality": {
+      "label": "Data quality",
+      "note": "Events mapped to real outcomes"
+    },
+    "revenue": {
+      "label": "Attributed revenue",
+      "note": "Across CRM and accounting"
+    },
+    "unmapped": {
+      "label": "Unmapped events",
+      "note": "Review before next report"
+    },
+    "model": {
+      "eyebrow": "Attribution model",
+      "title": "Choose how value is assigned.",
+      "description": "Compare models before they affect your campaign decisions.",
+      "label": "Attribution model",
+      "byPlatform": "Attributed revenue by platform"
+    },
+    "models": {
+      "data_driven": "Data-driven",
+      "last_touch": "Last touch",
+      "first_touch": "First touch",
+      "linear": "Linear"
+    },
+    "mapping": {
+      "eyebrow": "Event mapping",
+      "title": "Business outcomes, connected.",
+      "value": "Value",
+      "health": "Health",
+      "dynamic": "Dynamic",
+      "status": {
+        "mapped": "Mapped",
+        "needs_attention": "Review"
+      }
+    },
+    "lineage": {
+      "eyebrow": "Data lineage",
+      "title": "Where the number came from.",
+      "adClick": "Ad click",
+      "websiteForm": "Website form",
+      "crmLead": "CRM lead",
+      "calendarBooking": "Calendar booking",
+      "revenue": "Revenue"
+    }
+  },
+  "automations": {
+    "create": "Create rule",
+    "rulesLabel": "Automation rules",
+    "on": "On",
+    "off": "Paused",
+    "edit": "Edit",
+    "editRule": "Edit {name}",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "{name} paused.",
+    "resumed": "{name} resumed.",
+    "rule": {
+      "when": "When {metric} is {operator} {value} for {window}, {action}.",
+      "digest": "On a schedule, send the channel comparison and attribution changes to the team.",
+      "allChannels": "All channels",
+      "metrics": {
+        "cpl": "cost per lead",
+        "ctr": "click-through rate",
+        "roas": "ROAS",
+        "spend": "spend",
+        "leads": "leads"
+      },
+      "operators": {
+        "above": "above",
+        "below": "below"
+      },
+      "window": {
+        "hours": "{count, plural, one {# hour} other {# hours}}",
+        "days": "{count, plural, one {# day} other {# days}}"
+      },
+      "actions": {
+        "notify": "notify the campaign owner",
+        "recommend": "notify the owner and request a budget review",
+        "pause_campaign": "pause the campaign and create an incident",
+        "shift_budget": "request approval to shift budget",
+        "send_digest": "send the weekly digest"
+      }
+    },
+    "form": {
+      "eyebrow": "New automation",
+      "editEyebrow": "Edit automation",
+      "title": "Turn a signal into an action.",
+      "description": "Set a trigger, condition and safe action. Budget changes always need approval.",
+      "name": "Rule name",
+      "namePlaceholder": "e.g. Protect target CPL",
+      "metric": "Metric",
+      "operator": "Is",
+      "value": "Value",
+      "window": "For",
+      "unit": "Unit",
+      "units": {
+        "hours": "Hours",
+        "days": "Days"
+      },
+      "action": "Then",
+      "approvalHint": "This asks for approval first; nothing changes on its own.",
+      "platforms": "Platforms",
+      "allPlatformsHint": "None ticked = all platforms.",
+      "invalid": "Enter a name, a value and a period between 1 and 90.",
+      "submit": "Create rule",
+      "save": "Save rule",
+      "created": "Rule created.",
+      "updated": "Rule saved."
+    },
+    "activity": {
+      "eyebrow": "Recent automation activity",
+      "title": "Every automated decision is visible.",
+      "rule": "Rule",
+      "action": "Action",
+      "campaign": "Campaign",
+      "time": "Time",
+      "allChannels": "All channels",
+      "empty": "No automated actions yet.",
+      "outcomes": {
+        "review_requested": "Review requested",
+        "paused": "Campaign paused",
+        "notified": "Owner notified",
+        "digest_sent": "Sent to team",
+        "budget_shifted": "Budget shifted"
+      }
+    }
+  },
+  "integrations": {
+    "platformsLabel": "Ad platforms",
+    "statusConnected": "Connected",
+    "statusNotConnected": "Not connected",
+    "scopes": {
+      "campaigns": "Campaigns",
+      "assets": "Ads and assets",
+      "performance": "Performance data"
+    },
+    "lastSync": "Last sync {time} · Permissions reviewed",
+    "needsAuthorization": "Requires account authorization",
+    "connect": "Connect",
+    "syncNow": "Sync now",
+    "connected": "{platform} connected.",
+    "syncQueued": "{platform} sync started.",
+    "history": {
+      "eyebrow": "Sync history",
+      "title": "Provider operations stay observable.",
+      "empty": "No syncs yet.",
+      "status": {
+        "queued": "Queued",
+        "running": "Running",
+        "succeeded": "Success",
+        "failed": "Failed"
+      },
+      "kind": {
+        "sync": "Campaigns, spend and conversions",
+        "push": "Campaign changes sent"
+      }
+    }
+  },
+  "setup": {
+    "connectProvider": "＋ Connect provider",
+    "channelsLabel": "Channels",
+    "account": "Account",
+    "tracking": "Tracking",
+    "trackingHealthy": "Healthy",
+    "trackingReview": "Review",
+    "permissions": "Permissions",
+    "permissionList": "Campaigns · Audiences · Conversions",
+    "policy": "Policy status",
+    "noIssues": "✓ No issues",
+    "connectedAgo": "Connected · {time}",
+    "notConnected": "Not connected",
+    "on": "On",
+    "off": "Off",
+    "defaults": {
+      "eyebrow": "Defaults",
+      "title": "Guardrails applied to new campaigns.",
+      "edit": "Edit guardrails →",
+      "description": "These apply to every new campaign on every platform.",
+      "consentRequired": "Consent required",
+      "consentRequiredHint": "Audiences must have a consent basis.",
+      "autoTagLinks": "Auto-tag links",
+      "autoTagLinksHint": "Add UTM tags to every ad link.",
+      "policyValidation": "Policy validation",
+      "policyValidationHint": "Check ads against platform policies before launch.",
+      "saved": "Guardrails saved."
+    }
   }
 }

@@ -70,6 +70,7 @@ export const conversionEventSchema = baseRecordSchema.extend({
   value: moneySchema.nullable(),
   platforms: z.array(adPlatformSchema),
   health: eventHealthSchema,
+  lastReceivedAt: timestampSchema.nullable(),
 });
 
 export const conversionEventCreateSchema = z.object({
@@ -79,6 +80,26 @@ export const conversionEventCreateSchema = z.object({
   platforms: z.array(adPlatformSchema).min(1),
 });
 export const conversionEventUpdateSchema = conversionEventCreateSchema.partial();
+
+// GET /tracking/health (design: Tracking).
+export const trackingHealthSchema = z.object({
+  healthy: z.boolean(),
+  eventsToday: z.number().int().min(0),
+  // Fraction vs. yesterday; null without data.
+  changeVsYesterday: z.number().nullable(),
+  needsAttention: z.number().int().min(0),
+});
+
+// GET /attribution (design: Attribution & Data).
+export const attributionModelSchema = z.enum(["data_driven", "last_touch", "first_touch", "linear"]);
+export const attributionSchema = z.object({
+  model: attributionModelSchema,
+  // Share of conversion events mapped to a business outcome, 0 to 1.
+  dataQuality: z.number().min(0).max(1),
+  revenue: moneySchema,
+  unmappedEvents: z.number().int().min(0),
+  byPlatform: z.array(z.object({ platform: adPlatformSchema, revenue: moneySchema })),
+});
 
 export const libraryListQuerySchema = listQuerySchema.extend({ platform: adPlatformSchema.optional() });
 
@@ -95,4 +116,7 @@ export type ConversionSource = z.infer<typeof conversionSourceSchema>;
 export type ConversionEvent = z.infer<typeof conversionEventSchema>;
 export type ConversionEventCreateInput = z.infer<typeof conversionEventCreateSchema>;
 export type ConversionEventUpdateInput = z.infer<typeof conversionEventUpdateSchema>;
+export type TrackingHealth = z.infer<typeof trackingHealthSchema>;
+export type AttributionModel = z.infer<typeof attributionModelSchema>;
+export type Attribution = z.infer<typeof attributionSchema>;
 export type LibraryListQuery = z.infer<typeof libraryListQuerySchema>;

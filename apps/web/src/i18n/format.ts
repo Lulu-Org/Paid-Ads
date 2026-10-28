@@ -17,7 +17,7 @@ export function useFormat() {
         maximumFractionDigits: 0,
       }),
     number: (value: number) => format.number(value),
-    percent: (value: number) => format.number(value, { style: "percent" }),
+    percent: (value: number) => format.number(value, { style: "percent", maximumFractionDigits: 1 }),
     // "+12%" / "-3%" for changes.
     signedPercent: (value: number) =>
       format.number(value, { style: "percent", signDisplay: "exceptZero", maximumFractionDigits: 1 }),

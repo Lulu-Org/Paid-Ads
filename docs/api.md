@@ -71,19 +71,22 @@ interface AdsProvider {
 | GET/POST | `/creatives`, GET/PATCH/DELETE `/creatives/:id` | Creative library (upload via `multipart/form-data`) | creatives.* |
 | POST | `/creatives/:id/approve` | Approves a creative | creatives.approve |
 | GET/POST | `/conversion-events`, PATCH/DELETE `/conversion-events/:id` | Event mapping | tracking.* |
-| GET | `/tracking/health` | Events today, health per platform | tracking.view |
-| GET | `/attribution` | Revenue by platform and campaign from CRM and accounting outcomes | reports.view |
+| GET | `/tracking/health` | Events today, change vs. yesterday, events needing attention | tracking.view |
+| GET | `/attribution` | Data quality, attributed revenue by platform, unmapped events. `model` = `data_driven` (default), `last_touch`, `first_touch`, `linear` | reports.view |
 
 ## Automations, billing, approvals, team, operations
 
 | Method | Path | What | Permission |
 | --- | --- | --- | --- |
 | GET/POST | `/automations`, PATCH/DELETE `/automations/:id` | Rules | automations.* |
+| GET | `/automations/activity` | What the rules did, newest first | automations.view |
+| GET/PUT | `/campaign-defaults` | Guardrails for new campaigns: consent required, auto-tag links, policy validation | settings.view / edit |
 | GET/PUT | `/spend-limit` | Workspace monthly limit and alert | billing.view / edit |
 | GET/PUT | `/approval-policy` | Threshold and approver role | billing.view / edit |
 | GET | `/approvals`, POST `/approvals/:id/approve`, `/reject` | Approval requests | billing.approve |
 | GET/PUT | `/settings/permissions` | Role permissions | settings.edit |
 | GET | `/operations` | Sync health, jobs today, recent `SyncRun`s and failures | integrations.view |
+| GET | `/operations/sync-runs` | Sync history, newest first (`SyncRun`) | integrations.view |
 
 ## Events
 

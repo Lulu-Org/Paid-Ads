@@ -9,21 +9,33 @@ import { roleSchema } from "./user";
 // ---------- Automations ----------
 
 export const automationMetricSchema = z.enum(["cpl", "ctr", "roas", "spend", "leads"]);
-export const automationActionSchema = z.enum(["notify", "recommend", "pause_campaign", "shift_budget"]);
+export const automationActionSchema = z.enum(["notify", "recommend", "pause_campaign", "shift_budget", "send_digest"]);
 
 export const automationRuleSchema = baseRecordSchema.extend({
   name: z.string().trim().min(1).max(200),
-  // When the rule is checked: after each sync, for these platforms (empty = all).
-  trigger: z.object({ platforms: z.array(adPlatformSchema) }),
-  // e.g. CPL above 30 for 3 days.
-  condition: z.object({
-    metric: automationMetricSchema,
-    operator: z.enum(["above", "below"]),
-    value: z.number(),
-    days: z.number().int().min(1).max(90),
-  }),
+  // Checked after each sync for these platforms (empty = all), or on a schedule (cron, UTC) for digests.
+  trigger: z.object({ platforms: z.array(adPlatformSchema), schedule: z.string().min(1).nullable() }),
+  // e.g. CPL above 28 for 3 days; null for scheduled digests. "hours" covers the design's
+  // "no conversion event for 12 hours".
+  condition: z
+    .object({
+      metric: automationMetricSchema,
+      operator: z.enum(["above", "below"]),
+      value: z.number(),
+      window: z.object({ amount: z.number().int().min(1).max(90), unit: z.enum(["hours", "days"]) }),
+    })
+    .nullable(),
   action: automationActionSchema,
   enabled: z.boolean(),
+});
+
+// What a rule did (design: "Recent automation activity").
+export const automationActivitySchema = z.object({
+  id: idSchema,
+  ruleId: idSchema,
+  outcome: z.enum(["review_requested", "paused", "notified", "digest_sent", "budget_shifted"]),
+  campaignId: idSchema.nullable(),
+  at: timestampSchema,
 });
 
 export const automationRuleCreateSchema = automationRuleSchema.pick({
@@ -64,6 +76,13 @@ export const approvalRequestSchema = baseRecordSchema.extend({
   decidedAt: timestampSchema.nullable(),
 });
 
+// Guardrails applied to new campaigns (design: Platform Setup, "Defaults"). GET/PUT /campaign-defaults.
+export const campaignDefaultsSchema = z.object({
+  consentRequired: z.boolean(),
+  autoTagLinks: z.boolean(),
+  policyValidation: z.boolean(),
+});
+
 // ---------- Reports ----------
 
 export const reportSchema = baseRecordSchema.extend({
@@ -102,6 +121,8 @@ export type AutomationAction = z.infer<typeof automationActionSchema>;
 export type AutomationRule = z.infer<typeof automationRuleSchema>;
 export type AutomationRuleCreateInput = z.infer<typeof automationRuleCreateSchema>;
 export type AutomationRuleUpdateInput = z.infer<typeof automationRuleUpdateSchema>;
+export type AutomationActivity = z.infer<typeof automationActivitySchema>;
+export type CampaignDefaults = z.infer<typeof campaignDefaultsSchema>;
 export type SpendLimit = z.infer<typeof spendLimitSchema>;
 export type SpendLimitUpdateInput = z.infer<typeof spendLimitUpdateSchema>;
 export type ApprovalPolicy = z.infer<typeof approvalPolicySchema>;
