@@ -12,6 +12,8 @@ The design is the MagicPath component "Lulu Paid Ads" (`design/LuluPaidAds.tsx`,
 
 This repo started from the Lulu CRM repo (Oct 28, 2026): the platform parts (sign-in, workspaces, roles, audit log, outbox events, job queue, i18n, mock mode, Docker, Render and Vercel setup) are the same, so both modules plug into Lulu the same way.
 
+David's functional catalog (360 proposed functions, Oct 29, 2026) is in `docs/reference/`. Read `docs/reference/README.md`: it is guidance for how we build, not this bundle's task list.
+
 ## The 15 views
 
 Overview, Campaigns, Planning, Audiences, Creatives, Tracking, Attribution & Data, Reports, Automations, Integrations, Platform Setup, Launch Checklist, Operations, Billing & Controls, Team & Permissions. Each has a route under `/ads/<slug>` (`apps/web/src/config/navigation.ts`). Details are in `docs/plan.md`.
