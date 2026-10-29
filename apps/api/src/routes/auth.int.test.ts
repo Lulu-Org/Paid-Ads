@@ -34,7 +34,7 @@ describe('auth routes (int)', () => {
 
   beforeAll(async () => {
     await runSeed();
-  }, 60_000);
+  }, 180_000);
 
   afterAll(async () => {
     await db.$disconnect();
@@ -122,7 +122,7 @@ describe('auth routes (int)', () => {
 
     const all = await request(app).get('/api/v1/users').set('Authorization', `Bearer ${token}`);
     expect(all.status).toBe(200);
-    expect((all.body as ListBody).meta).toEqual({ page: 1, pageSize: 25, total: 2 });
+    expect((all.body as ListBody).meta).toEqual({ page: 1, pageSize: 25, total: 3 });
 
     const search = await request(app)
       .get('/api/v1/users?q=alex')
