@@ -14,7 +14,26 @@ export const AUDITED_ENTITIES: Record<string, string> = {
   setting: 'setting',
   permission: 'permission',
   user: 'user',
-  // Paid Ads entities are added here with their tables (task P1): adAccount, campaign, ...
+  adAccount: 'adAccount',
+  campaign: 'campaign',
+  campaignMetricDay: 'campaignMetricDay',
+  campaignPlanStep: 'campaignPlanStep',
+  audience: 'audience',
+  creative: 'creative',
+  campaignCreative: 'campaignCreative',
+  conversionEvent: 'conversionEvent',
+  automationRule: 'automationRule',
+  automationActivity: 'automationActivity',
+  spendLimit: 'spendLimit',
+  approvalPolicy: 'approvalPolicy',
+  teamMember: 'teamMember',
+  paymentMethod: 'paymentMethod',
+  statement: 'statement',
+  incident: 'incident',
+  webhookEvent: 'webhookEvent',
+  approvalRequest: 'approvalRequest',
+  report: 'report',
+  syncRun: 'syncRun',
 };
 
 // The domain events Paid Ads publishes: <entity>.created / .updated / .deleted.
@@ -23,7 +42,7 @@ export const PUBLISHED_EVENT_TYPES = Object.values(AUDITED_ENTITIES).flatMap((en
 );
 
 // Never copied into audit rows or events.
-const SECRET_FIELDS = new Set(['passwordHash']);
+const SECRET_FIELDS = new Set(['passwordHash', 'tokenEncrypted']);
 
 const MUTATIONS = new Set([
   'create',

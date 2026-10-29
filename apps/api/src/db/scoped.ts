@@ -1,7 +1,7 @@
 // Workspace-scoped, soft-delete-enforcing Prisma client.
 //
 // To scope a new model: add its Prisma delegate name (lowercase model name,
-// e.g. 'contact') to SCOPED_MODELS below. That single change wires the model
+// e.g. 'campaign') to SCOPED_MODELS below. That single change wires the model
 // into every rule here: automatic workspaceId + deletedAt filtering, unique
 // lookups confined to the workspace, workspaceId stamped on create, forced
 // into update/upsert where, and delete converted to a soft delete.
@@ -14,21 +14,23 @@ import { db, type Db } from './prisma';
 
 export const SCOPED_MODELS = [
   'user',
-  'contact',
-  'company',
-  'pipeline',
-  'stage',
-  'deal',
-  'task',
-  'note',
-  'activity',
-  'segment',
-  'importJob',
-  'importRow',
-  'aiInsight',
-  'customField',
   'setting',
   'permission',
+  'adAccount',
+  'campaign',
+  'campaignPlanStep',
+  'audience',
+  'creative',
+  'conversionEvent',
+  'automationRule',
+  'spendLimit',
+  'approvalPolicy',
+  'teamMember',
+  'paymentMethod',
+  'statement',
+  'incident',
+  'approvalRequest',
+  'report',
 ] as const;
 
 type WhereArg = Record<string, unknown>;
