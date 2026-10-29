@@ -10,13 +10,19 @@ export function useFormat() {
   const t = useTranslations("time");
 
   return {
-    money: (value: Money) =>
+    // `digits` for cents where they matter, e.g. CPL "€11.52".
+    money: (value: Money, digits = 0) =>
       format.number(value.amount, {
         style: "currency",
         currency: value.currency,
-        maximumFractionDigits: 0,
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
       }),
     number: (value: number) => format.number(value),
+    decimal: (value: number) => format.number(value, { maximumFractionDigits: 1 }),
+    // "€35K" for chart axes.
+    compactMoney: (value: Money) =>
+      format.number(value.amount, { style: "currency", currency: value.currency, notation: "compact", maximumFractionDigits: 1 }),
     percent: (value: number) => format.number(value, { style: "percent", maximumFractionDigits: 1 }),
     // "+12%" / "-3%" for changes.
     signedPercent: (value: number) =>

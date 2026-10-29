@@ -117,7 +117,10 @@
     },
     "team": {
       "description": "为每位成员分配合适的权限。"
-    }
+    },
+    "subtitle": "在一个互联的工作区中规划、发布并优化每一个付费广告活动。",
+    "viewInsights": "查看洞察",
+    "createCampaign": "创建广告活动"
   },
   "errors": {
     "NETWORK_ERROR": "无法连接服务器，请检查网络。",
@@ -701,6 +704,159 @@
       "invalid": "请输入有效的邮箱地址。",
       "submit": "发送邀请",
       "sent": "已向 {email} 发送邀请。"
+    }
+  },
+  "campaignStatus": {
+    "draft": "草稿",
+    "live": "投放中",
+    "paused": "已暂停",
+    "ended": "已结束"
+  },
+  "campaigns": {
+    "create": {
+      "eyebrow": "新广告活动",
+      "title": "创建一个互联的广告活动。",
+      "description": "选择一个渠道，并将广告活动与受众、创意、素材和 CRM 结果关联起来。",
+      "name": "广告活动名称",
+      "namePlaceholder": "例如：夏季发布 · 慕尼黑",
+      "channel": "广告渠道",
+      "budget": "月度预算（{currency}）",
+      "budgetNoCurrency": "月度预算",
+      "budgetPlaceholder": "2500",
+      "objective": "主要目标",
+      "start": "开始日期",
+      "end": "结束日期（可选）",
+      "note": "保存后，Lulu 会将广告活动与所选受众、素材库和 CRM 归因关联起来。",
+      "noAccount": "请先连接一个广告账户，以确定预算的货币。",
+      "submit": "保存广告活动草稿",
+      "saved": "{name} 已保存为草稿。",
+      "objectives": {
+        "lead_generation": "获取潜在客户",
+        "website_traffic": "网站流量",
+        "sales": "销售",
+        "brand_awareness": "品牌知名度"
+      },
+      "errors": {
+        "nameRequired": "请输入广告活动名称",
+        "nameTooLong": "最多 200 个字符",
+        "budgetInvalid": "请输入金额，例如 2500",
+        "endBeforeStart": "结束日期早于开始日期"
+      }
+    },
+    "table": {
+      "filterLabel": "按平台筛选",
+      "all": "全部",
+      "export": "下载 CSV",
+      "fileName": "广告活动",
+      "empty": "这里还没有广告活动",
+      "campaign": "广告活动",
+      "platform": "平台",
+      "status": "状态",
+      "spendBudget": "花费 / 预算",
+      "spend": "花费",
+      "budget": "预算",
+      "leads": "潜在客户",
+      "cpl": "单个线索成本",
+      "actions": "操作",
+      "budgetUsed": "已使用预算的 {percent}",
+      "readyToLaunch": "可以发布",
+      "openDetails": "查看详情",
+      "open": "打开 {name}"
+    },
+    "drawer": {
+      "eyebrow": "广告活动详情 · {platform}",
+      "pause": "暂停广告活动",
+      "resume": "恢复广告活动",
+      "pauseTitle": "暂停此广告活动？",
+      "resumeTitle": "恢复此广告活动？",
+      "pauseMessage": "{name} 将停止在平台上投放广告，直到你恢复它。",
+      "resumeMessage": "{name} 将重新投放广告并消耗预算。",
+      "paused": "{name} 已暂停。",
+      "resumed": "{name} 已恢复。",
+      "impressions": "展示次数",
+      "clicks": "点击次数",
+      "ctr": "点击率",
+      "conversions": "转化次数",
+      "revenue": "收入",
+      "cpl": "单个线索成本",
+      "audienceEyebrow": "受众",
+      "audience": "谁会看到此广告活动",
+      "noAudience": "尚未设置受众",
+      "planEyebrow": "计划与进度",
+      "plan": "接下来的步骤",
+      "scheduleRange": "{start} – {end}",
+      "scheduleFrom": "自 {start} 起持续投放",
+      "scheduleNone": "尚无排期",
+      "noPlan": "尚无计划步骤",
+      "step": {
+        "done": "已完成",
+        "current": "进行中",
+        "upcoming": "即将进行"
+      },
+      "reasonEyebrow": "理由与决策",
+      "reason": "为什么投放此广告活动",
+      "noReason": "尚未填写理由。",
+      "nextStep": "建议的下一步",
+      "assetsEyebrow": "使用的素材",
+      "assets": "此广告活动中的全部内容",
+      "noAssets": "尚未关联创意"
+    },
+    "summary": {
+      "active": "投放中的广告活动",
+      "activeNote": "可在广告活动详情中暂停或恢复",
+      "planned": "计划花费",
+      "plannedNote": "覆盖 {count} 个渠道",
+      "assets": "素材库中的素材",
+      "assetsNote": "{count, plural, =0 {无需审核} other {# 个待审核}}",
+      "drafts": "草稿",
+      "draftsNote": "等待发布"
+    },
+    "creativeTypes": {
+      "search_ad": "搜索广告",
+      "image": "图片",
+      "video": "视频",
+      "carousel": "轮播",
+      "document": "PDF 文档",
+      "lead_form": "线索表单",
+      "landing_page": "落地页",
+      "extension": "附加信息",
+      "profile": "商家资料"
+    }
+  },
+  "overview": {
+    "kpiLabel": "关键指标",
+    "noChange": "暂无可比较的历史数据",
+    "vsLastPeriod": "较上一周期",
+    "roasValue": "{value}x",
+    "kpi": {
+      "spend": "总花费",
+      "revenue": "归因收入",
+      "leads": "获得的潜在客户",
+      "roas": "综合广告支出回报率"
+    },
+    "performance": {
+      "eyebrow": "效果",
+      "title": "付费获客一目了然。",
+      "description": "已连接渠道的花费与归因收入。",
+      "spend": "花费",
+      "revenue": "归因收入",
+      "range": "最近 {days} 天",
+      "chartLabel": "每日花费与归因收入"
+    },
+    "channels": {
+      "eyebrow": "已连接的渠道",
+      "title": "所有获客渠道，集中管理。",
+      "manage": "管理连接",
+      "manageOne": "管理",
+      "connect": "连接",
+      "connected": "已连接",
+      "notConnected": "未连接",
+      "campaigns": "{count} 个广告活动"
+    },
+    "workspace": {
+      "eyebrow": "广告活动工作区",
+      "title": "需要你关注的广告活动。",
+      "viewAll": "查看所有广告活动"
     }
   }
 }
