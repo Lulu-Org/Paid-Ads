@@ -56,7 +56,7 @@ interface AdsProvider {
 
 | Method | Path | What | Permission |
 | --- | --- | --- | --- |
-| GET | `/overview` | KPIs (spend, attributed revenue, leads, CPL, ROAS with change vs. last period), spend by platform, top campaigns | campaigns.view |
+| GET | `/overview` | KPIs (spend, attributed revenue, leads, CPL, ROAS with change vs. last period and a daily trend), spend by platform. Built by `buildOverview` (`packages/shared/src/overview-logic.ts`). The range ends on `endDate`, the newest day with synced metrics, so an old last sync still shows numbers. Query `rangeDays` (default 30) | campaigns.view |
 | GET | `/planning` | Planned spend per platform, targets, forecast | budgets.view |
 | POST | `/planning/scenarios` | Saves a budget scenario | budgets.edit |
 | GET/POST | `/reports`, GET/PATCH/DELETE `/reports/:id` | Saved and scheduled reports | reports.* |
