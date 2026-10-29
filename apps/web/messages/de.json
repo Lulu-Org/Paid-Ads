@@ -117,7 +117,10 @@
     },
     "team": {
       "description": "Jedem Teammitglied die richtigen Rechte geben."
-    }
+    },
+    "subtitle": "Planen, starten und verbessern Sie jede bezahlte Kampagne in einem vernetzten Arbeitsbereich.",
+    "viewInsights": "Insights ansehen",
+    "createCampaign": "Kampagne erstellen"
   },
   "errors": {
     "NETWORK_ERROR": "Server nicht erreichbar. Bitte Verbindung prüfen.",
@@ -701,6 +704,159 @@
       "invalid": "Gültige E-Mail-Adresse eingeben.",
       "submit": "Einladung senden",
       "sent": "Einladung an {email} gesendet."
+    }
+  },
+  "campaignStatus": {
+    "draft": "Entwurf",
+    "live": "Aktiv",
+    "paused": "Pausiert",
+    "ended": "Beendet"
+  },
+  "campaigns": {
+    "create": {
+      "eyebrow": "Neue Kampagne",
+      "title": "Eine vernetzte Kampagne starten.",
+      "description": "Wählen Sie einen Kanal und verbinden Sie die Kampagne mit Zielgruppen, Creatives, Assets und CRM-Ergebnissen.",
+      "name": "Kampagnenname",
+      "namePlaceholder": "z. B. Sommerstart · München",
+      "channel": "Werbekanal",
+      "budget": "Monatsbudget ({currency})",
+      "budgetNoCurrency": "Monatsbudget",
+      "budgetPlaceholder": "2500",
+      "objective": "Hauptziel",
+      "start": "Startdatum",
+      "end": "Enddatum (optional)",
+      "note": "Lulu verbindet die Kampagne nach dem Speichern mit Ihrer Zielgruppe, Ihrer Asset-Bibliothek und der CRM-Attribution.",
+      "noAccount": "Verbinden Sie zuerst ein Werbekonto, damit das Budget eine Währung hat.",
+      "submit": "Kampagnenentwurf speichern",
+      "saved": "{name} als Entwurf gespeichert.",
+      "objectives": {
+        "lead_generation": "Lead-Generierung",
+        "website_traffic": "Website-Traffic",
+        "sales": "Verkäufe",
+        "brand_awareness": "Markenbekanntheit"
+      },
+      "errors": {
+        "nameRequired": "Bitte einen Kampagnennamen eingeben",
+        "nameTooLong": "Höchstens 200 Zeichen",
+        "budgetInvalid": "Bitte einen Betrag eingeben, z. B. 2500",
+        "endBeforeStart": "Das Enddatum liegt vor dem Startdatum"
+      }
+    },
+    "table": {
+      "filterLabel": "Nach Plattform filtern",
+      "all": "Alle",
+      "export": "Als CSV herunterladen",
+      "fileName": "kampagnen",
+      "empty": "Hier gibt es noch keine Kampagnen",
+      "campaign": "Kampagne",
+      "platform": "Plattform",
+      "status": "Status",
+      "spendBudget": "Ausgaben / Budget",
+      "spend": "Ausgaben",
+      "budget": "Budget",
+      "leads": "Leads",
+      "cpl": "CPL",
+      "actions": "Aktionen",
+      "budgetUsed": "{percent} des Budgets genutzt",
+      "readyToLaunch": "Startbereit",
+      "openDetails": "Details öffnen",
+      "open": "{name} öffnen"
+    },
+    "drawer": {
+      "eyebrow": "Kampagnendetails · {platform}",
+      "pause": "Kampagne pausieren",
+      "resume": "Kampagne fortsetzen",
+      "pauseTitle": "Diese Kampagne pausieren?",
+      "resumeTitle": "Diese Kampagne fortsetzen?",
+      "pauseMessage": "{name} liefert keine Anzeigen mehr aus, bis Sie sie fortsetzen.",
+      "resumeMessage": "{name} liefert wieder Anzeigen aus und gibt ihr Budget aus.",
+      "paused": "{name} pausiert.",
+      "resumed": "{name} fortgesetzt.",
+      "impressions": "Impressionen",
+      "clicks": "Klicks",
+      "ctr": "CTR",
+      "conversions": "Conversions",
+      "revenue": "Umsatz",
+      "cpl": "CPL",
+      "audienceEyebrow": "Zielgruppe",
+      "audience": "Wer diese Kampagne sieht",
+      "noAudience": "Noch keine Zielgruppe festgelegt",
+      "planEyebrow": "Plan und Fortschritt",
+      "plan": "Was als Nächstes passiert",
+      "scheduleRange": "{start} – {end}",
+      "scheduleFrom": "Ab {start}, dauerhaft",
+      "scheduleNone": "Noch kein Zeitplan",
+      "noPlan": "Noch keine Planschritte",
+      "step": {
+        "done": "Erledigt",
+        "current": "In Arbeit",
+        "upcoming": "Geplant"
+      },
+      "reasonEyebrow": "Begründung und Entscheidungen",
+      "reason": "Warum diese Kampagne läuft",
+      "noReason": "Noch keine Begründung.",
+      "nextStep": "Empfohlener nächster Schritt",
+      "assetsEyebrow": "Verwendete Assets",
+      "assets": "Alles in dieser Kampagne",
+      "noAssets": "Noch keine Creatives verknüpft"
+    },
+    "summary": {
+      "active": "Aktive Kampagnen",
+      "activeNote": "In den Kampagnendetails pausieren oder fortsetzen",
+      "planned": "Geplante Ausgaben",
+      "plannedNote": "{count, plural, one {Über # Kanal} other {Über # Kanäle}}",
+      "assets": "Assets in der Bibliothek",
+      "assetsNote": "{count, plural, =0 {Keine Prüfung nötig} other {# zu prüfen}}",
+      "drafts": "Entwürfe",
+      "draftsNote": "Warten auf den Start"
+    },
+    "creativeTypes": {
+      "search_ad": "Suchanzeige",
+      "image": "Bild",
+      "video": "Video",
+      "carousel": "Karussell",
+      "document": "PDF-Dokument",
+      "lead_form": "Lead-Formular",
+      "landing_page": "Landingpage",
+      "extension": "Erweiterung",
+      "profile": "Profil"
+    }
+  },
+  "overview": {
+    "kpiLabel": "Kennzahlen",
+    "noChange": "Keine früheren Daten zum Vergleich",
+    "vsLastPeriod": "ggü. Vorperiode",
+    "roasValue": "{value}x",
+    "kpi": {
+      "spend": "Gesamtausgaben",
+      "revenue": "Zugeordneter Umsatz",
+      "leads": "Generierte Leads",
+      "roas": "Gesamt-ROAS"
+    },
+    "performance": {
+      "eyebrow": "Performance",
+      "title": "Bezahlte Akquise auf einen Blick.",
+      "description": "Ausgaben und zugeordneter Umsatz über Ihre verbundenen Kanäle.",
+      "spend": "Ausgaben",
+      "revenue": "Zugeordneter Umsatz",
+      "range": "Letzte {days} Tage",
+      "chartLabel": "Tägliche Ausgaben und zugeordneter Umsatz"
+    },
+    "channels": {
+      "eyebrow": "Verbundene Kanäle",
+      "title": "Alle Akquisekanäle an einem Ort.",
+      "manage": "Verbindungen verwalten",
+      "manageOne": "Verwalten",
+      "connect": "Verbinden",
+      "connected": "Verbunden",
+      "notConnected": "Nicht verbunden",
+      "campaigns": "{count, plural, one {# Kampagne} other {# Kampagnen}}"
+    },
+    "workspace": {
+      "eyebrow": "Kampagnen-Arbeitsbereich",
+      "title": "Kampagnen, die Ihre Aufmerksamkeit brauchen.",
+      "viewAll": "Alle Kampagnen ansehen"
     }
   }
 }

@@ -59,6 +59,8 @@ export const kpiSchema = z.object({
 
 export const overviewSchema = z.object({
   rangeDays: z.number().int().min(1),
+  // Last day of the range: the newest day with synced metrics (today when there is none yet).
+  endDate: z.iso.date(),
   currency: z.string().regex(/^[A-Z]{3}$/),
   spend: kpiSchema,
   revenue: kpiSchema,

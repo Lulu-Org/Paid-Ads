@@ -3,6 +3,11 @@ import {
   approvalPolicySchema,
   approvalRequestSchema,
   campaignChecklistSchema,
+  campaignDetailSchema,
+  campaignSchema,
+  overviewSchema,
+  creativeSchema,
+  type CampaignCreateInput,
   operationsSummarySchema,
   paymentMethodSchema,
   spendLimitSchema,
@@ -47,7 +52,19 @@ export const realApi = {
 
   campaigns: {
     list: (query: Partial<CampaignListQuery> = {}) => getList(campaignListItemSchema, "/campaigns", query),
+    get: (id: string) => getOne(campaignDetailSchema, `/campaigns/${id}`),
+    create: (input: CampaignCreateInput) => write(campaignSchema, "POST", "/campaigns", input),
+    pause: (id: string) => write(campaignSchema, "POST", `/campaigns/${id}/pause`, {}),
+    resume: (id: string) => write(campaignSchema, "POST", `/campaigns/${id}/resume`, {}),
     checklist: (id: string) => getOne(campaignChecklistSchema, `/campaigns/${id}/checklist`),
+  },
+
+  creatives: {
+    list: () => getList(creativeSchema, "/creatives", { pageSize: 100 }),
+  },
+
+  overview: {
+    get: (rangeDays = 30) => getOne(overviewSchema, "/overview", { rangeDays }),
   },
 
   approvals: {

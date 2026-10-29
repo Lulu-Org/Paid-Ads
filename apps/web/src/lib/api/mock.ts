@@ -13,6 +13,9 @@ import type {
   AutomationRuleCreateInput,
   AutomationRuleUpdateInput,
   CampaignDefaults,
+  Campaign,
+  CampaignCreateInput,
+  CampaignDetail,
   CampaignListItem,
   CampaignListQuery,
   ConversionEvent,
@@ -20,7 +23,7 @@ import type {
   LoginInput,
   SyncRun,
 } from "@lulu/shared";
-import { approvalRequestCreateSchema, campaignTotals, launchChecklist } from "@lulu/shared";
+import { approvalRequestCreateSchema, buildOverview, campaignCreateSchema, campaignTotals, launchChecklist } from "@lulu/shared";
 import {
   DEMO_WORKSPACE_ID,
   demoAdAccounts,
@@ -38,6 +41,7 @@ import {
   demoAutomationActivity,
   demoAutomationRules,
   demoCampaigns,
+  demoPlans,
   demoMetricDays,
   demoCampaignDefaults,
   demoConversionEvents,
@@ -62,6 +66,7 @@ function paginate<T>(rows: T[], page = 1, pageSize = 25): ListResult<T> {
 
 // Copies, so changes in one test or session do not leak into the fixtures.
 const db = {
+  campaigns: demoCampaigns.map((c) => ({ ...c })),
   adAccounts: demoAdAccounts.map((a) => ({ ...a })),
   events: demoConversionEvents.map((e) => ({ ...e })),
   rules: demoAutomationRules.map((r) => ({ ...r })),
@@ -77,7 +82,7 @@ const db = {
 
 // Spend so far this month: the campaigns' spend in the sample data.
 const usedThisMonth = () =>
-  demoCampaigns.reduce((sum, c) => sum + campaignTotals(demoMetricDays[c.id] ?? [], c.budget).spend.amount, 0);
+  db.campaigns.reduce((sum, c) => sum + campaignTotals(demoMetricDays[c.id] ?? [], c.budget).spend.amount, 0);
 
 function findMember(userId: string) {
   const member = db.team.find((m) => m.userId === userId);
@@ -91,6 +96,19 @@ function findRule(id: string) {
   const rule = db.rules.find((r) => r.id === id);
   if (!rule) throw new ApiError("NOT_FOUND", 404);
   return rule;
+}
+
+function findCampaign(id: string) {
+  const campaign = db.campaigns.find((c) => c.id === id && c.deletedAt === null);
+  if (!campaign) throw new ApiError("NOT_FOUND", 404);
+  return campaign;
+}
+
+function setStatus(id: string, from: Campaign["status"], to: Campaign["status"]) {
+  const campaign = findCampaign(id);
+  if (campaign.status !== from) throw new ApiError("CAMPAIGN_STATUS_CONFLICT", 409);
+  Object.assign(campaign, { status: to, updatedAt: now() });
+  return { ...campaign };
 }
 
 export const mockApi = {
@@ -110,14 +128,53 @@ export const mockApi = {
 
   campaigns: {
     list(query: Partial<CampaignListQuery> = {}) {
-      const rows: CampaignListItem[] = demoCampaigns
+      const rows: CampaignListItem[] = db.campaigns
         .filter((c) => (!query.platform || c.platform === query.platform) && (!query.status || c.status === query.status))
         .map((c) => ({ ...c, totals: campaignTotals(demoMetricDays[c.id] ?? [], c.budget) }));
       return delay(paginate(rows, query.page, query.pageSize));
     },
+    async get(id: string): Promise<CampaignDetail> {
+      const campaign = findCampaign(id);
+      const days = demoMetricDays[id] ?? [];
+      return delay({
+        ...campaign,
+        totals: campaignTotals(days, campaign.budget),
+        plan: demoPlans[id] ?? [],
+        creativeIds: demoCampaignCreatives[id] ?? [],
+        days,
+      });
+    },
+    async create(input: CampaignCreateInput): Promise<Campaign> {
+      const parsed = campaignCreateSchema.parse(input);
+      const campaign: Campaign = {
+        ...record(),
+        id: newId("campaign"),
+        adAccountId: parsed.adAccountId ?? db.adAccounts.find((a) => a.platform === parsed.platform)?.id ?? null,
+        platform: parsed.platform,
+        externalId: null,
+        name: parsed.name,
+        status: "draft",
+        objective: parsed.objective,
+        audienceSummary: parsed.audienceSummary ?? null,
+        startAt: parsed.startAt ?? null,
+        endAt: parsed.endAt ?? null,
+        budget: parsed.budget,
+        rationale: parsed.rationale ?? null,
+        nextStep: parsed.nextStep ?? null,
+        ownerId: parsed.ownerId ?? CURRENT_USER_ID,
+      };
+      db.campaigns.unshift(campaign);
+      return delay(campaign);
+    },
+    // The real API queues ads.push; the mock changes the status straight away.
+    async pause(id: string): Promise<Campaign> {
+      return delay(setStatus(id, "live", "paused"));
+    },
+    async resume(id: string): Promise<Campaign> {
+      return delay(setStatus(id, "paused", "live"));
+    },
     async checklist(id: string) {
-      const campaign = demoCampaigns.find((c) => c.id === id);
-      if (!campaign) throw new ApiError("NOT_FOUND", 404);
+      const campaign = findCampaign(id);
       const creativeIds = demoCampaignCreatives[id] ?? [];
       return delay(
         launchChecklist({
@@ -132,6 +189,24 @@ export const mockApi = {
         }),
       );
     },
+  },
+
+  creatives: {
+    list: () => delay(paginate(demoCreatives, 1, 100)),
+  },
+
+  overview: {
+    get: (rangeDays = 30) =>
+      delay(
+        buildOverview({
+          campaigns: db.campaigns,
+          days: demoMetricDays,
+          accounts: db.adAccounts,
+          currency: "EUR",
+          rangeDays,
+          today: new Date(),
+        }),
+      ),
   },
 
   approvals: {

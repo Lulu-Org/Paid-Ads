@@ -117,7 +117,10 @@
     },
     "team": {
       "description": "Give every teammate the right access."
-    }
+    },
+    "subtitle": "Plan, launch and improve every paid campaign from one connected workspace.",
+    "viewInsights": "View insights",
+    "createCampaign": "Create campaign"
   },
   "errors": {
     "NETWORK_ERROR": "Can't reach the server. Check your connection.",
@@ -701,6 +704,159 @@
       "invalid": "Enter a valid email address.",
       "submit": "Send invite",
       "sent": "Invite sent to {email}."
+    }
+  },
+  "campaignStatus": {
+    "draft": "Draft",
+    "live": "Live",
+    "paused": "Paused",
+    "ended": "Ended"
+  },
+  "campaigns": {
+    "create": {
+      "eyebrow": "New campaign",
+      "title": "Start a connected campaign.",
+      "description": "Choose a channel and keep the campaign connected to your audiences, creatives, assets and CRM outcomes.",
+      "name": "Campaign name",
+      "namePlaceholder": "e.g. Summer launch · Munich",
+      "channel": "Advertising channel",
+      "budget": "Monthly budget ({currency})",
+      "budgetNoCurrency": "Monthly budget",
+      "budgetPlaceholder": "2500",
+      "objective": "Primary goal",
+      "start": "Start date",
+      "end": "End date (optional)",
+      "note": "Lulu will connect the campaign to your selected audience, asset library and CRM attribution once it is saved.",
+      "noAccount": "Connect an ad account first, so the budget has a currency.",
+      "submit": "Save campaign draft",
+      "saved": "{name} saved as a draft.",
+      "objectives": {
+        "lead_generation": "Lead generation",
+        "website_traffic": "Website traffic",
+        "sales": "Sales",
+        "brand_awareness": "Brand awareness"
+      },
+      "errors": {
+        "nameRequired": "Enter a campaign name",
+        "nameTooLong": "Use at most 200 characters",
+        "budgetInvalid": "Enter an amount, e.g. 2500",
+        "endBeforeStart": "The end date is before the start date"
+      }
+    },
+    "table": {
+      "filterLabel": "Filter by platform",
+      "all": "All",
+      "export": "Download as CSV",
+      "fileName": "campaigns",
+      "empty": "No campaigns here yet",
+      "campaign": "Campaign",
+      "platform": "Platform",
+      "status": "Status",
+      "spendBudget": "Spend / budget",
+      "spend": "Spend",
+      "budget": "Budget",
+      "leads": "Leads",
+      "cpl": "CPL",
+      "actions": "Actions",
+      "budgetUsed": "{percent} of budget used",
+      "readyToLaunch": "Ready to launch",
+      "openDetails": "Open details",
+      "open": "Open {name}"
+    },
+    "drawer": {
+      "eyebrow": "Campaign detail · {platform}",
+      "pause": "Pause campaign",
+      "resume": "Resume campaign",
+      "pauseTitle": "Pause this campaign?",
+      "resumeTitle": "Resume this campaign?",
+      "pauseMessage": "{name} stops delivering ads on the platform until you resume it.",
+      "resumeMessage": "{name} starts delivering ads again and spending its budget.",
+      "paused": "{name} paused.",
+      "resumed": "{name} resumed.",
+      "impressions": "Impressions",
+      "clicks": "Clicks",
+      "ctr": "CTR",
+      "conversions": "Conversions",
+      "revenue": "Revenue",
+      "cpl": "CPL",
+      "audienceEyebrow": "Audience",
+      "audience": "Who sees this campaign",
+      "noAudience": "No audience set yet",
+      "planEyebrow": "Plan and progress",
+      "plan": "What happens next",
+      "scheduleRange": "{start} – {end}",
+      "scheduleFrom": "From {start}, always on",
+      "scheduleNone": "No schedule yet",
+      "noPlan": "No plan steps yet",
+      "step": {
+        "done": "Done",
+        "current": "In progress",
+        "upcoming": "Upcoming"
+      },
+      "reasonEyebrow": "Reasoning and decisions",
+      "reason": "Why this campaign is running",
+      "noReason": "No reasoning written yet.",
+      "nextStep": "Recommended next step",
+      "assetsEyebrow": "Used assets",
+      "assets": "Everything in this campaign",
+      "noAssets": "No creatives linked yet"
+    },
+    "summary": {
+      "active": "Active campaigns",
+      "activeNote": "Pause or resume from campaign details",
+      "planned": "Planned spend",
+      "plannedNote": "{count, plural, one {Across # channel} other {Across # channels}}",
+      "assets": "Assets in library",
+      "assetsNote": "{count, plural, =0 {None need review} other {# need review}}",
+      "drafts": "Drafts",
+      "draftsNote": "Waiting to launch"
+    },
+    "creativeTypes": {
+      "search_ad": "Search ad",
+      "image": "Image",
+      "video": "Video",
+      "carousel": "Carousel",
+      "document": "PDF document",
+      "lead_form": "Lead form",
+      "landing_page": "Landing page",
+      "extension": "Extension",
+      "profile": "Profile"
+    }
+  },
+  "overview": {
+    "kpiLabel": "Key numbers",
+    "noChange": "No earlier data to compare",
+    "vsLastPeriod": "vs. previous period",
+    "roasValue": "{value}x",
+    "kpi": {
+      "spend": "Total spend",
+      "revenue": "Attributed revenue",
+      "leads": "Leads generated",
+      "roas": "Blended ROAS"
+    },
+    "performance": {
+      "eyebrow": "Performance",
+      "title": "Paid acquisition at a glance.",
+      "description": "Spend and attributed revenue across your connected channels.",
+      "spend": "Spend",
+      "revenue": "Attributed revenue",
+      "range": "Last {days} days",
+      "chartLabel": "Daily spend and attributed revenue"
+    },
+    "channels": {
+      "eyebrow": "Connected channels",
+      "title": "All your acquisition channels, together.",
+      "manage": "Manage connections",
+      "manageOne": "Manage",
+      "connect": "Connect",
+      "connected": "Connected",
+      "notConnected": "Not connected",
+      "campaigns": "{count, plural, one {# campaign} other {# campaigns}}"
+    },
+    "workspace": {
+      "eyebrow": "Campaign workspace",
+      "title": "Campaigns that need your attention.",
+      "viewAll": "View all campaigns"
     }
   }
 }

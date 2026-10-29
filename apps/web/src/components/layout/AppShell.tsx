@@ -6,6 +6,7 @@ import { usePathname } from "@/i18n/navigation";
 import { AdsTabs } from "./AdsNav";
 import { Rail } from "./Rail";
 import { TopBar } from "./TopBar";
+import { CreateCampaignProvider } from "@/features/campaigns/CreateCampaign";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("layout");
@@ -23,6 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [menuOpen]);
 
   return (
+    <CreateCampaignProvider>
     <div className="flex min-h-screen bg-bg">
       <div className="sticky top-0 hidden h-screen flex-none lg:block">
         <Rail />
@@ -52,5 +54,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     </div>
+    </CreateCampaignProvider>
   );
 }
