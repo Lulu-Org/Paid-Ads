@@ -40,7 +40,7 @@ Platform tables (already in `apps/api/prisma/schema.prisma`, same as the CRM): `
 | WebhookEvent | platform, eventType, campaignId, payload (JSON), receivedAt | No soft delete. |
 | ApprovalRequest | kind (`budget_change`, `launch`, `creative`), campaignId, payload (JSON), status (`ApprovalStatus`), requestedById, decidedById, decidedAt | |
 | Report | name, view (JSON: filters, comparison), schedule (cron, null = on demand), recipients (string[]) | |
-| SyncRun | adAccountId, kind (`sync` = platform → Lulu, `push` = Lulu → platform, `both`), scope (`campaign_performance`, `audiences`, `conversion_events`, `creatives`), status (`SyncStatus`), startedAt, finishedAt, recordsProcessed, error | The design's "Operations" view. No soft delete. |
+| SyncRun | adAccountId, platform, kind (`sync` = platform → Lulu, `push` = Lulu → platform, `both`), scope (`campaign_performance`, `audiences`, `conversion_events`, `creatives`), status (`SyncStatus`), startedAt, finishedAt, recordsProcessed, error | The design's "Operations" view. No soft delete. |
 
 ## Indexes
 
