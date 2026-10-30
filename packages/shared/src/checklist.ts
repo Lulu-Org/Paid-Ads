@@ -1,4 +1,5 @@
 import type { AdAccount, Campaign, CampaignChecklist, ChecklistItemKey } from "./campaign";
+import type { Money } from "./common";
 import type { ApprovalPolicy, ApprovalRequest, CampaignDefaults } from "./controls";
 import type { Audience, Creative } from "./library";
 
@@ -22,6 +23,20 @@ export function needsLaunchApproval(campaign: Campaign, policy: ApprovalPolicy):
   if (policy.scope === "none" || policy.scope === "creative_only") return false;
   if (campaign.budget.currency !== policy.threshold.currency) return true;
   return campaign.budget.amount > policy.threshold.amount;
+}
+
+/**
+ * Whether changing a campaign's budget needs an approval under the policy. The threshold applies to
+ * the absolute change (the design's "minimum change amount"), not the resulting total.
+ */
+export function needsBudgetApproval(
+  current: Money,
+  next: Money,
+  policy: ApprovalPolicy,
+): boolean {
+  if (policy.scope === "none" || policy.scope === "creative_only") return false;
+  if (current.currency !== next.currency || next.currency !== policy.threshold.currency) return true;
+  return Math.abs(next.amount - current.amount) > policy.threshold.amount;
 }
 
 export function launchChecklist(input: ChecklistInput): CampaignChecklist {

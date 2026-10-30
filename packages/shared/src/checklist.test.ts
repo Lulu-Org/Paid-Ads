@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { AdAccount, Campaign } from "./campaign";
-import { launchChecklist, needsLaunchApproval, type ChecklistInput } from "./checklist";
+import {
+  launchChecklist,
+  needsBudgetApproval,
+  needsLaunchApproval,
+  type ChecklistInput,
+} from "./checklist";
 import type { ApprovalPolicy, ApprovalRequest } from "./controls";
 import type { Audience, Creative } from "./library";
 
@@ -60,6 +65,46 @@ describe("launchChecklist", () => {
     expect(launchChecklist(input({ campaign: big, approvals: [approved] })).passed).toBe(10);
     const pending = { ...approved, status: "pending" } as ApprovalRequest;
     expect(failing(launchChecklist(input({ campaign: big, approvals: [pending] })))).toEqual(["approval_granted"]);
+  });
+});
+
+describe("needsBudgetApproval", () => {
+  const current = { amount: 2000, currency: "EUR" };
+
+  it("never asks for approval under the no-approval scopes", () => {
+    expect(
+      needsBudgetApproval(current, { amount: 9000, currency: "EUR" }, { ...policy, scope: "none" }),
+    ).toBe(false);
+    expect(
+      needsBudgetApproval(
+        current,
+        { amount: 9000, currency: "EUR" },
+        { ...policy, scope: "creative_only" },
+      ),
+    ).toBe(false);
+  });
+
+  it("compares the absolute change, not the resulting total", () => {
+    expect(needsBudgetApproval(current, { amount: 4500, currency: "EUR" }, policy)).toBe(false);
+    expect(needsBudgetApproval(current, { amount: 4500.01, currency: "EUR" }, policy)).toBe(true);
+    expect(needsBudgetApproval(current, { amount: 2000 - 2500, currency: "EUR" }, policy)).toBe(
+      false,
+    );
+    expect(needsBudgetApproval(current, { amount: 2000 - 2500.01, currency: "EUR" }, policy)).toBe(
+      true,
+    );
+  });
+
+  it("does not ask for approval exactly at the threshold", () => {
+    expect(needsBudgetApproval(current, { amount: 4500, currency: "EUR" }, policy)).toBe(false);
+    expect(needsBudgetApproval(current, { amount: current.amount, currency: "EUR" }, policy)).toBe(
+      false,
+    );
+  });
+
+  it("asks for approval on a currency mismatch", () => {
+    expect(needsBudgetApproval(current, { amount: 2001, currency: "USD" }, policy)).toBe(true);
+    expect(needsBudgetApproval(current, { amount: 2001, currency: "EUR" }, { ...policy, threshold: { amount: 2500, currency: "USD" } })).toBe(true);
   });
 });
 

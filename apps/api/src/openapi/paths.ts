@@ -178,6 +178,259 @@ const auditPaths: OpenApiPaths = {
   },
 };
 
+const campaignIdParameter = {
+  name: 'id',
+  in: 'path',
+  required: true,
+  schema: { type: 'string' },
+};
+
+const campaignListParameters = [
+  { name: 'q', in: 'query', required: false, schema: { type: 'string' } },
+  {
+    name: 'platform',
+    in: 'query',
+    required: false,
+    schema: { enum: ['google_lsa', 'google_ads', 'meta_ads', 'linkedin_ads'] },
+  },
+  {
+    name: 'status',
+    in: 'query',
+    required: false,
+    schema: { enum: ['draft', 'live', 'paused', 'ended'] },
+  },
+  {
+    name: 'sort',
+    in: 'query',
+    required: false,
+    schema: {
+      enum: [
+        'name',
+        '-name',
+        'createdAt',
+        '-createdAt',
+        'startAt',
+        '-startAt',
+        'budget',
+        '-budget',
+      ],
+    },
+  },
+  { name: 'page', in: 'query', required: false, schema: { type: 'integer', minimum: 1 } },
+  {
+    name: 'pageSize',
+    in: 'query',
+    required: false,
+    schema: { type: 'integer', minimum: 1, maximum: 100 },
+  },
+];
+
+const campaignPaths: OpenApiPaths = {
+  '/api/v1/campaigns': {
+    get: {
+      operationId: 'listCampaigns',
+      summary: 'List campaigns',
+      description:
+        'Campaigns with computed totals (spend, revenue, leads, CPL, ROAS and spend ÷ budget progress). Filters: platform, status and q (name or objective, case-insensitive). Sort: name (default), createdAt, startAt or budget, with - for descending. Needs campaigns: view.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: campaignListParameters,
+      responses: {
+        '200': listDataResponse('A page of campaigns with their totals.', 'CampaignListItem'),
+        '400': errorResponse('Invalid query, including an unsupported sort.'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+      },
+    },
+    post: {
+      operationId: 'createCampaign',
+      summary: 'Create a campaign',
+      description:
+        'Creates a draft. The owner defaults to the current user. An adAccountId must exist in the workspace and match the platform. Needs campaigns: create.',
+      tags: ['Campaigns'],
+      security: bearer,
+      requestBody: jsonBody('CampaignCreateInput'),
+      responses: {
+        '201': dataResponse('The draft campaign.', 'Campaign'),
+        '400': errorResponse('Invalid body or an ad account/owner outside the workspace.'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+      },
+    },
+  },
+  '/api/v1/campaigns/{id}': {
+    get: {
+      operationId: 'getCampaign',
+      summary: 'Campaign detail',
+      description:
+        'One campaign with its totals, daily metrics (oldest first), ordered plan steps, creative ids, rationale and next step. Another workspace’s campaign answers 404. Needs campaigns: view.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The campaign detail.', 'CampaignDetail'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+      },
+    },
+    patch: {
+      operationId: 'updateCampaign',
+      summary: 'Update a campaign',
+      description:
+        'Edits details and schedule. The platform cannot change. A budget change whose absolute amount is above the policy threshold holds the whole PATCH: the campaign stays unchanged and the response is 202 with the open budget_change ApprovalRequest. Otherwise the change is applied and the campaign returned. Needs campaigns: edit.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      requestBody: jsonBody('CampaignUpdateInput'),
+      responses: {
+        '200': dataResponse('The updated campaign.', 'Campaign'),
+        '202': dataResponse('Approval required; the campaign was not changed.', 'ApprovalRequest'),
+        '400': errorResponse('Invalid body or an ad account/owner outside the workspace.'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+      },
+    },
+  },
+  '/api/v1/campaigns/{id}/launch': {
+    post: {
+      operationId: 'launchCampaign',
+      summary: 'Launch a campaign',
+      description:
+        'Runs the launch checklist. A required launch approval answers 202 with the open launch ApprovalRequest and keeps the campaign in draft. A failed checklist answers 409 with the checklist in details. On success the status becomes live locally and ads.push is queued; no provider call runs in the request. Needs campaigns: edit.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The launched campaign.', 'Campaign'),
+        '202': dataResponse(
+          'Launch approval required; the campaign stays in draft.',
+          'ApprovalRequest',
+        ),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+        '409': errorResponse('The campaign is not a draft or the checklist has failed items.'),
+      },
+    },
+  },
+  '/api/v1/campaigns/{id}/pause': {
+    post: {
+      operationId: 'pauseCampaign',
+      summary: 'Pause a campaign',
+      description:
+        'Pauses a live campaign locally, then queues ads.push. Only live → paused is allowed; any other status answers 409. Needs campaigns: edit.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The paused campaign.', 'Campaign'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+        '409': errorResponse('The campaign is not live.'),
+      },
+    },
+  },
+  '/api/v1/campaigns/{id}/resume': {
+    post: {
+      operationId: 'resumeCampaign',
+      summary: 'Resume a campaign',
+      description:
+        'Resumes a paused campaign locally, then queues ads.push. Only paused → live is allowed; any other status answers 409. Needs campaigns: edit.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The resumed campaign.', 'Campaign'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+        '409': errorResponse('The campaign is not paused.'),
+      },
+    },
+  },
+  '/api/v1/campaigns/{id}/checklist': {
+    get: {
+      operationId: 'getCampaignChecklist',
+      summary: 'Launch checklist',
+      description:
+        'The ten launch checks and their pass state: account, budget, schedule, audience, creatives, tracking, consent, landing page, approval and owner. Needs campaigns: view.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The launch checklist.', 'CampaignChecklist'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+      },
+    },
+  },
+  '/api/v1/campaigns/{id}/plan': {
+    get: {
+      operationId: 'getCampaignPlan',
+      summary: 'Campaign plan',
+      description: 'The campaign’s plan steps, ordered. Needs campaigns: view.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The plan steps.', 'CampaignPlan'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+      },
+    },
+    put: {
+      operationId: 'replaceCampaignPlan',
+      summary: 'Replace the campaign plan',
+      description:
+        'Atomically replaces the plan with the given steps (at most 20), assigning order from the array index. Needs campaigns: edit.',
+      tags: ['Campaigns'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      requestBody: jsonBody('CampaignPlanUpdateInput'),
+      responses: {
+        '200': dataResponse('The new plan steps.', 'CampaignPlan'),
+        '400': errorResponse('Invalid body or more than 20 steps.'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Campaign not found.'),
+      },
+    },
+  },
+};
+
+const overviewPaths: OpenApiPaths = {
+  '/api/v1/overview': {
+    get: {
+      operationId: 'getOverview',
+      summary: 'Overview KPIs',
+      description:
+        'Spend, attributed revenue, leads, CPL and ROAS with the change against the preceding range of the same length, plus daily trends and spend by platform. The range ends on the newest day with synced metrics. rangeDays is 1–366 and defaults to 30. Needs campaigns: view.',
+      tags: ['Overview'],
+      security: bearer,
+      parameters: [
+        {
+          name: 'rangeDays',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', minimum: 1, maximum: 366, default: 30 },
+        },
+      ],
+      responses: {
+        '200': dataResponse('Overview KPIs and platform split.', 'Overview'),
+        '400': errorResponse('Invalid rangeDays.'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Workspace not found.'),
+      },
+    },
+  },
+};
+
 export const paths: OpenApiPaths = {
   '/health': {
     get: {
@@ -270,4 +523,6 @@ export const paths: OpenApiPaths = {
   },
   ...authPaths,
   ...auditPaths,
+  ...campaignPaths,
+  ...overviewPaths,
 };

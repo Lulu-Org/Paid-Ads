@@ -49,6 +49,10 @@ export function change(current: number, previous: number): number | null {
 
 // ---------- GET /overview ----------
 
+export const overviewQuerySchema = z.object({
+  rangeDays: z.coerce.number().int().min(1).max(366).default(30),
+});
+
 export const kpiSchema = z.object({
   value: z.number(),
   // Fraction vs. the previous period of the same length; null without data.
@@ -80,3 +84,4 @@ export const overviewSchema = z.object({
 
 export type Kpi = z.infer<typeof kpiSchema>;
 export type Overview = z.infer<typeof overviewSchema>;
+export type OverviewQuery = z.infer<typeof overviewQuerySchema>;
