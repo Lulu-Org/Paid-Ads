@@ -875,5 +875,285 @@
       "asOf": "数据截至 {date}",
       "empty": "当渠道报告花费和潜在客户后，这里会显示信号。"
     }
+  },
+  "planning": {
+    "target": {
+      "roas": "目标 ROAS {value}x",
+      "cpl": "目标单个线索成本 {value}",
+      "leads": "目标 {value} 个潜在客户"
+    },
+    "kpi": {
+      "planned": "计划月度花费",
+      "allocated": "已分配 {share}",
+      "targetLeads": "目标潜在客户",
+      "noPreviousPlan": "没有可比较的上期计划",
+      "vsLastPlan": "较上期计划 {change}",
+      "forecastRevenue": "预测收入",
+      "noForecast": "历史数据不足，无法预测",
+      "forecastRoas": "预测 ROAS {value}x",
+      "nextReview": "下次计划评审",
+      "days": "{count, plural, =0 {今天} other {# 天}}"
+    },
+    "budget": {
+      "eyebrow": "预算计划 · {month}",
+      "eyebrowEmpty": "预算计划",
+      "title": "先分配，再花费。",
+      "description": "每个渠道都有目标、负责人和评审节点。",
+      "saveScenario": "保存方案",
+      "share": "占计划花费的 {share}"
+    },
+    "steps": {
+      "eyebrow": "计划步骤",
+      "title": "从简报到评审。",
+      "status": "计划状态："
+    },
+    "status": {
+      "draft": "草稿",
+      "pending_approval": "等待审批",
+      "approved": "已批准"
+    },
+    "logic": {
+      "eyebrow": "计划依据",
+      "title": "为什么这样规划。",
+      "goal": "目标",
+      "constraint": "约束",
+      "signal": "信号"
+    },
+    "scenario": {
+      "eyebrow": "预算方案",
+      "title": "试试另一种分配。",
+      "description": "修改每个渠道的预算。预测基于各渠道最近 30 天的结果。",
+      "defaultName": "方案 · {month}",
+      "name": "方案名称",
+      "amount": "{platform}（{currency}）",
+      "allocated": "已分配",
+      "targetLeads": "目标潜在客户",
+      "forecastRevenue": "预测收入",
+      "overLimit": "超过了每月花费上限 {limit}。",
+      "submit": "保存方案",
+      "saved": "{name} 已保存为草稿。",
+      "errors": {
+        "nameRequired": "请输入名称",
+        "amountInvalid": "请为每个渠道输入 0 或以上的金额"
+      }
+    }
+  },
+  "audiences": {
+    "refreshed": "{name} 已刷新。",
+    "never": "尚未同步",
+    "library": {
+      "eyebrow": "受众库",
+      "title": "一个受众，多个渠道。",
+      "description": "创建、同步和排除受众，同时保持授权和来源清晰可见。"
+    },
+    "create": "创建受众",
+    "empty": "还没有受众",
+    "syncing": "正在刷新",
+    "synced": "已同步",
+    "sources": {
+      "crm_segment": "CRM 分组",
+      "website_visitors": "网站访客",
+      "customer_list": "客户名单",
+      "lookalike": "相似受众"
+    },
+    "sourceShort": {
+      "crm_segment": "CRM",
+      "website_visitors": "网站",
+      "customer_list": "名单",
+      "lookalike": "CRM"
+    },
+    "estimatedReach": "预计覆盖",
+    "people": "人",
+    "source": "来源",
+    "matchRate": "匹配率",
+    "usedIn": "用于",
+    "campaigns": "{count, plural, =0 {无广告活动} other {# 个广告活动}}",
+    "refresh": "立即刷新",
+    "view": "查看受众",
+    "open": "打开 {name}",
+    "controls": {
+      "eyebrow": "受众控制",
+      "title": "来源、授权与排除。",
+      "privacy": "隐私设置",
+      "source": "来源",
+      "lastSync": "上次同步",
+      "consent": "授权",
+      "exclusions": "排除",
+      "actions": "操作",
+      "valid": "有效"
+    },
+    "detail": {
+      "eyebrow": "受众",
+      "source": "来源",
+      "size": "规模",
+      "consent": "授权依据",
+      "platforms": "已同步到"
+    },
+    "createForm": {
+      "eyebrow": "新受众",
+      "title": "创建一次，随处使用。",
+      "description": "选择来源和要同步的渠道。每个受众的授权依据都清晰可见。",
+      "name": "受众名称",
+      "namePlaceholder": "例如：CRM · 已成交客户",
+      "source": "来源",
+      "consent": "授权依据",
+      "consentPlaceholder": "例如：CRM 中的营销授权",
+      "platforms": "同步到",
+      "note": "Lulu 会将受众同步到所选渠道，并保留其授权依据。",
+      "submit": "创建受众",
+      "saved": "{name} 已创建，正在进行首次同步。",
+      "errors": {
+        "nameRequired": "请输入名称",
+        "nameTooLong": "最多 200 个字符",
+        "consentRequired": "请说明为什么可以使用此受众",
+        "consentTooLong": "最多 300 个字符",
+        "platformsRequired": "请至少选择一个渠道"
+      }
+    }
+  },
+  "creatives": {
+    "library": {
+      "eyebrow": "创意库",
+      "title": "每个素材、版本和结果都有完整背景。",
+      "description": "查看素材用在哪里、由谁批准，以及哪个版本胜出。"
+    },
+    "add": "添加创意",
+    "open": "打开 {name}",
+    "badge": {
+      "live": "投放中",
+      "winner": "胜出",
+      "review": "待审核",
+      "rejected": "已拒绝"
+    },
+    "campaigns": "{count, plural, =0 {无广告活动} other {# 个广告活动}}",
+    "approval": {
+      "approved": "已批准",
+      "pending": "需要审批",
+      "rejected": "已拒绝"
+    },
+    "testing": {
+      "eyebrow": "创意测试",
+      "title": "版本 {variant} 领先 {lead}。",
+      "noWinner": "暂时没有领先的版本。",
+      "description": "{campaign} 中各版本的单个线索成本。",
+      "variant": "版本 {variant} · {role}",
+      "role": {
+        "control": "对照组",
+        "winner": "胜出",
+        "learning": "学习中"
+      },
+      "cpl": "单个线索成本 {value}",
+      "leads": "{count} 个潜在客户"
+    },
+    "detail": {
+      "eyebrow": "创意 · {type}",
+      "status": "审批",
+      "usedIn": "用于",
+      "openFile": "打开文件"
+    },
+    "addForm": {
+      "eyebrow": "新创意",
+      "title": "向创意库添加创意。",
+      "description": "上传图片、视频或 PDF。批准后即可在广告活动中使用。",
+      "drop": "将文件拖到这里或选择文件",
+      "formats": "PNG、JPG、GIF、WebP、MP4、MOV 或 PDF，最大 {size} MB",
+      "file": "创意文件",
+      "name": "名称",
+      "type": "类型",
+      "approvalNote": "新创意需要审批后才能投放。",
+      "submit": "添加创意",
+      "saved": "{name} 已添加，等待审批。",
+      "errors": {
+        "tooBig": "文件超过 {size} MB",
+        "fileType": "请使用图片、视频或 PDF",
+        "nameRequired": "请输入名称"
+      }
+    }
+  },
+  "reports": {
+    "allChannels": "所有渠道",
+    "lastDays": "{count, plural, other {最近 # 天}}",
+    "schedule": {
+      "weekly": "每周一",
+      "monthly": "每月 1 日",
+      "custom": "已排期",
+      "onDemand": "按需"
+    },
+    "customRange": "自定义日期",
+    "removeFilter": "移除筛选 {filter}",
+    "filter": "筛选",
+    "filterLabel": "按渠道筛选",
+    "from": "开始",
+    "to": "结束",
+    "rangeInvalid": "结束日期早于开始日期",
+    "apply": "应用",
+    "scheduleReport": "定期发送报告",
+    "customReport": "自定义报告",
+    "noComparison": "暂无历史数据",
+    "points": "{value} 个百分点",
+    "roasValue": "{value}x",
+    "kpi": {
+      "revenue": "归因收入",
+      "leads": "潜在客户",
+      "conversionRate": "转化率",
+      "costPerLead": "单个线索成本"
+    },
+    "comparison": {
+      "eyebrow": "渠道对比",
+      "title": "比较每个渠道的贡献。",
+      "channel": "渠道",
+      "spend": "花费",
+      "leads": "潜在客户",
+      "conversions": "转化",
+      "roas": "ROAS",
+      "noSpend": "无花费",
+      "noCampaigns": "无广告活动"
+    },
+    "saved": {
+      "eyebrow": "已保存的报告",
+      "title": "你常用的报告。",
+      "open": "打开",
+      "delete": "删除",
+      "empty": "还没有已保存的报告",
+      "deleted": "{name} 已删除。",
+      "deleteTitle": "删除此报告？",
+      "deleteMessage": "{name} 及其发送计划将被删除。"
+    },
+    "form": {
+      "name": "报告名称",
+      "namePlaceholder": "例如：每周渠道汇总",
+      "frequency": "发送",
+      "recipients": "收件人",
+      "recipientsPlaceholder": "name@company.com, …",
+      "currentView": "使用当前视图：{channels}，最近 {days} 天。",
+      "channels": "渠道",
+      "channelsHint": "不选择即为所有渠道。",
+      "range": "日期范围",
+      "compare": "对比",
+      "compareOptions": {
+        "previous_period": "上一周期",
+        "previous_year": "去年同期",
+        "none": "不对比"
+      },
+      "scheduled": "{name} 已排期。",
+      "saved": "{name} 已保存。",
+      "errors": {
+        "nameRequired": "请输入名称",
+        "recipientsRequired": "请至少添加一个邮箱地址",
+        "recipientsInvalid": "请检查邮箱地址"
+      },
+      "schedule": {
+        "eyebrow": "定期发送报告",
+        "title": "按计划发送此视图。",
+        "description": "报告会在 UTC 时间 08:00 通过邮件发送。",
+        "submit": "定期发送报告"
+      },
+      "custom": {
+        "eyebrow": "自定义报告",
+        "title": "创建报告。",
+        "description": "选择渠道、日期范围和对比方式。保存后可随时查看。",
+        "submit": "保存报告"
+      }
+    }
   }
 }

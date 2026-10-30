@@ -25,9 +25,10 @@ Platform tables (already in `apps/api/prisma/schema.prisma`, same as the CRM): `
 | Campaign | adAccountId, platform, externalId (null for drafts), name, status, objective, audienceSummary, startAt, endAt (null = always on), budgetAmount, budgetCurrency, rationale, nextStep, ownerId | `rationale` and `nextStep` are the design's "Why this campaign" and "Next step". |
 | CampaignMetricDay | campaignId, date, impressions, clicks, conversions, leads, spendAmount, revenueAmount, currency | One row per campaign per day, written by `ads.sync`. Totals, CTR (clicks ÷ impressions), CPL (spend ÷ leads) and ROAS (revenue ÷ spend) are computed, never stored. |
 | CampaignPlanStep | campaignId, order, label, detail, status (`PlanStepStatus`) | The design's campaign plan timeline. |
-| Audience | name, source (`crm_segment`, `website_visitors`, `customer_list`, `lookalike`), sizeEstimate, consentBasis, platforms (`AdPlatform`[]), lastSyncedAt | |
+| Audience | name, source (`crm_segment`, `website_visitors`, `customer_list`, `lookalike`), sizeEstimate, consentBasis, platforms (`AdPlatform`[]), lastSyncedAt, description, matchRate (0–1, from the platforms on sync), exclusions (string[]) | `description`, `matchRate` and `exclusions` added for the Audiences view (F2). |
+| CampaignAudience | campaignId, audienceId | Which audiences a campaign targets; gives the audience's campaign count. |
 | Creative | name, type (`search_ad`, `image`, `video`, `carousel`, `document`, `lead_form`, `landing_page`, `extension`, `profile`), fileUrl, meta (JSON: formats, lengths), approvalStatus, approvedById | |
-| CampaignCreative | campaignId, creativeId, variant (`A`, `B`, …) | Which creatives run where. |
+| CampaignCreative | campaignId, creativeId, variant (`A`, `B`, …), role (`control`, `winner`, `learning`), spendAmount, leads | Which creatives run where, and each variant's results (written by `ads.sync`) for creative tests. |
 | ConversionEvent | name, source (`crm`, `calendar`, `accounting`, `website`, `call`), valueAmount, valueCurrency (both null = dynamic, the value comes with each conversion), platforms (`AdPlatform`[]), health (`mapped`, `needs_attention`), lastReceivedAt | The design's "Event mapping". |
 | AutomationRule | name, trigger (JSON: platforms, schedule cron or null), condition (JSON or null for scheduled digests: metric, operator, value, window in hours or days), action (`notify`, `recommend`, `pause_campaign`, `shift_budget`, `send_digest`), enabled | Budget actions always go through an approval. |
 | AutomationActivity | ruleId, outcome (`review_requested`, `paused`, `notified`, `digest_sent`, `budget_shifted`), campaignId, at | One row per thing a rule did. |
@@ -40,6 +41,7 @@ Platform tables (already in `apps/api/prisma/schema.prisma`, same as the CRM): `
 | WebhookEvent | platform, eventType, campaignId, payload (JSON), receivedAt | |
 | ApprovalRequest | kind (`budget_change`, `launch`, `creative`), campaignId, payload (JSON), status (`ApprovalStatus`), requestedById, decidedById, decidedAt | |
 | Report | name, view (JSON: filters, comparison), schedule (cron, null = on demand), recipients (string[]) | |
+| BudgetPlan | name, month (`YYYY-MM`), status (`draft`, `pending_approval`, `approved`), channels (JSON: platform, planned money, target `{ metric: roas \| cpl \| leads, value }`), steps (JSON: label, detail, status), rationale (JSON: goal, constraint, signal), nextReviewAt, nextReviewNote | One approved plan per month; scenarios are drafts. Allocation and forecasts are computed (`buildPlanning`), never stored. |
 | SyncRun | adAccountId, platform, kind (`sync` = platform → Lulu, `push` = Lulu → platform, `both`), scope (`campaign_performance`, `audiences`, `conversion_events`, `creatives`), status (`SyncStatus`), startedAt, finishedAt, recordsProcessed, error | The design's "Operations" view. |
 
 ## Indexes

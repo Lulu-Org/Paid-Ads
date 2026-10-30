@@ -15,6 +15,16 @@ import type {
   CampaignDefaults,
   Campaign,
   CampaignCreateInput,
+  AudienceCreateInput,
+  AudienceListItem,
+  CreativeListItem,
+  CreativeTest,
+  CreativeType,
+  PlanScenarioCreateInput,
+  Planning,
+  Report,
+  ReportCreateInput,
+  ReportRunQuery,
   CampaignDetail,
   CampaignListItem,
   CampaignListQuery,
@@ -23,7 +33,7 @@ import type {
   LoginInput,
   SyncRun,
 } from "@lulu/shared";
-import { approvalRequestCreateSchema, buildOverview, campaignCreateSchema, campaignTotals, launchChecklist } from "@lulu/shared";
+import { approvalRequestCreateSchema, audienceCreateSchema, buildOverview, buildPlanning, buildReport, channelHistory, creativeCreateSchema, planScenarioCreateSchema, reportCreateSchema, reportRunQuerySchema, campaignCreateSchema, campaignTotals, launchChecklist } from "@lulu/shared";
 import {
   DEMO_WORKSPACE_ID,
   demoAdAccounts,
@@ -49,6 +59,7 @@ import {
   demoTrackingHealth,
   demoUsers,
 } from "./fixtures";
+import { demoAudienceExtras, demoBudgetPlan, demoPreviousTargetLeads, demoReports, demoVariantResults } from "./fixtures-f2";
 import { ApiError, type ListResult } from "./types";
 
 // The same shape as real.ts, answered from the design's sample data.
@@ -66,6 +77,10 @@ function paginate<T>(rows: T[], page = 1, pageSize = 25): ListResult<T> {
 
 // Copies, so changes in one test or session do not leak into the fixtures.
 const db = {
+  audiences: demoAudiences.map((a) => ({ ...a, ...demoAudienceExtras[a.id], syncing: a.lastSyncedAt === null })),
+  creatives: demoCreatives.map((c) => ({ ...c })),
+  plan: demoBudgetPlan(),
+  reports: demoReports.map((r) => ({ ...r })),
   campaigns: demoCampaigns.map((c) => ({ ...c })),
   adAccounts: demoAdAccounts.map((a) => ({ ...a })),
   events: demoConversionEvents.map((e) => ({ ...e })),
@@ -96,6 +111,10 @@ function findRule(id: string) {
   const rule = db.rules.find((r) => r.id === id);
   if (!rule) throw new ApiError("NOT_FOUND", 404);
   return rule;
+}
+
+function planningFor(plan: typeof db.plan) {
+  return buildPlanning(plan, db.spendLimit.monthly, channelHistory(db.campaigns, demoMetricDays, "EUR"), demoPreviousTargetLeads);
 }
 
 function findCampaign(id: string) {
@@ -192,7 +211,105 @@ export const mockApi = {
   },
 
   creatives: {
-    list: () => delay(paginate(demoCreatives, 1, 100)),
+    list(): Promise<ListResult<CreativeListItem>> {
+      const rows = db.creatives.map((c) => ({
+        ...c,
+        campaignCount: Object.values(demoCampaignCreatives).filter((ids) => ids.includes(c.id)).length,
+        winning: demoVariantResults.some((v) => v.creativeId === c.id && v.role === "winner"),
+      }));
+      return delay(paginate(rows, 1, 100));
+    },
+    // The real API takes multipart/form-data; the mock keeps the name and type and has no file URL.
+    async create(input: { name: string; type: CreativeType; file: File | null }) {
+      const parsed = creativeCreateSchema.parse({ name: input.name, type: input.type });
+      const creative = { ...record(), id: newId("creative"), ...parsed, fileUrl: null, meta: parsed.meta ?? {}, approvalStatus: "pending" as const, approvedById: null };
+      db.creatives.unshift(creative);
+      return delay(creative);
+    },
+    tests(): Promise<CreativeTest[]> {
+      const byCampaign = Object.groupBy(demoVariantResults, (v) => v.campaignId);
+      return delay(
+        Object.entries(byCampaign).map(([campaignId, variants]) => {
+          const rows = variants!.map((v) => ({
+            variant: v.variant,
+            creativeId: v.creativeId,
+            creativeName: db.creatives.find((c) => c.id === v.creativeId)?.name ?? v.creativeId,
+            role: v.role,
+            spend: { amount: v.spend, currency: "EUR" },
+            leads: v.leads,
+            cpl: v.leads ? { amount: Math.round((v.spend / v.leads) * 100) / 100, currency: "EUR" } : null,
+          }));
+          const control = rows.find((r) => r.role === "control")?.cpl;
+          const winner = rows.find((r) => r.role === "winner")?.cpl;
+          return {
+            campaignId,
+            campaignName: db.campaigns.find((c) => c.id === campaignId)?.name ?? campaignId,
+            variants: rows,
+            winnerLead: control && winner ? (control.amount - winner.amount) / control.amount : null,
+          };
+        }),
+      );
+    },
+  },
+
+  audiences: {
+    list(): Promise<ListResult<AudienceListItem>> {
+      const rows = db.audiences
+        .filter((a) => a.deletedAt === null)
+        .map(({ campaignIds, ...a }) => ({ ...a, campaignCount: campaignIds.length }));
+      return delay(paginate(rows, 1, 100));
+    },
+    async create(input: AudienceCreateInput) {
+      const parsed = audienceCreateSchema.parse(input);
+      const audience = {
+        ...record(),
+        id: newId("audience"),
+        ...parsed,
+        sizeEstimate: null,
+        lastSyncedAt: null,
+        description: null,
+        matchRate: null,
+        exclusions: [],
+        campaignIds: [] as string[],
+        syncing: true,
+      };
+      db.audiences.unshift(audience);
+      return delay(audience);
+    },
+    // The real API queues the sync job; the mock finishes it straight away.
+    async sync(id: string) {
+      const audience = db.audiences.find((a) => a.id === id);
+      if (!audience) throw new ApiError("NOT_FOUND", 404);
+      Object.assign(audience, { syncing: false, lastSyncedAt: now() });
+      return delay(undefined);
+    },
+  },
+
+  planning: {
+    get: (): Promise<Planning> => delay(planningFor(db.plan)),
+    async saveScenario(input: PlanScenarioCreateInput): Promise<Planning> {
+      const parsed = planScenarioCreateSchema.parse(input);
+      const channels = db.plan.channels.map((c) => ({ ...c, planned: parsed.channels.find((p) => p.platform === c.platform)?.planned ?? c.planned }));
+      db.plan = { ...db.plan, name: parsed.name, channels, status: "draft", updatedAt: now() };
+      return delay(planningFor(db.plan));
+    },
+  },
+
+  reports: {
+    list: () => delay(paginate(db.reports.filter((r) => r.deletedAt === null))),
+    async create(input: ReportCreateInput): Promise<Report> {
+      const report = { ...record(), id: newId("report"), ...reportCreateSchema.parse(input) };
+      db.reports.unshift(report);
+      return delay(report);
+    },
+    async remove(id: string) {
+      const report = db.reports.find((r) => r.id === id);
+      if (!report) throw new ApiError("NOT_FOUND", 404);
+      report.deletedAt = now();
+      return delay(undefined);
+    },
+    run: (query: ReportRunQuery) =>
+      delay(buildReport({ campaigns: db.campaigns, days: demoMetricDays, currency: "EUR" }, reportRunQuerySchema.parse(query))),
   },
 
   overview: {

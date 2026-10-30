@@ -875,5 +875,285 @@
       "asOf": "Daten bis {date}",
       "empty": "Signale erscheinen, sobald Ihre Kanäle Ausgaben und Leads melden."
     }
+  },
+  "planning": {
+    "target": {
+      "roas": "Ziel-ROAS {value}x",
+      "cpl": "Ziel-CPL {value}",
+      "leads": "Ziel {value} Leads"
+    },
+    "kpi": {
+      "planned": "Geplante Monatsausgaben",
+      "allocated": "{share} verteilt",
+      "targetLeads": "Ziel-Leads",
+      "noPreviousPlan": "Kein früherer Plan zum Vergleich",
+      "vsLastPlan": "{change} ggü. letztem Plan",
+      "forecastRevenue": "Prognostizierter Umsatz",
+      "noForecast": "Zu wenig Verlauf für eine Prognose",
+      "forecastRoas": "{value}x prognostizierter ROAS",
+      "nextReview": "Nächste Planungsprüfung",
+      "days": "{count, plural, =0 {Heute} one {# Tag} other {# Tage}}"
+    },
+    "budget": {
+      "eyebrow": "Budgetplan · {month}",
+      "eyebrowEmpty": "Budgetplan",
+      "title": "Verteilen, bevor ausgegeben wird.",
+      "description": "Jeder Kanal hat ein Ziel, einen Verantwortlichen und einen Prüfpunkt.",
+      "saveScenario": "Szenario speichern",
+      "share": "{share} der geplanten Ausgaben"
+    },
+    "steps": {
+      "eyebrow": "Planungsschritte",
+      "title": "Vom Briefing zur Prüfung.",
+      "status": "Planstatus:"
+    },
+    "status": {
+      "draft": "Entwurf",
+      "pending_approval": "Wartet auf Freigabe",
+      "approved": "Freigegeben"
+    },
+    "logic": {
+      "eyebrow": "Planungslogik",
+      "title": "Warum der Plan so aussieht.",
+      "goal": "Ziel",
+      "constraint": "Rahmen",
+      "signal": "Signal"
+    },
+    "scenario": {
+      "eyebrow": "Budgetszenario",
+      "title": "Eine andere Verteilung ausprobieren.",
+      "description": "Ändern Sie, was jeder Kanal bekommt. Die Prognose nutzt die Ergebnisse jedes Kanals der letzten 30 Tage.",
+      "defaultName": "Szenario · {month}",
+      "name": "Name des Szenarios",
+      "amount": "{platform} ({currency})",
+      "allocated": "Verteilt",
+      "targetLeads": "Ziel-Leads",
+      "forecastRevenue": "Prognostizierter Umsatz",
+      "overLimit": "Das ist mehr als das monatliche Ausgabenlimit von {limit}.",
+      "submit": "Szenario speichern",
+      "saved": "{name} als Entwurf gespeichert.",
+      "errors": {
+        "nameRequired": "Bitte einen Namen eingeben",
+        "amountInvalid": "Bitte für jeden Kanal einen Betrag von 0 oder mehr eingeben"
+      }
+    }
+  },
+  "audiences": {
+    "refreshed": "{name} aktualisiert.",
+    "never": "Noch nicht synchronisiert",
+    "library": {
+      "eyebrow": "Zielgruppen-Bibliothek",
+      "title": "Eine Zielgruppe, viele Kanäle.",
+      "description": "Zielgruppen erstellen, synchronisieren und ausschließen – mit sichtbarer Einwilligung und Quelle."
+    },
+    "create": "Zielgruppe erstellen",
+    "empty": "Noch keine Zielgruppen",
+    "syncing": "Wird aktualisiert",
+    "synced": "Synchronisiert",
+    "sources": {
+      "crm_segment": "CRM-Segment",
+      "website_visitors": "Website-Besucher",
+      "customer_list": "Kundenliste",
+      "lookalike": "Lookalike"
+    },
+    "sourceShort": {
+      "crm_segment": "CRM",
+      "website_visitors": "Website",
+      "customer_list": "Liste",
+      "lookalike": "CRM"
+    },
+    "estimatedReach": "geschätzte Reichweite",
+    "people": "Personen",
+    "source": "Quelle",
+    "matchRate": "Abgleichrate",
+    "usedIn": "Verwendet in",
+    "campaigns": "{count, plural, =0 {Keine Kampagnen} one {# Kampagne} other {# Kampagnen}}",
+    "refresh": "Jetzt aktualisieren",
+    "view": "Zielgruppe ansehen",
+    "open": "{name} öffnen",
+    "controls": {
+      "eyebrow": "Zielgruppen-Kontrollen",
+      "title": "Quellen, Einwilligung und Ausschlüsse.",
+      "privacy": "Datenschutzeinstellungen",
+      "source": "Quelle",
+      "lastSync": "Letzte Synchronisierung",
+      "consent": "Einwilligung",
+      "exclusions": "Ausschlüsse",
+      "actions": "Aktionen",
+      "valid": "Gültig"
+    },
+    "detail": {
+      "eyebrow": "Zielgruppe",
+      "source": "Quelle",
+      "size": "Größe",
+      "consent": "Grundlage der Einwilligung",
+      "platforms": "Synchronisiert mit"
+    },
+    "createForm": {
+      "eyebrow": "Neue Zielgruppe",
+      "title": "Einmal erstellen, überall nutzen.",
+      "description": "Wählen Sie eine Quelle und die Kanäle zur Synchronisierung. Die Einwilligung bleibt bei jeder Zielgruppe sichtbar.",
+      "name": "Name der Zielgruppe",
+      "namePlaceholder": "z. B. CRM · Gewonnene Kunden",
+      "source": "Quelle",
+      "consent": "Grundlage der Einwilligung",
+      "consentPlaceholder": "z. B. Marketing-Einwilligung im CRM",
+      "platforms": "Synchronisieren mit",
+      "note": "Lulu synchronisiert die Zielgruppe mit den gewählten Kanälen und behält ihre Einwilligungsgrundlage bei.",
+      "submit": "Zielgruppe erstellen",
+      "saved": "{name} erstellt. Die erste Synchronisierung läuft.",
+      "errors": {
+        "nameRequired": "Bitte einen Namen eingeben",
+        "nameTooLong": "Höchstens 200 Zeichen",
+        "consentRequired": "Bitte angeben, warum Sie diese Zielgruppe nutzen dürfen",
+        "consentTooLong": "Höchstens 300 Zeichen",
+        "platformsRequired": "Bitte mindestens einen Kanal wählen"
+      }
+    }
+  },
+  "creatives": {
+    "library": {
+      "eyebrow": "Creative-Bibliothek",
+      "title": "Jedes Asset, jede Version, jedes Ergebnis im Kontext.",
+      "description": "Sehen Sie, wo ein Asset genutzt wird, wer es freigegeben hat und welche Variante gewinnt."
+    },
+    "add": "Creative hinzufügen",
+    "open": "{name} öffnen",
+    "badge": {
+      "live": "Aktiv",
+      "winner": "Gewinner",
+      "review": "Prüfung",
+      "rejected": "Abgelehnt"
+    },
+    "campaigns": "{count, plural, =0 {Keine Kampagnen} one {# Kampagne} other {# Kampagnen}}",
+    "approval": {
+      "approved": "Freigegeben",
+      "pending": "Freigabe nötig",
+      "rejected": "Abgelehnt"
+    },
+    "testing": {
+      "eyebrow": "Creative-Tests",
+      "title": "Variante {variant} liegt {lead} vorn.",
+      "noWinner": "Noch liegt keine Variante vorn.",
+      "description": "Kosten pro Lead je Variante in {campaign}.",
+      "variant": "Variante {variant} · {role}",
+      "role": {
+        "control": "Kontrolle",
+        "winner": "Gewinner",
+        "learning": "Lernphase"
+      },
+      "cpl": "{value} CPL",
+      "leads": "{count, plural, one {# Lead} other {# Leads}}"
+    },
+    "detail": {
+      "eyebrow": "Creative · {type}",
+      "status": "Freigabe",
+      "usedIn": "Verwendet in",
+      "openFile": "Datei öffnen"
+    },
+    "addForm": {
+      "eyebrow": "Neues Creative",
+      "title": "Ein Creative zur Bibliothek hinzufügen.",
+      "description": "Laden Sie ein Bild, Video oder PDF hoch. Nach der Freigabe kann es in Kampagnen genutzt werden.",
+      "drop": "Datei hier ablegen oder auswählen",
+      "formats": "PNG, JPG, GIF, WebP, MP4, MOV oder PDF bis {size} MB",
+      "file": "Creative-Datei",
+      "name": "Name",
+      "type": "Typ",
+      "approvalNote": "Neue Creatives warten auf Freigabe, bevor sie laufen können.",
+      "submit": "Creative hinzufügen",
+      "saved": "{name} hinzugefügt und wartet auf Freigabe.",
+      "errors": {
+        "tooBig": "Die Datei ist größer als {size} MB",
+        "fileType": "Bitte ein Bild, Video oder PDF verwenden",
+        "nameRequired": "Bitte einen Namen eingeben"
+      }
+    }
+  },
+  "reports": {
+    "allChannels": "Alle Kanäle",
+    "lastDays": "{count, plural, one {Letzter Tag} other {Letzte # Tage}}",
+    "schedule": {
+      "weekly": "Wöchentlich, montags",
+      "monthly": "Monatlich, am 1.",
+      "custom": "Geplant",
+      "onDemand": "Bei Bedarf"
+    },
+    "customRange": "Eigener Zeitraum",
+    "removeFilter": "Filter {filter} entfernen",
+    "filter": "Filter",
+    "filterLabel": "Nach Kanal filtern",
+    "from": "Von",
+    "to": "Bis",
+    "rangeInvalid": "Das Ende liegt vor dem Anfang",
+    "apply": "Anwenden",
+    "scheduleReport": "Bericht planen",
+    "customReport": "Eigener Bericht",
+    "noComparison": "Keine früheren Daten",
+    "points": "{value} Pp.",
+    "roasValue": "{value}x",
+    "kpi": {
+      "revenue": "Zugeordneter Umsatz",
+      "leads": "Leads",
+      "conversionRate": "Conversion-Rate",
+      "costPerLead": "Kosten pro Lead"
+    },
+    "comparison": {
+      "eyebrow": "Kanalvergleich",
+      "title": "Vergleichen, was jeder Kanal beiträgt.",
+      "channel": "Kanal",
+      "spend": "Ausgaben",
+      "leads": "Leads",
+      "conversions": "Conversions",
+      "roas": "ROAS",
+      "noSpend": "Keine Ausgaben",
+      "noCampaigns": "Keine Kampagnen"
+    },
+    "saved": {
+      "eyebrow": "Gespeicherte Berichte",
+      "title": "Berichte, zu denen Sie zurückkehren.",
+      "open": "Öffnen",
+      "delete": "Löschen",
+      "empty": "Noch keine gespeicherten Berichte",
+      "deleted": "{name} gelöscht.",
+      "deleteTitle": "Diesen Bericht löschen?",
+      "deleteMessage": "{name} und sein Zeitplan werden entfernt."
+    },
+    "form": {
+      "name": "Name des Berichts",
+      "namePlaceholder": "z. B. Wöchentliche Kanalübersicht",
+      "frequency": "Senden",
+      "recipients": "Empfänger",
+      "recipientsPlaceholder": "name@firma.de, …",
+      "currentView": "Nutzt die aktuelle Ansicht: {channels}, letzte {days} Tage.",
+      "channels": "Kanäle",
+      "channelsHint": "Keine Auswahl bedeutet alle Kanäle.",
+      "range": "Zeitraum",
+      "compare": "Vergleichen mit",
+      "compareOptions": {
+        "previous_period": "Vorzeitraum",
+        "previous_year": "Gleicher Zeitraum im Vorjahr",
+        "none": "Kein Vergleich"
+      },
+      "scheduled": "{name} geplant.",
+      "saved": "{name} gespeichert.",
+      "errors": {
+        "nameRequired": "Bitte einen Namen eingeben",
+        "recipientsRequired": "Bitte mindestens eine E-Mail-Adresse angeben",
+        "recipientsInvalid": "Bitte die E-Mail-Adressen prüfen"
+      },
+      "schedule": {
+        "eyebrow": "Bericht planen",
+        "title": "Diese Ansicht regelmäßig senden.",
+        "description": "Der Bericht wird um 08:00 UTC per E-Mail verschickt.",
+        "submit": "Bericht planen"
+      },
+      "custom": {
+        "eyebrow": "Eigener Bericht",
+        "title": "Einen Bericht erstellen.",
+        "description": "Wählen Sie Kanäle, Zeitraum und Vergleich. Speichern Sie ihn und rufen Sie ihn bei Bedarf ab.",
+        "submit": "Bericht speichern"
+      }
+    }
   }
 }

@@ -87,3 +87,88 @@ export function SectionHeading({
     </div>
   );
 }
+
+/** The design's white card (.ads-card). */
+export function AdsCard({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <section className={`rounded-[14px] border border-[#e8e7f0] bg-surface shadow-[0_8px_30px_#23234307] ${className}`}>
+      {children}
+    </section>
+  );
+}
+
+/** Eyebrow and title at the top of a card, with an optional action on the right (.ads-card-header). */
+export function CardHeader({
+  eyebrow,
+  title,
+  description,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="min-w-0">
+        <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{eyebrow}</span>
+        <h2 className="mt-[7px] text-[16px] font-medium tracking-[-0.03em] text-[#292a43]">{title}</h2>
+        {description && <p className="mt-1 text-[12px] text-[#8b8c9c]">{description}</p>}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+/** A KPI tile without a chart (Planning, Reports): label, value and a coloured note. */
+export function KpiTile({
+  label,
+  value,
+  note,
+  noteTone = "positive",
+  testId,
+}: {
+  label: string;
+  value: React.ReactNode;
+  note?: React.ReactNode;
+  noteTone?: "positive" | "negative" | "neutral";
+  testId?: string;
+}) {
+  const tone = { positive: "text-[#2b956f]", negative: "text-[#c2413d]", neutral: "text-[#3d3e54]" }[noteTone];
+  return (
+    <article className="min-h-[144px] rounded-[14px] border border-[#e8e7f0] bg-surface px-[19px] py-[18px] shadow-[0_8px_30px_#23234307]">
+      <span className="block text-[10px] text-[#888a9c]">{label}</span>
+      <strong className="mt-[13px] block text-[25px] font-semibold tracking-[-0.05em] text-[#24253f]" data-testid={testId}>
+        {value}
+      </strong>
+      {note && <small className={`mt-[5px] block text-[10px] font-semibold ${tone}`}>{note}</small>}
+    </article>
+  );
+}
+
+const stepMarker = {
+  done: "border-[#9bdfc4] bg-[#e8faf2] text-[#299c76]",
+  current: "border-[#9f95ee] bg-[#f1efff] text-[#6456dc]",
+  upcoming: "border-[#dad9e7] bg-surface text-[#999aa8]",
+} as const;
+
+/** The design's vertical steps (.ads-planning-timeline): marker, label and detail. */
+export function StepList({ steps }: { steps: { label: string; detail: string; status: keyof typeof stepMarker }[] }) {
+  return (
+    <ol className="mb-[17px]">
+      {steps.map((step, i) => (
+        <li key={`${step.label}-${i}`} className="relative flex min-h-[50px] items-center pl-[34px]">
+          {i < steps.length - 1 && <i aria-hidden className="absolute top-7 -bottom-2 left-[9px] w-px bg-[#e8e7ef]" />}
+          <b aria-hidden className={`absolute left-0 grid size-[19px] place-items-center rounded-full border text-[10px] ${stepMarker[step.status]}`}>
+            {step.status === "done" ? "✓" : step.status === "current" ? "•" : "○"}
+          </b>
+          <span>
+            <strong className="block text-[10px] font-semibold text-[#4c4d60]">{step.label}</strong>
+            <small className="mt-[3px] block text-[9px] text-[#a0a1ad]">{step.detail}</small>
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
