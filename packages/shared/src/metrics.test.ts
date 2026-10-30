@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CampaignMetricDay } from "./campaign";
-import { campaignTotals, change, ctr, progress } from "./metrics";
+import { campaignTotals, change, ctr, overviewQuerySchema, progress } from "./metrics";
 
 const day = (date: string, spend: number, leads: number, extra: Partial<CampaignMetricDay> = {}): CampaignMetricDay => ({
   date,
@@ -41,6 +41,20 @@ describe("campaignTotals", () => {
       { amount: 2500, currency: "EUR" },
     );
     expect(totals).toMatchObject({ ctr: null, cpl: null, roas: null, progress: 0, leads: 0 });
+  });
+});
+
+describe("overviewQuerySchema", () => {
+  it("defaults to 30 days and coerces the query string", () => {
+    expect(overviewQuerySchema.parse({})).toEqual({ rangeDays: 30 });
+    expect(overviewQuerySchema.parse({ rangeDays: "90" })).toEqual({ rangeDays: 90 });
+  });
+
+  it("rejects ranges outside 1 to 366 days", () => {
+    expect(overviewQuerySchema.safeParse({ rangeDays: "0" }).success).toBe(false);
+    expect(overviewQuerySchema.safeParse({ rangeDays: "367" }).success).toBe(false);
+    expect(overviewQuerySchema.safeParse({ rangeDays: "1" }).success).toBe(true);
+    expect(overviewQuerySchema.safeParse({ rangeDays: "366" }).success).toBe(true);
   });
 });
 
