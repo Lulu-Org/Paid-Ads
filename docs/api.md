@@ -43,20 +43,20 @@ interface AdsProvider {
 
 | Method | Path | What | Permission |
 | --- | --- | --- | --- |
-| GET | `/campaigns` | List with totals (spend, leads, CPL, progress = spend ÷ budget). Filters `platform`, `status` | campaigns.view |
-| POST | `/campaigns` | Create a draft | campaigns.create |
+| GET | `/campaigns` | List with totals (spend, leads, CPL, progress = spend ÷ budget). Filters `platform`, `status`; `q` matches name or objective; sort `name` (default), `createdAt`, `startAt` or `budget`, with `-` for descending | campaigns.view |
+| POST | `/campaigns` | Create a draft; the owner defaults to the current user and an `adAccountId` must exist in the workspace and match the platform | campaigns.create |
 | GET | `/campaigns/:id` | Detail: metrics, plan steps, creatives, rationale, next step | campaigns.view |
-| PATCH | `/campaigns/:id` | Edit a draft or its details. A budget change above the policy threshold returns `202` with an `ApprovalRequest` | campaigns.edit |
-| POST | `/campaigns/:id/launch` | Runs the launch checklist, then queues `ads.push` | campaigns.edit (+ approval if required) |
-| POST | `/campaigns/:id/pause`, `/resume` | Queues `ads.push` with the new status | campaigns.edit |
+| PATCH | `/campaigns/:id` | Edit a draft or its details. A budget change whose absolute amount is above the policy threshold holds the whole PATCH: the campaign is unchanged and the response is `202` with the open `budget_change` `ApprovalRequest` | campaigns.edit |
+| POST | `/campaigns/:id/launch` | Runs the launch checklist. A required approval returns `202` with the open `launch` `ApprovalRequest` and keeps the campaign in draft; a failed checklist returns `409` with it in `details`; on success the status becomes `live`, then `ads.push` is queued | campaigns.edit (+ approval if required) |
+| POST | `/campaigns/:id/pause`, `/resume` | Only `live → paused` and `paused → live`; the status changes locally, then `ads.push` is queued. Any other status returns `409` | campaigns.edit |
 | GET | `/campaigns/:id/checklist` | The launch checklist items and which pass | campaigns.view |
-| GET/PUT | `/campaigns/:id/plan` | Plan steps | campaigns.view / edit |
+| GET/PUT | `/campaigns/:id/plan` | `{ steps: [...] }`, ordered; PUT replaces all active steps (at most 20) | campaigns.view / edit |
 
 ## Overview, planning and reports
 
 | Method | Path | What | Permission |
 | --- | --- | --- | --- |
-| GET | `/overview` | KPIs (spend, attributed revenue, leads, CPL, ROAS with change vs. last period and a daily trend), spend by platform. Built by `buildOverview` (`packages/shared/src/overview-logic.ts`). The range ends on `endDate`, the newest day with synced metrics, so an old last sync still shows numbers. Query `rangeDays` (default 30) | campaigns.view |
+| GET | `/overview` | KPIs (spend, attributed revenue, leads, CPL, ROAS with change vs. the preceding range of the same length and a daily trend), spend by platform. Built by `buildOverview` (`packages/shared/src/overview-logic.ts`). The range ends on `endDate`, the newest day with synced metrics, so an old last sync still shows numbers. Query `rangeDays` (1–366, default 30) | campaigns.view |
 | GET | `/planning` | Planned spend per platform, targets, forecast | budgets.view |
 | POST | `/planning/scenarios` | Saves a budget scenario | budgets.edit |
 | GET/POST | `/reports`, GET/PATCH/DELETE `/reports/:id` | Saved and scheduled reports | reports.* |
