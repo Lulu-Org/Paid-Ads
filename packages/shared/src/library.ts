@@ -26,6 +26,18 @@ export const audienceCreateSchema = z.object({
 });
 export const audienceUpdateSchema = audienceCreateSchema.partial();
 
+// GET /audiences returns each audience with what the cards and the controls table show.
+// `matchRate` (0 to 1) comes from the platforms on sync; null until the first sync reports it.
+// `exclusions` are the names of the segments left out (e.g. "Existing customers").
+// `campaignCount` counts CampaignAudience links; `syncing` is true while an audiences sync runs.
+export const audienceListItemSchema = audienceSchema.extend({
+  description: z.string().max(300).nullable(),
+  matchRate: z.number().min(0).max(1).nullable(),
+  exclusions: z.array(z.string().trim().min(1).max(200)),
+  campaignCount: z.number().int().min(0),
+  syncing: z.boolean(),
+});
+
 // ---------- Creatives ----------
 
 export const creativeTypeSchema = z.enum([
@@ -57,6 +69,37 @@ export const creativeCreateSchema = z.object({
   meta: creativeSchema.shape.meta.optional(),
 });
 export const creativeUpdateSchema = creativeCreateSchema.partial();
+
+// GET /creatives returns each creative with how many campaigns use it (CampaignCreative links)
+// and whether it currently wins a creative test.
+export const creativeListItemSchema = creativeSchema.extend({
+  campaignCount: z.number().int().min(0),
+  winning: z.boolean(),
+});
+
+// ---------- Creative tests ----------
+
+export const variantRoleSchema = z.enum(["control", "winner", "learning"]);
+
+// GET /creative-tests: campaigns running two or more creative variants, with each variant's results
+// (spend and leads per CampaignCreative, written by ads.sync). CPL is null without leads.
+export const creativeTestSchema = z.object({
+  campaignId: idSchema,
+  campaignName: z.string(),
+  variants: z.array(
+    z.object({
+      variant: z.string().min(1).max(3),
+      creativeId: idSchema,
+      creativeName: z.string(),
+      role: variantRoleSchema,
+      spend: moneySchema,
+      leads: z.number().int().min(0),
+      cpl: moneySchema.nullable(),
+    }),
+  ),
+  // How much cheaper the winner's CPL is than the control's, as a fraction; null without a winner.
+  winnerLead: z.number().nullable(),
+});
 
 // ---------- Conversion events ----------
 
@@ -110,6 +153,10 @@ export type AudienceUpdateInput = z.infer<typeof audienceUpdateSchema>;
 export type CreativeType = z.infer<typeof creativeTypeSchema>;
 export type ApprovalStatus = z.infer<typeof approvalStatusSchema>;
 export type Creative = z.infer<typeof creativeSchema>;
+export type AudienceListItem = z.infer<typeof audienceListItemSchema>;
+export type CreativeListItem = z.infer<typeof creativeListItemSchema>;
+export type VariantRole = z.infer<typeof variantRoleSchema>;
+export type CreativeTest = z.infer<typeof creativeTestSchema>;
 export type CreativeCreateInput = z.infer<typeof creativeCreateSchema>;
 export type CreativeUpdateInput = z.infer<typeof creativeUpdateSchema>;
 export type ConversionSource = z.infer<typeof conversionSourceSchema>;

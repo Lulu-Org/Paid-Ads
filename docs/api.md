@@ -57,18 +57,20 @@ interface AdsProvider {
 | Method | Path | What | Permission |
 | --- | --- | --- | --- |
 | GET | `/overview` | KPIs (spend, attributed revenue, leads, CPL, ROAS with change vs. last period and a daily trend), spend by platform. Built by `buildOverview` (`packages/shared/src/overview-logic.ts`). The range ends on `endDate`, the newest day with synced metrics, so an old last sync still shows numbers. Query `rangeDays` (default 30) | campaigns.view |
-| GET | `/planning` | Planned spend per platform, targets, forecast | budgets.view |
-| POST | `/planning/scenarios` | Saves a budget scenario | budgets.edit |
+| GET | `/planning` | The month's `BudgetPlan` with what `buildPlanning` (`packages/shared/src/planning-logic.ts`) computes: allocated against the monthly spend limit, share per channel, target leads, forecast leads and revenue from each channel's last 30 days (`planningSchema`) | budgets.view |
+| POST | `/planning/scenarios` | Saves a draft scenario with other channel amounts (`planScenarioCreateSchema`); returns the `planningSchema` for it | budgets.edit |
 | GET/POST | `/reports`, GET/PATCH/DELETE `/reports/:id` | Saved and scheduled reports | reports.* |
 | GET | `/reports/:id/run` | The report's numbers for a date range | reports.view |
+| GET | `/reports/run` | Ad hoc numbers: `from`, `to` (dates), `platforms` (comma separated, empty = all). KPIs with change vs. the period before, and spend, leads, conversions, revenue and ROAS per channel (`reportRunSchema`, built by `buildReport`) | reports.view |
 
 ## Audiences, creatives, tracking
 
 | Method | Path | What | Permission |
 | --- | --- | --- | --- |
-| GET/POST | `/audiences`, GET/PATCH/DELETE `/audiences/:id` | Audience library | audiences.* |
+| GET/POST | `/audiences`, GET/PATCH/DELETE `/audiences/:id` | Audience library. The list returns `audienceListItemSchema`: description, match rate, exclusions, campaign count, `syncing` | audiences.* |
 | POST | `/audiences/:id/sync` | Queues the audience sync to its platforms | audiences.edit |
-| GET/POST | `/creatives`, GET/PATCH/DELETE `/creatives/:id` | Creative library (upload via `multipart/form-data`) | creatives.* |
+| GET/POST | `/creatives`, GET/PATCH/DELETE `/creatives/:id` | Creative library (upload via `multipart/form-data`: `file`, plus `name` and `type`). The list returns `creativeListItemSchema`: campaign count and `winning` | creatives.* |
+| GET | `/creative-tests` | Campaigns running two or more creative variants, with spend, leads and CPL per variant (`creativeTestSchema`) | creatives.view |
 | POST | `/creatives/:id/approve` | Approves a creative | creatives.approve |
 | GET/POST | `/conversion-events`, PATCH/DELETE `/conversion-events/:id` | Event mapping | tracking.* |
 | GET | `/tracking/health` | Events today, change vs. yesterday, events needing attention | tracking.view |
