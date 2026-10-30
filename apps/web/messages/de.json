@@ -761,7 +761,10 @@
       "budgetUsed": "{percent} des Budgets genutzt",
       "readyToLaunch": "Startbereit",
       "openDetails": "Details öffnen",
-      "open": "{name} öffnen"
+      "open": "{name} öffnen",
+      "filter": "Filter",
+      "statusFilter": "Nach Status filtern",
+      "removeFilter": "Filter {filter} entfernen"
     },
     "drawer": {
       "eyebrow": "Kampagnendetails · {platform}",
@@ -784,7 +787,6 @@
       "noAudience": "Noch keine Zielgruppe festgelegt",
       "planEyebrow": "Plan und Fortschritt",
       "plan": "Was als Nächstes passiert",
-      "scheduleRange": "{start} – {end}",
       "scheduleFrom": "Ab {start}, dauerhaft",
       "scheduleNone": "Noch kein Zeitplan",
       "noPlan": "Noch keine Planschritte",
@@ -826,7 +828,7 @@
   "overview": {
     "kpiLabel": "Kennzahlen",
     "noChange": "Keine früheren Daten zum Vergleich",
-    "vsLastPeriod": "ggü. Vorperiode",
+    "vsLastPeriod": "ggü. Vorzeitraum",
     "roasValue": "{value}x",
     "kpi": {
       "spend": "Gesamtausgaben",
@@ -857,6 +859,21 @@
       "eyebrow": "Kampagnen-Arbeitsbereich",
       "title": "Kampagnen, die Ihre Aufmerksamkeit brauchen.",
       "viewAll": "Alle Kampagnen ansehen"
+    },
+    "kpiInfo": {
+      "spend": "Werbeausgaben aller Kanäle in den letzten {days} Tagen mit synchronisierten Daten.",
+      "revenue": "Umsatz, den Ihr CRM im selben Zeitraum bezahlten Kampagnen zuordnet.",
+      "leads": "Leads, die die Plattformen im selben Zeitraum gemeldet haben.",
+      "roas": "Zugeordneter Umsatz geteilt durch Ausgaben."
+    },
+    "signal": {
+      "eyebrow": "Lulu-Signal",
+      "title": "{platform} bringt die günstigsten Leads.",
+      "body": "{platform} liefert Leads für {cpl} CPL, gegenüber {average} über alle Kanäle. Planen Sie, ob Sie Budget dorthin verschieben.",
+      "action": "In der Planung prüfen",
+      "sources": "{count, plural, one {Verglichen über # Kanal} other {Verglichen über # Kanäle}}",
+      "asOf": "Daten bis {date}",
+      "empty": "Signale erscheinen, sobald Ihre Kanäle Ausgaben und Leads melden."
     }
   }
 }

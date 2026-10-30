@@ -4,10 +4,11 @@ import type { AdPlatform } from "@lulu/shared";
 // Small pieces the Paid Ads views share (design: platform logos, health cards, section headings).
 
 const platformMarks: Record<AdPlatform, { short: string; className: string }> = {
-  google_ads: { short: "G", className: "bg-[#e8f0fe] text-[#1a73e8]" },
-  google_lsa: { short: "L", className: "bg-[#e6f4ea] text-[#188038]" },
-  meta_ads: { short: "M", className: "bg-[#e7f0ff] text-[#0866ff]" },
-  linkedin_ads: { short: "in", className: "bg-[#e8f3fa] text-[#0a66c2]" },
+  // Gradients from the MagicPath design (.ads-platform-logo).
+  google_ads: { short: "G", className: "bg-gradient-to-br from-[#4285f4] to-[#34a853] text-white" },
+  google_lsa: { short: "L", className: "bg-gradient-to-br from-[#fbbc04] to-[#ea4335] text-white" },
+  meta_ads: { short: "M", className: "bg-gradient-to-br from-[#5b5be7] to-[#e84fa8] text-white" },
+  linkedin_ads: { short: "in", className: "bg-[#0a66c2] text-[10px] text-white" },
 };
 
 /** The platform's letter mark, with the platform name for screen readers. */
