@@ -2,7 +2,7 @@ import { Decimal } from '@prisma/client/runtime/client';
 import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { created, noContent, ok, paginated } from './response';
+import { accepted, created, noContent, ok, paginated } from './response';
 
 const app = express();
 
@@ -14,6 +14,9 @@ app.get('/ok-meta', (_req, res) => {
 });
 app.get('/created', (_req, res) => {
   created(res, { id: '1' });
+});
+app.get('/accepted', (_req, res) => {
+  accepted(res, { status: 'pending' });
 });
 app.get('/no-content', (_req, res) => {
   noContent(res);
@@ -50,6 +53,12 @@ describe('response helpers', () => {
     const res = await request(app).get('/created');
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ data: { id: '1' } });
+  });
+
+  it('accepted sends 202 with data', async () => {
+    const res = await request(app).get('/accepted');
+    expect(res.status).toBe(202);
+    expect(res.body).toEqual({ data: { status: 'pending' } });
   });
 
   it('noContent sends 204 with empty body', async () => {
