@@ -13,6 +13,46 @@ enum Role {
   member
 }
 
+enum AdPlatform {
+  google_lsa
+  google_ads
+  meta_ads
+  linkedin_ads
+}
+
+enum ConnectionStatus {
+  connected
+  needs_attention
+  disconnected
+}
+
+enum CampaignStatus {
+  draft
+  live
+  paused
+  ended
+}
+
+enum PlanStepStatus {
+  done
+  current
+  upcoming
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+enum SyncStatus {
+  queued
+  running
+  succeeded
+  failed
+  retry_queued
+}
+
 model Workspace {
   id              String    @id @default(uuid())
   name            String
@@ -25,6 +65,27 @@ model Workspace {
   users       User[]
   settings    Setting[]
   permissions Permission[]
+
+  adAccounts           AdAccount[]
+  campaigns            Campaign[]
+  campaignMetricDays   CampaignMetricDay[]
+  campaignPlanSteps    CampaignPlanStep[]
+  audiences            Audience[]
+  creatives            Creative[]
+  campaignCreatives    CampaignCreative[]
+  conversionEvents     ConversionEvent[]
+  automationRules      AutomationRule[]
+  automationActivities AutomationActivity[]
+  spendLimits          SpendLimit[]
+  approvalPolicies     ApprovalPolicy[]
+  teamMembers          TeamMember[]
+  paymentMethods       PaymentMethod[]
+  statements           Statement[]
+  incidents            Incident[]
+  webhookEvents        WebhookEvent[]
+  approvalRequests     ApprovalRequest[]
+  reports              Report[]
+  syncRuns             SyncRun[]
 
   @@map("workspaces")
 }
@@ -43,12 +104,423 @@ model User {
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
 
+  campaigns                 Campaign[]        @relation("CampaignOwner")
+  approvedCreatives         Creative[]        @relation("CreativeApprover")
+  teamMembers               TeamMember[]
+  approvalRequestsRequested ApprovalRequest[] @relation("ApprovalRequester")
+  approvalRequestsDecided   ApprovalRequest[] @relation("ApprovalDecider")
+
   @@index([workspaceId])
   @@map("users")
 }
 
-// Paid Ads tables (ad accounts, campaigns, metrics, ...) are added by task P1, following
-// docs/data-model.md. Every table has workspaceId (AGENTS.md rule 2).
+// ---------------------------------------------------------------------------------------------
+// Paid Ads domain (docs/data-model.md). Every table has workspaceId (AGENTS.md rule 2). Money is a
+// Decimal amount plus a currency column; rates are computed, never stored.
+
+model AdAccount {
+  id             String           @id @default(uuid())
+  workspaceId    String
+  platform       AdPlatform
+  externalId     String
+  name           String
+  currency       String
+  status         ConnectionStatus @default(disconnected)
+  scopes         String[]         @default([])
+  tokenEncrypted String?
+  tokenExpiresAt DateTime?
+  lastSyncAt     DateTime?
+  lastError      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  campaigns Campaign[]
+  syncRuns  SyncRun[]
+
+  @@index([workspaceId, platform])
+  @@map("ad_accounts")
+}
+
+model Campaign {
+  id              String         @id @default(uuid())
+  workspaceId     String
+  adAccountId     String?
+  platform        AdPlatform
+  externalId      String?
+  name            String
+  status          CampaignStatus @default(draft)
+  objective       String
+  audienceSummary String?
+  startAt         DateTime?
+  endAt           DateTime?
+  budgetAmount    Decimal        @db.Decimal(14, 2)
+  budgetCurrency  String
+  rationale       String?
+  nextStep        String?
+  ownerId         String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  workspace            Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  adAccount            AdAccount?           @relation(fields: [adAccountId], references: [id], onDelete: SetNull)
+  owner                User                 @relation("CampaignOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  metricDays           CampaignMetricDay[]
+  planSteps            CampaignPlanStep[]
+  creatives            CampaignCreative[]
+  approvalRequests     ApprovalRequest[]
+  automationActivities AutomationActivity[]
+  webhookEvents        WebhookEvent[]
+
+  @@index([workspaceId, platform])
+  @@index([workspaceId, status])
+  @@map("campaigns")
+}
+
+model CampaignMetricDay {
+  id            String   @id @default(uuid())
+  workspaceId   String
+  campaignId    String
+  date          DateTime @db.Date
+  impressions   Int
+  clicks        Int
+  conversions   Int
+  leads         Int
+  spendAmount   Decimal  @db.Decimal(14, 2)
+  revenueAmount Decimal  @db.Decimal(14, 2)
+  currency      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  campaign  Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, campaignId, date])
+  @@map("campaign_metric_days")
+}
+
+model CampaignPlanStep {
+  id          String         @id @default(uuid())
+  workspaceId String
+  campaignId  String
+  order       Int
+  label       String
+  detail      String
+  status      PlanStepStatus
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  campaign  Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, campaignId])
+  @@map("campaign_plan_steps")
+}
+
+model Audience {
+  id           String       @id @default(uuid())
+  workspaceId  String
+  name         String
+  source       String
+  sizeEstimate Int?
+  consentBasis String
+  platforms    AdPlatform[] @default([])
+  lastSyncedAt DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@map("audiences")
+}
+
+model Creative {
+  id             String         @id @default(uuid())
+  workspaceId    String
+  name           String
+  type           String
+  fileUrl        String?
+  meta           Json           @default("{}")
+  approvalStatus ApprovalStatus @default(pending)
+  approvedById   String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+
+  workspace  Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  approvedBy User?              @relation("CreativeApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  campaigns  CampaignCreative[]
+
+  @@index([workspaceId])
+  @@map("creatives")
+}
+
+model CampaignCreative {
+  id          String   @id @default(uuid())
+  workspaceId String
+  campaignId  String
+  creativeId  String
+  variant     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  campaign  Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  creative  Creative  @relation(fields: [creativeId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, campaignId])
+  @@map("campaign_creatives")
+}
+
+model ConversionEvent {
+  id             String       @id @default(uuid())
+  workspaceId    String
+  name           String
+  source         String
+  valueAmount    Decimal?     @db.Decimal(14, 2)
+  valueCurrency  String?
+  platforms      AdPlatform[] @default([])
+  health         String
+  lastReceivedAt DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@map("conversion_events")
+}
+
+model AutomationRule {
+  id          String    @id @default(uuid())
+  workspaceId String
+  name        String
+  trigger     Json
+  condition   Json?
+  action      String
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  workspace  Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  activities AutomationActivity[]
+
+  @@index([workspaceId])
+  @@map("automation_rules")
+}
+
+model AutomationActivity {
+  id          String   @id @default(uuid())
+  workspaceId String
+  ruleId      String
+  outcome     String
+  campaignId  String?
+  at          DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  rule      AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  campaign  Campaign?      @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, at])
+  @@map("automation_activities")
+}
+
+model SpendLimit {
+  id                String    @id @default(uuid())
+  workspaceId       String
+  monthlyAmount     Decimal   @db.Decimal(14, 2)
+  currency          String
+  alertAt           Float
+  notifyBeforeLimit Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId])
+  @@map("spend_limits")
+}
+
+model ApprovalPolicy {
+  id              String    @id @default(uuid())
+  workspaceId     String
+  scope           String
+  thresholdAmount Decimal   @db.Decimal(14, 2)
+  currency        String
+  approverRole    String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId])
+  @@map("approval_policies")
+}
+
+model TeamMember {
+  id                  String    @id @default(uuid())
+  workspaceId         String
+  userId              String
+  adsRole             String
+  title               String?
+  channelScope        String
+  canApproveCreatives Boolean   @default(false)
+  invitedAt           DateTime?
+  joinedAt            DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, userId])
+  @@map("team_members")
+}
+
+model PaymentMethod {
+  id          String    @id @default(uuid())
+  workspaceId String
+  status      String
+  brand       String?
+  last4       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@map("payment_methods")
+}
+
+model Statement {
+  id           String     @id @default(uuid())
+  workspaceId  String
+  month        String
+  platform     AdPlatform
+  amountAmount Decimal    @db.Decimal(14, 2)
+  currency     String
+  status       String
+  downloadUrl  String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, month])
+  @@map("statements")
+}
+
+model Incident {
+  id          String     @id @default(uuid())
+  workspaceId String
+  platform    AdPlatform
+  kind        String
+  subject     String
+  retryAt     DateTime?
+  resolvedAt  DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@map("incidents")
+}
+
+model WebhookEvent {
+  id          String     @id @default(uuid())
+  workspaceId String
+  platform    AdPlatform
+  eventType   String
+  campaignId  String?
+  payload     Json       @default("{}")
+  receivedAt  DateTime   @default(now())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  campaign  Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, receivedAt])
+  @@map("webhook_events")
+}
+
+model ApprovalRequest {
+  id            String         @id @default(uuid())
+  workspaceId   String
+  kind          String
+  campaignId    String?
+  payload       Json           @default("{}")
+  status        ApprovalStatus @default(pending)
+  requestedById String
+  decidedById   String?
+  decidedAt     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  requestedBy User      @relation("ApprovalRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  decidedBy   User?     @relation("ApprovalDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, status])
+  @@map("approval_requests")
+}
+
+model Report {
+  id          String    @id @default(uuid())
+  workspaceId String
+  name        String
+  view        Json
+  schedule    String?
+  recipients  String[]  @default([])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+  @@map("reports")
+}
+
+model SyncRun {
+  id               String     @id @default(uuid())
+  workspaceId      String
+  adAccountId      String
+  platform         AdPlatform
+  kind             String
+  scope            String
+  status           SyncStatus
+  startedAt        DateTime   @default(now())
+  finishedAt       DateTime?
+  recordsProcessed Int        @default(0)
+  error            String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  adAccount AdAccount @relation(fields: [adAccountId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, startedAt])
+  @@map("sync_runs")
+}
 
 model Setting {
   id          String    @id @default(uuid())
@@ -126,19 +598,19 @@ model AuditLog {
 // One row per domain event (e.g. contact.updated), written next to the change and published by
 // the outbox dispatcher (src/jobs/outbox.ts). Consumers must be idempotent: delivery is at least once.
 model OutboxEvent {
-  id            String       @id @default(uuid())
+  id            String         @id @default(uuid())
   workspaceId   String
   eventType     String
-  schemaVersion Int          @default(1)
+  schemaVersion Int            @default(1)
   aggregateType String
   aggregateId   String?
   actorType     AuditActorType
   actorId       String?
   correlationId String
-  payload       Json         @default("{}")
-  occurredAt    DateTime     @default(now())
-  status        OutboxStatus @default(pending)
-  attempts      Int          @default(0)
+  payload       Json           @default("{}")
+  occurredAt    DateTime       @default(now())
+  status        OutboxStatus   @default(pending)
+  attempts      Int            @default(0)
   lastError     String?
   dispatchedAt  DateTime?
 
