@@ -15,6 +15,7 @@ describe('scopedDb', () => {
   });
 
   afterAll(async () => {
+    await db.webhookEvent.deleteMany({ where: { workspaceId: { in: [workspaceA, workspaceB] } } });
     await db.user.deleteMany({ where: { workspaceId: { in: [workspaceA, workspaceB] } } });
     await db.workspace.deleteMany({ where: { id: { in: [workspaceA, workspaceB] } } });
     await db.$disconnect();
@@ -124,5 +125,27 @@ describe('scopedDb', () => {
     expect(viaA?.id).toBe(settingA.id);
 
     await db.setting.delete({ where: { id: settingA.id } });
+  });
+
+  it('soft-deletes and scopes operational tables', async () => {
+    const scopedA = scopedDb(workspaceA);
+    const scopedB = scopedDb(workspaceB);
+
+    const event = await scopedA.webhookEvent.create({
+      data: { workspaceId: workspaceA, platform: 'google_ads', eventType: 'test.event' },
+    });
+
+    expect(await scopedA.webhookEvent.findUnique({ where: { id: event.id } })).not.toBeNull();
+    expect(await scopedB.webhookEvent.findUnique({ where: { id: event.id } })).toBeNull();
+
+    await scopedA.webhookEvent.delete({ where: { id: event.id } });
+
+    expect(await scopedA.webhookEvent.findMany({ where: { id: event.id } })).toEqual([]);
+    expect(await scopedA.webhookEvent.count({ where: { id: event.id } })).toBe(0);
+
+    const viaBase = await db.webhookEvent.findUnique({ where: { id: event.id } });
+    expect(viaBase?.deletedAt).not.toBeNull();
+
+    await db.webhookEvent.delete({ where: { id: event.id } });
   });
 });

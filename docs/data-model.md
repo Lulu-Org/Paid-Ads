@@ -23,25 +23,25 @@ Platform tables (already in `apps/api/prisma/schema.prisma`, same as the CRM): `
 | --- | --- | --- |
 | AdAccount | platform, externalId, name, currency, status (`ConnectionStatus`), scopes (string[]), tokenEncrypted, tokenExpiresAt, lastSyncAt, lastError | One per connected ad account. The token never leaves the API. |
 | Campaign | adAccountId, platform, externalId (null for drafts), name, status, objective, audienceSummary, startAt, endAt (null = always on), budgetAmount, budgetCurrency, rationale, nextStep, ownerId | `rationale` and `nextStep` are the design's "Why this campaign" and "Next step". |
-| CampaignMetricDay | campaignId, date, impressions, clicks, conversions, leads, spendAmount, revenueAmount, currency | One row per campaign per day, written by `ads.sync`. Totals, CTR (clicks ÷ impressions), CPL (spend ÷ leads) and ROAS (revenue ÷ spend) are computed, never stored. No soft delete. |
+| CampaignMetricDay | campaignId, date, impressions, clicks, conversions, leads, spendAmount, revenueAmount, currency | One row per campaign per day, written by `ads.sync`. Totals, CTR (clicks ÷ impressions), CPL (spend ÷ leads) and ROAS (revenue ÷ spend) are computed, never stored. |
 | CampaignPlanStep | campaignId, order, label, detail, status (`PlanStepStatus`) | The design's campaign plan timeline. |
 | Audience | name, source (`crm_segment`, `website_visitors`, `customer_list`, `lookalike`), sizeEstimate, consentBasis, platforms (`AdPlatform`[]), lastSyncedAt | |
 | Creative | name, type (`search_ad`, `image`, `video`, `carousel`, `document`, `lead_form`, `landing_page`, `extension`, `profile`), fileUrl, meta (JSON: formats, lengths), approvalStatus, approvedById | |
-| CampaignCreative | campaignId, creativeId, variant (`A`, `B`, …) | Which creatives run where. No soft delete. |
+| CampaignCreative | campaignId, creativeId, variant (`A`, `B`, …) | Which creatives run where. |
 | ConversionEvent | name, source (`crm`, `calendar`, `accounting`, `website`, `call`), valueAmount, valueCurrency (both null = dynamic, the value comes with each conversion), platforms (`AdPlatform`[]), health (`mapped`, `needs_attention`), lastReceivedAt | The design's "Event mapping". |
 | AutomationRule | name, trigger (JSON: platforms, schedule cron or null), condition (JSON or null for scheduled digests: metric, operator, value, window in hours or days), action (`notify`, `recommend`, `pause_campaign`, `shift_budget`, `send_digest`), enabled | Budget actions always go through an approval. |
-| AutomationActivity | ruleId, outcome (`review_requested`, `paused`, `notified`, `digest_sent`, `budget_shifted`), campaignId, at | One row per thing a rule did. No soft delete. |
+| AutomationActivity | ruleId, outcome (`review_requested`, `paused`, `notified`, `digest_sent`, `budget_shifted`), campaignId, at | One row per thing a rule did. |
 | SpendLimit | monthlyAmount, currency, alertAt (fraction, e.g. 0.8), notifyBeforeLimit | One per workspace. |
 | ApprovalPolicy | scope (`budget_and_launch`, `all_changes`, `creative_only`, `none`), thresholdAmount, currency, approverRole (`AdsRole` except analyst) | Changes above the threshold need approval. |
 | TeamMember | userId, adsRole (`owner`, `editor`, `reviewer`, `analyst`), title, channelScope (`all`, `google_ads`, `meta_ads`, `reports_only`), canApproveCreatives, invitedAt, joinedAt | Paid Ads role on top of the platform role. Role matrix: `roleMatrix` in `packages/shared/src/team.ts`. |
 | PaymentMethod | status (`active`, `missing`, `failed`), brand, last4 | Copied from the payment provider; never card numbers. |
 | Statement | month (`YYYY-MM`), platform, amountAmount, currency, status (`paid`, `due`, `failed`), downloadUrl | Monthly platform charges. |
 | Incident | platform, kind (`rate_limited`, `consent_review`, `auth_expired`, `sync_failed`), subject, retryAt (null = a person must act), resolvedAt | |
-| WebhookEvent | platform, eventType, campaignId, payload (JSON), receivedAt | No soft delete. |
+| WebhookEvent | platform, eventType, campaignId, payload (JSON), receivedAt | |
 | ApprovalRequest | kind (`budget_change`, `launch`, `creative`), campaignId, payload (JSON), status (`ApprovalStatus`), requestedById, decidedById, decidedAt | |
 | Report | name, view (JSON: filters, comparison), schedule (cron, null = on demand), recipients (string[]) | |
-| SyncRun | adAccountId, platform, kind (`sync` = platform → Lulu, `push` = Lulu → platform, `both`), scope (`campaign_performance`, `audiences`, `conversion_events`, `creatives`), status (`SyncStatus`), startedAt, finishedAt, recordsProcessed, error | The design's "Operations" view. No soft delete. |
+| SyncRun | adAccountId, platform, kind (`sync` = platform → Lulu, `push` = Lulu → platform, `both`), scope (`campaign_performance`, `audiences`, `conversion_events`, `creatives`), status (`SyncStatus`), startedAt, finishedAt, recordsProcessed, error | The design's "Operations" view. |
 
 ## Indexes
 
-`(workspaceId, platform)` on AdAccount and Campaign, `(workspaceId, status)` on Campaign, `(workspaceId, campaignId, date)` unique on CampaignMetricDay, `(workspaceId, startedAt)` on SyncRun.
+`(workspaceId, platform)` on AdAccount and Campaign, `(workspaceId, status)` on Campaign, `(workspaceId, campaignId, date)` unique on CampaignMetricDay, `(campaignId, creativeId)` unique on CampaignCreative, `(workspaceId, startedAt)` on SyncRun.
