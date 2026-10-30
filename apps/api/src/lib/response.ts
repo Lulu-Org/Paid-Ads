@@ -30,6 +30,10 @@ export function created(res: Response, data: unknown): Response {
   return res.status(201).json({ data: toJsonSafe(data) });
 }
 
+export function accepted(res: Response, data: unknown): Response {
+  return res.status(202).json({ data: toJsonSafe(data) });
+}
+
 export function noContent(res: Response): Response {
   return res.status(204).send();
 }

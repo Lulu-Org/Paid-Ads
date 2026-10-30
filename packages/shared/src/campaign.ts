@@ -110,9 +110,25 @@ export const campaignCreateSchema = z.object({
 // PATCH /campaigns/:id. The platform cannot change after creation.
 export const campaignUpdateSchema = campaignCreateSchema.omit({ platform: true }).partial();
 
+export const campaignSortSchema = z.enum([
+  "name",
+  "-name",
+  "createdAt",
+  "-createdAt",
+  "startAt",
+  "-startAt",
+  "budget",
+  "-budget",
+]);
+
 export const campaignListQuerySchema = listQuerySchema.extend({
   platform: adPlatformSchema.optional(),
   status: campaignStatusSchema.optional(),
+  sort: campaignSortSchema.optional(),
+});
+
+export const campaignPlanSchema = z.object({
+  steps: z.array(campaignPlanStepSchema),
 });
 
 export const campaignPlanUpdateSchema = z.object({
@@ -152,7 +168,9 @@ export type CampaignMetricDay = z.infer<typeof campaignMetricDaySchema>;
 export type CampaignDetail = z.infer<typeof campaignDetailSchema>;
 export type CampaignCreateInput = z.infer<typeof campaignCreateSchema>;
 export type CampaignUpdateInput = z.infer<typeof campaignUpdateSchema>;
+export type CampaignSort = z.infer<typeof campaignSortSchema>;
 export type CampaignListQuery = z.infer<typeof campaignListQuerySchema>;
+export type CampaignPlan = z.infer<typeof campaignPlanSchema>;
 export type CampaignPlanUpdateInput = z.infer<typeof campaignPlanUpdateSchema>;
 export type ChecklistItemKey = z.infer<typeof checklistItemKeySchema>;
 export type CampaignChecklist = z.infer<typeof campaignChecklistSchema>;
