@@ -156,6 +156,8 @@ export const campaignChecklistSchema = z.object({
 });
 
 export type AdPlatform = z.infer<typeof adPlatformSchema>;
+export type AdAccountConnectInput = z.infer<typeof adAccountConnectSchema>;
+export type AdAccountConnectResult = z.infer<typeof adAccountConnectResultSchema>;
 export type ConnectionStatus = z.infer<typeof connectionStatusSchema>;
 export type CampaignStatus = z.infer<typeof campaignStatusSchema>;
 export type PlanStepStatus = z.infer<typeof planStepStatusSchema>;
