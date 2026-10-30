@@ -875,5 +875,285 @@
       "asOf": "Data up to {date}",
       "empty": "Signals appear once your channels report spend and leads."
     }
+  },
+  "planning": {
+    "target": {
+      "roas": "target ROAS {value}x",
+      "cpl": "target CPL {value}",
+      "leads": "target {value} leads"
+    },
+    "kpi": {
+      "planned": "Planned monthly spend",
+      "allocated": "{share} allocated",
+      "targetLeads": "Target leads",
+      "noPreviousPlan": "No earlier plan to compare",
+      "vsLastPlan": "{change} vs. last plan",
+      "forecastRevenue": "Forecast revenue",
+      "noForecast": "Not enough history to forecast",
+      "forecastRoas": "{value}x forecast ROAS",
+      "nextReview": "Next planning review",
+      "days": "{count, plural, =0 {Today} one {# day} other {# days}}"
+    },
+    "budget": {
+      "eyebrow": "Budget plan · {month}",
+      "eyebrowEmpty": "Budget plan",
+      "title": "Allocate before the spend happens.",
+      "description": "Every channel has a target, owner and review point.",
+      "saveScenario": "Save scenario",
+      "share": "{share} of planned spend"
+    },
+    "steps": {
+      "eyebrow": "Planning steps",
+      "title": "From brief to review.",
+      "status": "Plan status:"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending_approval": "Waiting for approval",
+      "approved": "Approved"
+    },
+    "logic": {
+      "eyebrow": "Planning logic",
+      "title": "Why this plan looks this way.",
+      "goal": "Goal",
+      "constraint": "Constraint",
+      "signal": "Signal"
+    },
+    "scenario": {
+      "eyebrow": "Budget scenario",
+      "title": "Try a different split.",
+      "description": "Change what each channel gets. The forecast uses each channel's results from the last 30 days.",
+      "defaultName": "Scenario · {month}",
+      "name": "Scenario name",
+      "amount": "{platform} ({currency})",
+      "allocated": "Allocated",
+      "targetLeads": "Target leads",
+      "forecastRevenue": "Forecast revenue",
+      "overLimit": "This is more than the monthly spend limit of {limit}.",
+      "submit": "Save scenario",
+      "saved": "{name} saved as a draft.",
+      "errors": {
+        "nameRequired": "Enter a name",
+        "amountInvalid": "Enter an amount of 0 or more for every channel"
+      }
+    }
+  },
+  "audiences": {
+    "refreshed": "{name} refreshed.",
+    "never": "Not synced yet",
+    "library": {
+      "eyebrow": "Audience library",
+      "title": "One audience, many channels.",
+      "description": "Build, sync and exclude audiences while keeping consent and source visible."
+    },
+    "create": "Create audience",
+    "empty": "No audiences yet",
+    "syncing": "Refreshing",
+    "synced": "Synced",
+    "sources": {
+      "crm_segment": "CRM segment",
+      "website_visitors": "Website visitors",
+      "customer_list": "Customer list",
+      "lookalike": "Lookalike"
+    },
+    "sourceShort": {
+      "crm_segment": "CRM",
+      "website_visitors": "Website",
+      "customer_list": "List",
+      "lookalike": "CRM"
+    },
+    "estimatedReach": "estimated reach",
+    "people": "people",
+    "source": "Source",
+    "matchRate": "Match rate",
+    "usedIn": "Used in",
+    "campaigns": "{count, plural, =0 {No campaigns} one {# campaign} other {# campaigns}}",
+    "refresh": "Refresh now",
+    "view": "View audience",
+    "open": "Open {name}",
+    "controls": {
+      "eyebrow": "Audience controls",
+      "title": "Sources, consent and exclusions.",
+      "privacy": "Privacy settings",
+      "source": "Source",
+      "lastSync": "Last sync",
+      "consent": "Consent",
+      "exclusions": "Exclusions",
+      "actions": "Actions",
+      "valid": "Valid"
+    },
+    "detail": {
+      "eyebrow": "Audience",
+      "source": "Source",
+      "size": "Size",
+      "consent": "Consent basis",
+      "platforms": "Synced to"
+    },
+    "createForm": {
+      "eyebrow": "New audience",
+      "title": "Build an audience once, use it everywhere.",
+      "description": "Pick a source and the channels to sync it to. Consent stays visible on every audience.",
+      "name": "Audience name",
+      "namePlaceholder": "e.g. CRM · Won customers",
+      "source": "Source",
+      "consent": "Consent basis",
+      "consentPlaceholder": "e.g. Marketing consent in CRM",
+      "platforms": "Sync to",
+      "note": "Lulu syncs the audience to the selected channels and keeps its consent basis with it.",
+      "submit": "Create audience",
+      "saved": "{name} created. The first sync is running.",
+      "errors": {
+        "nameRequired": "Enter a name",
+        "nameTooLong": "Use at most 200 characters",
+        "consentRequired": "Say why you may use this audience",
+        "consentTooLong": "Use at most 300 characters",
+        "platformsRequired": "Choose at least one channel"
+      }
+    }
+  },
+  "creatives": {
+    "library": {
+      "eyebrow": "Creative library",
+      "title": "Every asset, version and result in context.",
+      "description": "See where an asset is used, who approved it and which variant is winning."
+    },
+    "add": "Add creative",
+    "open": "Open {name}",
+    "badge": {
+      "live": "Live",
+      "winner": "Winner",
+      "review": "Review",
+      "rejected": "Rejected"
+    },
+    "campaigns": "{count, plural, =0 {No campaigns} one {# campaign} other {# campaigns}}",
+    "approval": {
+      "approved": "Approved",
+      "pending": "Needs approval",
+      "rejected": "Rejected"
+    },
+    "testing": {
+      "eyebrow": "Creative testing",
+      "title": "Variant {variant} is leading by {lead}.",
+      "noWinner": "No variant is leading yet.",
+      "description": "Cost per lead per variant in {campaign}.",
+      "variant": "Variant {variant} · {role}",
+      "role": {
+        "control": "Control",
+        "winner": "Winner",
+        "learning": "Learning"
+      },
+      "cpl": "{value} CPL",
+      "leads": "{count, plural, one {# lead} other {# leads}}"
+    },
+    "detail": {
+      "eyebrow": "Creative · {type}",
+      "status": "Approval",
+      "usedIn": "Used in",
+      "openFile": "Open file"
+    },
+    "addForm": {
+      "eyebrow": "New creative",
+      "title": "Add a creative to the library.",
+      "description": "Upload an image, video or PDF. It can be used in campaigns once it is approved.",
+      "drop": "Drop a file here or choose one",
+      "formats": "PNG, JPG, GIF, WebP, MP4, MOV or PDF up to {size} MB",
+      "file": "Creative file",
+      "name": "Name",
+      "type": "Type",
+      "approvalNote": "New creatives wait for approval before they can run.",
+      "submit": "Add creative",
+      "saved": "{name} added and waiting for approval.",
+      "errors": {
+        "tooBig": "The file is larger than {size} MB",
+        "fileType": "Use an image, video or PDF",
+        "nameRequired": "Enter a name"
+      }
+    }
+  },
+  "reports": {
+    "allChannels": "All channels",
+    "lastDays": "{count, plural, one {Last day} other {Last # days}}",
+    "schedule": {
+      "weekly": "Weekly, Mondays",
+      "monthly": "Monthly, on the 1st",
+      "custom": "Scheduled",
+      "onDemand": "On demand"
+    },
+    "customRange": "Custom range",
+    "removeFilter": "Remove filter {filter}",
+    "filter": "Filter",
+    "filterLabel": "Filter by channel",
+    "from": "From",
+    "to": "To",
+    "rangeInvalid": "The end is before the start",
+    "apply": "Apply",
+    "scheduleReport": "Schedule report",
+    "customReport": "Custom report",
+    "noComparison": "No earlier data",
+    "points": "{value}pp",
+    "roasValue": "{value}x",
+    "kpi": {
+      "revenue": "Revenue attributed",
+      "leads": "Leads",
+      "conversionRate": "Conversion rate",
+      "costPerLead": "Cost per lead"
+    },
+    "comparison": {
+      "eyebrow": "Channel comparison",
+      "title": "Compare what each channel contributes.",
+      "channel": "Channel",
+      "spend": "Spend",
+      "leads": "Leads",
+      "conversions": "Conversions",
+      "roas": "ROAS",
+      "noSpend": "No spend",
+      "noCampaigns": "No campaigns"
+    },
+    "saved": {
+      "eyebrow": "Saved reports",
+      "title": "Reports you come back to.",
+      "open": "Open",
+      "delete": "Delete",
+      "empty": "No saved reports yet",
+      "deleted": "{name} deleted.",
+      "deleteTitle": "Delete this report?",
+      "deleteMessage": "{name} and its schedule will be removed."
+    },
+    "form": {
+      "name": "Report name",
+      "namePlaceholder": "e.g. Weekly channel summary",
+      "frequency": "Send",
+      "recipients": "Recipients",
+      "recipientsPlaceholder": "name@company.com, …",
+      "currentView": "Uses the current view: {channels}, last {days} days.",
+      "channels": "Channels",
+      "channelsHint": "None selected means every channel.",
+      "range": "Date range",
+      "compare": "Compare with",
+      "compareOptions": {
+        "previous_period": "Previous period",
+        "previous_year": "Same period last year",
+        "none": "No comparison"
+      },
+      "scheduled": "{name} scheduled.",
+      "saved": "{name} saved.",
+      "errors": {
+        "nameRequired": "Enter a name",
+        "recipientsRequired": "Add at least one email address",
+        "recipientsInvalid": "Check the email addresses"
+      },
+      "schedule": {
+        "eyebrow": "Schedule report",
+        "title": "Send this view on a schedule.",
+        "description": "The report goes out by email at 08:00 UTC.",
+        "submit": "Schedule report"
+      },
+      "custom": {
+        "eyebrow": "Custom report",
+        "title": "Build a report.",
+        "description": "Choose the channels, the range and what to compare with. Save it and run it when you need it.",
+        "submit": "Save report"
+      }
+    }
   }
 }

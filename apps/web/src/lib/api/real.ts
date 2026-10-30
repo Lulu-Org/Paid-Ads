@@ -7,6 +7,18 @@ import {
   campaignSchema,
   overviewSchema,
   creativeSchema,
+  audienceListItemSchema,
+  audienceSchema,
+  creativeListItemSchema,
+  creativeTestSchema,
+  planningSchema,
+  reportSchema,
+  reportRunSchema,
+  type AudienceCreateInput,
+  type CreativeType,
+  type PlanScenarioCreateInput,
+  type ReportCreateInput,
+  type ReportRunQuery,
   type CampaignCreateInput,
   operationsSummarySchema,
   paymentMethodSchema,
@@ -38,7 +50,8 @@ import {
   type ConversionEventCreateInput,
   type LoginInput,
 } from "@lulu/shared";
-import { getList, getOne, post, write } from "./http";
+import { z } from "zod";
+import { getList, getOne, post, remove, write } from "./http";
 
 // Endpoints from docs/api.md. Keep the same shape as mock.ts.
 export const realApi = {
@@ -60,7 +73,34 @@ export const realApi = {
   },
 
   creatives: {
-    list: () => getList(creativeSchema, "/creatives", { pageSize: 100 }),
+    list: () => getList(creativeListItemSchema, "/creatives", { pageSize: 100 }),
+    create: (input: { name: string; type: CreativeType; file: File | null }) => {
+      const form = new FormData();
+      form.set("name", input.name);
+      form.set("type", input.type);
+      if (input.file) form.set("file", input.file);
+      return write(creativeSchema, "POST", "/creatives", form);
+    },
+    tests: () => getOne(z.array(creativeTestSchema), "/creative-tests"),
+  },
+
+  audiences: {
+    list: () => getList(audienceListItemSchema, "/audiences", { pageSize: 100 }),
+    create: (input: AudienceCreateInput) => write(audienceSchema, "POST", "/audiences", input),
+    sync: (id: string) => post(`/audiences/${id}/sync`).then(() => undefined),
+  },
+
+  planning: {
+    get: () => getOne(planningSchema, "/planning"),
+    saveScenario: (input: PlanScenarioCreateInput) => write(planningSchema, "POST", "/planning/scenarios", input),
+  },
+
+  reports: {
+    list: () => getList(reportSchema, "/reports"),
+    create: (input: ReportCreateInput) => write(reportSchema, "POST", "/reports", input),
+    remove: (id: string) => remove(`/reports/${id}`),
+    run: (query: ReportRunQuery) =>
+      getOne(reportRunSchema, "/reports/run", { from: query.from, to: query.to, platforms: query.platforms.join(",") }),
   },
 
   overview: {

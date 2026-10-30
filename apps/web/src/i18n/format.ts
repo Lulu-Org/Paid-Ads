@@ -19,6 +19,11 @@ export function useFormat() {
         maximumFractionDigits: digits,
       }),
     number: (value: number) => format.number(value),
+    // "2.4 MB" for file sizes.
+    compactBytes: (bytes: number) =>
+      bytes >= 1024 * 1024
+        ? format.number(bytes / 1024 / 1024, { style: "unit", unit: "megabyte", maximumFractionDigits: 1 })
+        : format.number(bytes / 1024, { style: "unit", unit: "kilobyte", maximumFractionDigits: 0 }),
     // "412.8K" for big counts in tight places.
     compact: (value: number) => format.number(value, { notation: "compact", maximumFractionDigits: 1 }),
     percent2: (value: number) => format.number(value, { style: "percent", maximumFractionDigits: 2 }),
