@@ -14,11 +14,11 @@ export function PageHeader({ page, actions }: { page: AdsPageKey; actions?: Reac
   const createCampaign = useCreateCampaign();
 
   return (
-    <div className="mb-7 flex flex-wrap items-end justify-between gap-6">
+    <div className="mb-[29px] flex flex-wrap items-end justify-between gap-[26px]">
       <div>
         <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{tPages("eyebrow", { page: t(page) })}</span>
-        <h1 className="mt-2 mb-1.5 text-[29px] font-semibold tracking-tight text-text">{tPages(`${page}.description`)}</h1>
-        <p className="max-w-[690px] text-xs leading-relaxed text-text-muted">{tPages("subtitle")}</p>
+        <h1 className="mt-[7px] mb-1.5 text-[clamp(27px,3vw,36px)] leading-[1.1] font-medium tracking-[-0.05em] text-[#1e2038]">{tPages(`${page}.description`)}</h1>
+        <p className="max-w-[690px] text-xs text-[#8b8c9c]">{tPages("subtitle")}</p>
       </div>
       <div className="flex flex-wrap gap-2">
         {actions}

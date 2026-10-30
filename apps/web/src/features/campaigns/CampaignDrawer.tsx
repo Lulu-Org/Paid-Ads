@@ -11,11 +11,24 @@ import { useApi } from "@/lib/useApi";
 import { statusTone } from "./status";
 
 const stepMark = { done: "✓", current: "•", upcoming: "○" } as const;
+// Markers and labels from the design (.ads-plan-step).
 const stepStyle = {
-  done: "bg-success-soft text-success",
-  current: "bg-primary-soft text-primary",
-  upcoming: "bg-surface-muted text-text-faint",
+  done: "border-[#8dd8ba] bg-[#ecfaf4] text-[#2e9e79]",
+  current: "border-[#8c80e7] bg-[#f1efff] text-[#6556da]",
+  upcoming: "border-[#dad9e6] bg-surface text-[#9b9ca9]",
 } as const;
+// Dividers between the stat cells: 2 columns on phones, 3 from sm (design: .ads-detail-stats).
+function statBorders(i: number) {
+  return [
+    "border-[#e8e7ef]",
+    i % 2 === 0 ? "border-r" : "",
+    i >= 2 ? "border-t pt-[15px]" : "",
+    i % 3 === 2 ? "sm:border-r-0" : "sm:border-r",
+    i >= 3 ? "sm:border-t sm:pt-[15px]" : "sm:border-t-0 sm:pt-[9px]",
+  ].join(" ");
+}
+
+const stepLabel = { done: "text-[#2e9e79]", current: "text-[#6556da]", upcoming: "text-[#9b9ca9]" } as const;
 
 const creativeIcon: Partial<Record<Creative["type"], string>> = { video: "▶", document: "PDF", lead_form: "☷" };
 
@@ -65,14 +78,14 @@ export function CampaignDrawer({
 
   const schedule = campaign.startAt
     ? campaign.endAt
-      ? t("scheduleRange", { start: format.date(campaign.startAt), end: format.date(campaign.endAt) })
+      ? format.dateRange(campaign.startAt, campaign.endAt)
       : t("scheduleFrom", { start: format.date(campaign.startAt) })
     : t("scheduleNone");
 
   const stats: [string, string][] = [
-    [t("impressions"), totals.impressions ? format.number(totals.impressions) : dash],
-    [t("clicks"), totals.clicks ? format.number(totals.clicks) : dash],
-    [t("ctr"), totals.ctr !== null ? format.percent(totals.ctr) : dash],
+    [t("impressions"), totals.impressions ? format.compact(totals.impressions) : dash],
+    [t("clicks"), totals.clicks ? format.compact(totals.clicks) : dash],
+    [t("ctr"), totals.ctr !== null ? format.percent2(totals.ctr) : dash],
     [t("conversions"), totals.conversions ? format.number(totals.conversions) : dash],
     [t("revenue"), totals.revenue.amount ? format.money(totals.revenue) : dash],
     [t("cpl"), totals.cpl ? format.money(totals.cpl, 2) : dash],
@@ -82,23 +95,26 @@ export function CampaignDrawer({
 
   return (
     <>
-      <Drawer open onClose={onClose} eyebrow={t("eyebrow", { platform: tPlatform(`${campaign.platform}.name`) })} title={campaign.name}>
-        <p className="-mt-3 text-[11px] text-text-muted">{campaign.objective}</p>
+      <Drawer open wide onClose={onClose} eyebrow={t("eyebrow", { platform: tPlatform(`${campaign.platform}.name`) })} title={campaign.name}>
+        <p className="-mt-4 border-b border-[#eeeef3] pb-5 text-[10px] text-[#8e8f9f]">{campaign.objective}</p>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-b border-border pb-4">
-          <Pill tone={statusTone[status]}>{tStatus(status)}</Pill>
+        <div className="flex flex-wrap items-center gap-2 pt-[17px] pb-5">
+          <span className="mr-auto">
+            <Pill tone={statusTone[status]}>{tStatus(status)}</Pill>
+          </span>
           {canToggle && (
-            <Button variant="outline" onClick={() => setConfirm(true)}>
+            <Button variant="outline" onClick={() => setConfirm(true)} className="!px-[11px] !py-2 !text-[10px]">
               {status === "live" ? `Ⅱ ${t("pause")}` : `▶ ${t("resume")}`}
             </Button>
           )}
         </div>
 
-        <dl className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {stats.map(([label, value]) => (
-            <div key={label} className="rounded-lg bg-surface-soft p-3">
-              <dt className="text-[9px] text-text-subtle">{label}</dt>
-              <dd className="mt-1 text-[13px] font-semibold text-text-strong">{value}</dd>
+        <dl className="grid grid-cols-2 gap-2 rounded-xl border border-[#ecebf3] bg-[#fbfbfd] p-3.5 sm:grid-cols-3">
+          {stats.map(([label, value], i) => (
+            <div key={label} className={`px-2.5 py-[9px] ${statBorders(i)}`}
+            >
+              <dt className="text-[9px] text-[#9293a3]">{label}</dt>
+              <dd className="mt-[5px] text-[15px] font-semibold tracking-[-0.03em] text-[#2b2c45]">{value}</dd>
             </div>
           ))}
         </dl>
@@ -111,17 +127,21 @@ export function CampaignDrawer({
           {detail.loading && !detail.data ? (
             <Skeleton className="h-16 w-full" />
           ) : detail.data?.plan.length ? (
-            <ol className="grid gap-1">
-              {detail.data.plan.map((step) => (
-                <li key={step.id} className="flex items-start gap-2.5 border-b border-surface-muted py-2.5 last:border-b-0">
-                  <span aria-hidden className={`grid size-[22px] flex-none place-items-center rounded-full text-[10px] font-black ${stepStyle[step.status]}`}>
+            <ol>
+              {detail.data.plan.map((step, i, all) => (
+                <li key={step.id} className="relative flex min-h-[53px] items-center gap-2.5 py-2 pl-[33px]">
+                  <i
+                    aria-hidden
+                    className={`absolute left-2.5 w-px bg-[#e6e5ef] ${i === 0 ? "top-1/2" : "top-0"} ${i === all.length - 1 ? "bottom-1/2" : "bottom-0"}`}
+                  />
+                  <span aria-hidden className={`absolute left-px z-[1] grid size-[19px] place-items-center rounded-full border text-[10px] ${stepStyle[step.status]}`}>
                     {stepMark[step.status]}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <strong className="block text-[11px] text-text-strong">{step.label}</strong>
-                    <small className="mt-0.5 block text-[10px] text-text-subtle">{step.detail}</small>
+                    <strong className="block text-[10px] font-semibold text-[#3d3e55]">{step.label}</strong>
+                    <small className="mt-[3px] block text-[9px] text-[#8e8f9f]">{step.detail}</small>
                   </span>
-                  <b className="text-[9px] text-text-faint">{t(`step.${step.status}`)}</b>
+                  <b className={`text-[8px] font-semibold ${stepLabel[step.status]}`}>{t(`step.${step.status}`)}</b>
                 </li>
               ))}
             </ol>
@@ -177,13 +197,13 @@ export function CampaignDrawer({
 
 function Section({ eyebrow, title, meta, children }: { eyebrow: string; title: string; meta?: string; children: React.ReactNode }) {
   return (
-    <section className="mt-6">
-      <div className="mb-3 flex items-end justify-between gap-3">
+    <section className="border-b border-[#eeeef3] py-6 last:border-b-0">
+      <div className="mb-3.5 flex items-end justify-between gap-[15px]">
         <div>
           <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{eyebrow}</span>
-          <h3 className="mt-1.5 text-[13px] font-semibold text-text">{title}</h3>
+          <h3 className="mt-[7px] text-[14px] font-medium tracking-[-0.03em] text-[#2d2e47]">{title}</h3>
         </div>
-        {meta && <span className="text-right text-[10px] text-text-subtle">{meta}</span>}
+        {meta && <span className="text-right text-[9px] text-[#9293a3]">{meta}</span>}
       </div>
       {children}
     </section>

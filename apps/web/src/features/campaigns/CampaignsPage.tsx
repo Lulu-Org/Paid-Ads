@@ -48,13 +48,13 @@ export function CampaignsPage() {
   return (
     <>
       <PageHeader page="campaigns" />
-      <div className="mb-4.5 grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-4 grid gap-[13px] sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
-          <Card key={card.label} className="px-[18px] py-[17px]">
-            <span className="block text-[11px] text-text-muted">{card.label}</span>
-            <strong className="mt-2 block text-[24px] font-semibold tracking-tight text-text">{c.rows ? card.value : "…"}</strong>
-            <small className="mt-1 block text-[10px] text-text-subtle">{card.note}</small>
-          </Card>
+          <article key={card.label} className="rounded-[13px] border border-[#e8e7f0] bg-surface px-[18px] py-[17px] shadow-[0_8px_25px_#23234305]">
+            <span className="block text-[9px] text-[#9293a2]">{card.label}</span>
+            <strong className="mt-2 mb-[3px] block text-[22px] font-semibold tracking-[-0.04em] text-[#282943]">{c.rows ? card.value : "…"}</strong>
+            <small className="block text-[9px] leading-[1.45] text-[#6d6e80]">{card.note}</small>
+          </article>
         ))}
       </div>
       <CampaignTable rows={c.rows} loading={c.loading} filter={c.filter} onFilterChange={c.setFilter} onOpen={c.setOpen} />

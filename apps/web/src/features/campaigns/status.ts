@@ -10,8 +10,8 @@ export const statusTone: Record<CampaignStatus, PillTone> = {
 
 // The coloured dot before a campaign name, by platform (design: campaign-dot).
 export const platformDot: Record<AdPlatform, string> = {
-  google_ads: "#4285f4",
-  google_lsa: "#34a853",
-  meta_ads: "#e1306c",
-  linkedin_ads: "#64748b",
+  google_ads: "#6e61e2",
+  google_lsa: "#4c9eed",
+  meta_ads: "#d65bb6",
+  linkedin_ads: "#9a9caf",
 };

@@ -19,6 +19,12 @@ export function useFormat() {
         maximumFractionDigits: digits,
       }),
     number: (value: number) => format.number(value),
+    // "412.8K" for big counts in tight places.
+    compact: (value: number) => format.number(value, { notation: "compact", maximumFractionDigits: 1 }),
+    percent2: (value: number) => format.number(value, { style: "percent", maximumFractionDigits: 2 }),
+    // "1 Jun – 30 Jun 2026", following the language's rules for ranges.
+    dateRange: (start: Date | string, end: Date | string) =>
+      format.dateTimeRange(new Date(start), new Date(end), { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }),
     decimal: (value: number) => format.number(value, { maximumFractionDigits: 1 }),
     // "€35K" for chart axes.
     compactMoney: (value: Money) =>

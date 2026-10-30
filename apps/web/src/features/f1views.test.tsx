@@ -54,6 +54,16 @@ describe("Campaigns table", () => {
     expect(rowNames()).toHaveLength(4);
   });
 
+  it("adds a status filter from + Filter and removes it again", async () => {
+    await show(campaignsPage);
+    await screen.findByText("Spring launch · Berlin", {}, slow);
+    fireEvent.click(screen.getByRole("button", { name: /Filter/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Draft" }));
+    expect(rowNames()).toEqual(["B2B pipeline · Q4"]);
+    fireEvent.click(screen.getByRole("button", { name: "Remove filter Draft" }));
+    expect(rowNames()).toHaveLength(4);
+  });
+
   it("shows the summary from the data", async () => {
     await show(campaignsPage);
     await screen.findByText("Spring launch · Berlin", {}, slow);
@@ -68,7 +78,8 @@ describe("Campaign drawer", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Open Spring launch · Berlin" }, slow));
     const drawer = await screen.findByRole("dialog", { name: "Spring launch · Berlin" });
     expect(within(drawer).getByText("Qualified lead generation")).toBeTruthy();
-    expect(within(drawer).getByText("412,800")).toBeTruthy();
+    expect(within(drawer).getByText("412.8K")).toBeTruthy();
+    expect(within(drawer).getByText("4.46%")).toBeTruthy();
     expect(await within(drawer).findByText("What happens next")).toBeTruthy();
 
     fireEvent.click(within(drawer).getByRole("button", { name: /Pause campaign/ }));
@@ -130,6 +141,8 @@ describe("Overview", () => {
     expect(screen.getByTestId("kpi-spend").textContent).toMatch(/€/);
     expect(screen.getByText("All your acquisition channels, together.")).toBeTruthy();
     expect(await screen.findByText("Studio awareness", {}, slow)).toBeTruthy();
+    // The signal names the channel with the lowest cost per lead in the data (Meta: €2,660 / 231 leads).
+    expect(screen.getByText("Meta Ads brings the cheapest leads.")).toBeTruthy();
   });
 });
 
@@ -140,5 +153,17 @@ describe("niceMax", () => {
     expect(niceMax(2100)).toBe(4000);
     expect(niceMax(87)).toBe(100);
     expect(niceMax(450)).toBe(500);
+  });
+});
+
+describe("smoothPath", () => {
+  it("never goes below the lowest point after a sharp drop", async () => {
+    const { smoothPath } = await import("./overview/charts");
+    const ys = smoothPath([10, 10, 10, 0, 0], 400, 100, 10)
+      .match(/-?\d+(\.\d+)?/g)!
+      .map(Number)
+      .filter((_, i) => i % 2 === 1);
+    expect(Math.max(...ys)).toBeLessThanOrEqual(100);
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(0);
   });
 });
