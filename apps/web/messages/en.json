@@ -761,7 +761,10 @@
       "budgetUsed": "{percent} of budget used",
       "readyToLaunch": "Ready to launch",
       "openDetails": "Open details",
-      "open": "Open {name}"
+      "open": "Open {name}",
+      "filter": "Filter",
+      "statusFilter": "Filter by status",
+      "removeFilter": "Remove filter {filter}"
     },
     "drawer": {
       "eyebrow": "Campaign detail · {platform}",
@@ -784,7 +787,6 @@
       "noAudience": "No audience set yet",
       "planEyebrow": "Plan and progress",
       "plan": "What happens next",
-      "scheduleRange": "{start} – {end}",
       "scheduleFrom": "From {start}, always on",
       "scheduleNone": "No schedule yet",
       "noPlan": "No plan steps yet",
@@ -826,7 +828,7 @@
   "overview": {
     "kpiLabel": "Key numbers",
     "noChange": "No earlier data to compare",
-    "vsLastPeriod": "vs. previous period",
+    "vsLastPeriod": "vs. last period",
     "roasValue": "{value}x",
     "kpi": {
       "spend": "Total spend",
@@ -857,6 +859,21 @@
       "eyebrow": "Campaign workspace",
       "title": "Campaigns that need your attention.",
       "viewAll": "View all campaigns"
+    },
+    "kpiInfo": {
+      "spend": "Ad spend across all channels in the last {days} days of synced data.",
+      "revenue": "Revenue your CRM attributes to paid campaigns in the same period.",
+      "leads": "Leads the platforms reported in the same period.",
+      "roas": "Attributed revenue divided by spend."
+    },
+    "signal": {
+      "eyebrow": "Lulu signal",
+      "title": "{platform} brings the cheapest leads.",
+      "body": "{platform} is delivering leads at {cpl} CPL, against {average} across your channels. Plan whether to shift budget towards it.",
+      "action": "Review in Planning",
+      "sources": "{count, plural, one {Compared across # channel} other {Compared across # channels}}",
+      "asOf": "Data up to {date}",
+      "empty": "Signals appear once your channels report spend and leads."
     }
   }
 }

@@ -761,7 +761,10 @@
       "budgetUsed": "已使用预算的 {percent}",
       "readyToLaunch": "可以发布",
       "openDetails": "查看详情",
-      "open": "打开 {name}"
+      "open": "打开 {name}",
+      "filter": "筛选",
+      "statusFilter": "按状态筛选",
+      "removeFilter": "移除筛选 {filter}"
     },
     "drawer": {
       "eyebrow": "广告活动详情 · {platform}",
@@ -784,7 +787,6 @@
       "noAudience": "尚未设置受众",
       "planEyebrow": "计划与进度",
       "plan": "接下来的步骤",
-      "scheduleRange": "{start} – {end}",
       "scheduleFrom": "自 {start} 起持续投放",
       "scheduleNone": "尚无排期",
       "noPlan": "尚无计划步骤",
@@ -826,7 +828,7 @@
   "overview": {
     "kpiLabel": "关键指标",
     "noChange": "暂无可比较的历史数据",
-    "vsLastPeriod": "较上一周期",
+    "vsLastPeriod": "较上期",
     "roasValue": "{value}x",
     "kpi": {
       "spend": "总花费",
@@ -857,6 +859,21 @@
       "eyebrow": "广告活动工作区",
       "title": "需要你关注的广告活动。",
       "viewAll": "查看所有广告活动"
+    },
+    "kpiInfo": {
+      "spend": "最近 {days} 天已同步数据中所有渠道的广告花费。",
+      "revenue": "同一期间内 CRM 归因到付费广告的收入。",
+      "leads": "同一期间内各平台报告的潜在客户数。",
+      "roas": "归因收入除以花费。"
+    },
+    "signal": {
+      "eyebrow": "Lulu 信号",
+      "title": "{platform} 的潜在客户成本最低。",
+      "body": "{platform} 的单个线索成本为 {cpl}，而所有渠道的平均为 {average}。可以在规划中考虑是否向它转移预算。",
+      "action": "在规划中查看",
+      "sources": "在 {count} 个渠道之间比较",
+      "asOf": "数据截至 {date}",
+      "empty": "当渠道报告花费和潜在客户后，这里会显示信号。"
     }
   }
 }

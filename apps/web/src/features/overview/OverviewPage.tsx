@@ -13,11 +13,14 @@ import { useApi } from "@/lib/useApi";
 import { CampaignDrawer } from "@/features/campaigns/CampaignDrawer";
 import { CampaignTable } from "@/features/campaigns/CampaignTable";
 import { useCampaigns } from "@/features/campaigns/useCampaigns";
-import { LineChart, Sparkline } from "./charts";
+import { LineChart, MiniBars } from "./charts";
+import { SignalCard } from "./SignalCard";
 
 const RANGE_DAYS = 30;
 const DAY_MS = 86_400_000;
-const colours = { spend: "#7065df", revenue: "#60a7de", leads: "#62be8f", roas: "#e49b6c" } as const;
+// Lines and mini bars from the design CSS (.spend-line, .revenue-line, .ads-sparkline).
+const lines = { spend: "#7163e8", revenue: "#32c9b4" } as const;
+const bars = { spend: "#dddafb", revenue: "#d8ebfa", leads: "#d7f2e8", roas: "#f8e4d0" } as const;
 
 export function OverviewPage() {
   const t = useTranslations("overview");
@@ -72,48 +75,58 @@ export function OverviewPage() {
     <>
       <PageHeader page="overview" />
 
-      <section className="mb-4.5 grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4" aria-label={t("kpiLabel")}>
+      <section className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label={t("kpiLabel")}>
         {data
           ? kpis.map((k) => (
-              <Card key={k.key} className="px-[18px] py-[17px]">
-                <span className="block text-[11px] text-text-muted">{k.label}</span>
-                <strong className="mt-2 block text-[24px] font-semibold tracking-tight text-text" data-testid={`kpi-${k.key}`}>
+              <article key={k.key} className="relative min-h-[144px] overflow-hidden rounded-[14px] border border-[#e8e7f0] bg-surface px-[19px] py-[18px] shadow-[0_8px_30px_#23234307]">
+                <span className="flex items-center justify-between text-[10px] text-[#888a9c]">
+                  {k.label}
+                  <b className="cursor-help text-[11px] font-normal text-[#bcbdc9]" title={t(`kpiInfo.${k.key}`, { days: data.rangeDays })} aria-label={t(`kpiInfo.${k.key}`, { days: data.rangeDays })}>
+                    ⓘ
+                  </b>
+                </span>
+                <strong className="mt-[13px] block text-[25px] font-semibold tracking-[-0.05em] text-[#24253f]" data-testid={`kpi-${k.key}`}>
                   {k.value}
                 </strong>
-                <small className="mt-1 block text-[10px]">{changeNote(k.kpi)}</small>
-                <Sparkline values={k.kpi.trend} colour={colours[k.key as keyof typeof colours]} />
-              </Card>
+                <small className="mt-[5px] block pr-20 text-[10px] font-semibold">{changeNote(k.kpi)}</small>
+                <MiniBars values={k.kpi.trend} colour={bars[k.key as keyof typeof bars]} />
+              </article>
             ))
-          : [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-[132px] rounded-[13px]" />)}
+          : [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-[144px] rounded-[14px]" />)}
       </section>
 
-      <Card className="mb-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{t("performance.eyebrow")}</span>
-            <h2 className="mt-1.5 text-[17px] font-semibold tracking-tight text-[#363347]">{t("performance.title")}</h2>
-            <p className="mt-1 text-[11px] text-text-muted">{t("performance.description")}</p>
+      <section className="mb-[26px] grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,0.78fr)]">
+        <article className="min-h-[368px] rounded-[14px] border border-[#e8e7f0] bg-surface px-[23px] py-[22px] shadow-[0_8px_30px_#23234307]">
+          <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{t("performance.eyebrow")}</span>
+          <h2 className="mt-1.5 mb-1 text-[16px] font-medium tracking-[-0.03em] text-[#252641]">{t("performance.title")}</h2>
+          <p className="text-[12px] text-[#8b8c9c]">{t("performance.description")}</p>
+          <div className="mt-7 mb-3.5 flex items-center gap-5 text-[10px] text-[#88899a]">
+            <span className="flex items-center gap-1.5">
+              <i className="size-[7px] rounded-full" style={{ background: lines.spend }} aria-hidden />
+              {t("performance.spend")}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <i className="size-[7px] rounded-full" style={{ background: lines.revenue }} aria-hidden />
+              {t("performance.revenue")}
+            </span>
+            <b className="ml-auto font-medium text-[#9c9dad]">{t("performance.range", { days: RANGE_DAYS })}</b>
           </div>
-          <div className="flex items-center gap-4 text-[10px] text-text-muted">
-            <span className="flex items-center gap-1.5"><i className="h-0.5 w-4 rounded" style={{ background: colours.spend }} aria-hidden />{t("performance.spend")}</span>
-            <span className="flex items-center gap-1.5"><i className="h-0.5 w-4 rounded" style={{ background: colours.revenue }} aria-hidden />{t("performance.revenue")}</span>
-            <b className="text-text-strong">{t("performance.range", { days: RANGE_DAYS })}</b>
-          </div>
-        </div>
-        {data ? (
-          <LineChart
-            title={t("performance.chartLabel")}
-            series={[
-              { values: data.revenue.trend, colour: colours.revenue },
-              { values: data.spend.trend, colour: colours.spend },
-            ]}
-            labels={labels}
-            formatY={compactMoney}
-          />
-        ) : (
-          <Skeleton className="mt-4 h-[220px] w-full" />
-        )}
-      </Card>
+          {data ? (
+            <LineChart
+              title={t("performance.chartLabel")}
+              series={[
+                { values: data.revenue.trend, colour: lines.revenue },
+                { values: data.spend.trend, colour: lines.spend },
+              ]}
+              labels={labels}
+              formatY={compactMoney}
+            />
+          ) : (
+            <Skeleton className="h-[230px] w-full" />
+          )}
+        </article>
+        <SignalCard overview={data} />
+      </section>
 
       <SectionHeading
         eyebrow={t("channels.eyebrow")}
@@ -122,25 +135,25 @@ export function OverviewPage() {
       />
       <section className="mb-6 grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
         {[...(data?.platforms ?? [])].sort((a, b) => adPlatformOrder.indexOf(a.platform) - adPlatformOrder.indexOf(b.platform)).map((p) => (
-          <Card key={p.platform} className="flex items-start gap-3">
+          <article key={p.platform} className="flex min-h-[116px] items-start gap-[11px] rounded-[13px] border border-[#e8e7f0] bg-surface p-4 shadow-[0_8px_25px_#23234305]">
             <PlatformMark platform={p.platform} />
             <div className="min-w-0 flex-1">
-              <h3 className="flex items-center gap-1.5 text-[12px] font-semibold text-text-strong">
+              <h3 className="flex items-center gap-1.5 text-[12px] font-medium text-text-strong">
                 {tPlatform(`${p.platform}.name`)}
                 {p.connected && <span className="size-1.5 rounded-full bg-[#67be8e]" aria-label={t("channels.connected")} />}
               </h3>
-              <p className="mt-0.5 text-[10px] text-text-subtle">{tPlatform(`${p.platform}.detail`)}</p>
-              <small className="mt-2 block text-[10px] text-text-muted">
+              <p className="mt-0.5 truncate text-[9px] text-text-subtle">{tPlatform(`${p.platform}.detail`)}</p>
+              <small className="mt-3 block text-[9px] font-semibold text-text-strong">
                 {p.connected ? t("channels.campaigns", { count: p.campaigns }) : t("channels.notConnected")}
               </small>
             </div>
             <Link
               href="/ads/integrations"
-              className={`rounded-md px-2.5 py-1.5 text-[10px] font-extrabold ${p.connected ? "text-text-muted hover:bg-surface-muted" : "border border-[#dad8ec] text-primary-hover hover:bg-[#f7f5ff]"}`}
+              className={`mt-0.5 rounded-[9px] px-[9px] py-[7px] text-[9px] font-semibold whitespace-nowrap ${p.connected ? "bg-[#f2f1ff] text-[#5f60a4]" : "border border-[#dad8ec] bg-surface text-text-strong hover:bg-[#f7f5ff]"}`}
             >
               {p.connected ? t("channels.manageOne") : t("channels.connect")}
             </Link>
-          </Card>
+          </article>
         ))}
       </section>
 
