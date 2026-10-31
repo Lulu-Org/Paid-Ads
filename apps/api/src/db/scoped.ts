@@ -23,6 +23,7 @@ export const SCOPED_MODELS = [
   'audience',
   'creative',
   'campaignCreative',
+  'campaignAudience',
   'conversionEvent',
   'automationRule',
   'automationActivity',

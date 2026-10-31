@@ -21,6 +21,7 @@ export const AUDITED_ENTITIES: Record<string, string> = {
   audience: 'audience',
   creative: 'creative',
   campaignCreative: 'campaignCreative',
+  campaignAudience: 'campaignAudience',
   conversionEvent: 'conversionEvent',
   automationRule: 'automationRule',
   automationActivity: 'automationActivity',

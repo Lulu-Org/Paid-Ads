@@ -11,6 +11,10 @@ import { usersRouter } from './users';
 import { creativesRouter, creativeTestsRouter } from './creatives';
 import { audiencesRouter } from './audiences';
 import { attributionRouter, conversionEventsRouter, trackingRouter } from './tracking';
+import { approvalsRouter } from './approvals';
+import { approvalPolicyRouter, spendLimitRouter } from './controls';
+import { automationsRouter } from './automations';
+import { reportsRouter } from './reports';
 
 export const apiRouter = Router();
 
@@ -28,4 +32,15 @@ apiRouter.use('/audit-log', auditRouter);
 apiRouter.use('/ad-accounts', adAccountsRouter);
 apiRouter.use('/campaigns', campaignsRouter);
 apiRouter.use('/overview', overviewRouter);
-// Remaining Paid Ads routers mount here (docs/api.md): /audiences, /creatives, ...
+apiRouter.use('/audiences', audiencesRouter);
+apiRouter.use('/creatives', creativesRouter);
+apiRouter.use('/creative-tests', creativeTestsRouter);
+apiRouter.use('/conversion-events', conversionEventsRouter);
+apiRouter.use('/tracking', trackingRouter);
+apiRouter.use('/attribution', attributionRouter);
+apiRouter.use('/approvals', approvalsRouter);
+apiRouter.use('/spend-limit', spendLimitRouter);
+apiRouter.use('/approval-policy', approvalPolicyRouter);
+apiRouter.use('/reports', reportsRouter);
+apiRouter.use('/automations', automationsRouter);
+// Remaining Paid Ads routers mount here (docs/api.md): /ad-accounts, /audiences, /creatives, ...
