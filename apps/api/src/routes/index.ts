@@ -28,10 +28,4 @@ apiRouter.use('/audit-log', auditRouter);
 apiRouter.use('/ad-accounts', adAccountsRouter);
 apiRouter.use('/campaigns', campaignsRouter);
 apiRouter.use('/overview', overviewRouter);
-apiRouter.use('/audiences', audiencesRouter);
-apiRouter.use('/creatives', creativesRouter);
-apiRouter.use('/creative-tests', creativeTestsRouter);
-apiRouter.use('/conversion-events', conversionEventsRouter);
-apiRouter.use('/tracking', trackingRouter);
-apiRouter.use('/attribution', attributionRouter);
-// Remaining Paid Ads routers mount here (docs/api.md): /planning, /reports, ...
+// Remaining Paid Ads routers mount here (docs/api.md): /audiences, /creatives, ...
