@@ -15,6 +15,33 @@ describe('envSchema', () => {
     expect(parsed.AI_PROVIDER).toBe('simulated');
   });
 
+  it('defaults every ad platform to the simulated provider and derives the public API URL', () => {
+    const parsed = envSchema.parse(validSource);
+    expect(parsed.ADS_PROVIDER_GOOGLE_LSA).toBe('simulated');
+    expect(parsed.ADS_PROVIDER_GOOGLE_ADS).toBe('simulated');
+    expect(parsed.ADS_PROVIDER_META_ADS).toBe('simulated');
+    expect(parsed.ADS_PROVIDER_LINKEDIN_ADS).toBe('simulated');
+    expect(parsed.API_PUBLIC_URL).toBe('http://localhost:4000');
+  });
+
+  it('derives the public API URL from PORT and accepts an override', () => {
+    expect(envSchema.parse({ ...validSource, PORT: '8080' }).API_PUBLIC_URL).toBe(
+      'http://localhost:8080',
+    );
+    expect(
+      envSchema.parse({ ...validSource, API_PUBLIC_URL: 'https://api.lulu.test' }).API_PUBLIC_URL,
+    ).toBe('https://api.lulu.test');
+  });
+
+  it('accepts simulated or live provider modes and rejects anything else', () => {
+    expect(
+      envSchema.parse({ ...validSource, ADS_PROVIDER_GOOGLE_ADS: 'live' }).ADS_PROVIDER_GOOGLE_ADS,
+    ).toBe('live');
+    expect(envSchema.safeParse({ ...validSource, ADS_PROVIDER_GOOGLE_ADS: 'real' }).success).toBe(
+      false,
+    );
+  });
+
   it('coerces PORT to a number', () => {
     const parsed = envSchema.parse({ ...validSource, PORT: '8080' });
     expect(parsed.PORT).toBe(8080);
@@ -65,8 +92,36 @@ describe('envSchema', () => {
       ...validSource,
       NODE_ENV: 'production',
       JWT_SECRET: 'a'.repeat(32),
+      ADS_TOKEN_ENCRYPTION_KEY: 'b'.repeat(32),
     });
     expect(withSecret.success).toBe(true);
+  });
+
+  it('requires ADS_TOKEN_ENCRYPTION_KEY in production', () => {
+    const without = envSchema.safeParse({
+      ...validSource,
+      NODE_ENV: 'production',
+      JWT_SECRET: 'a'.repeat(32),
+    });
+    expect(without.success).toBe(false);
+
+    const withKey = envSchema.safeParse({
+      ...validSource,
+      NODE_ENV: 'production',
+      JWT_SECRET: 'a'.repeat(32),
+      ADS_TOKEN_ENCRYPTION_KEY: 'b'.repeat(32),
+    });
+    expect(withKey.success).toBe(true);
+  });
+
+  it('rejects a token key shorter than 32 characters', () => {
+    expect(
+      envSchema.safeParse({ ...validSource, ADS_TOKEN_ENCRYPTION_KEY: 'local-key' }).success,
+    ).toBe(false);
+    expect(
+      envSchema.parse({ ...validSource, ADS_TOKEN_ENCRYPTION_KEY: 'a'.repeat(32) })
+        .ADS_TOKEN_ENCRYPTION_KEY,
+    ).toBe('a'.repeat(32));
   });
 
   it('applies auth and seed defaults', () => {

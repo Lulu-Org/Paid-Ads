@@ -11,7 +11,7 @@ const server: Server = app.listen(env.PORT, () => {
   console.log(`API listening on http://localhost:${env.PORT} (${env.NODE_ENV})`);
 });
 
-// Background jobs (ai.analyze, import.process) run in the same process for now.
+// Background jobs (ads.sync, ads.push) run in the same process for now.
 startWorkers();
 
 function shutdown(signal: string): void {

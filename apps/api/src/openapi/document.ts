@@ -19,6 +19,7 @@ export function buildOpenApiDocument(): Record<string, unknown> {
       { name: 'Operations', description: 'Unauthenticated operational endpoints.' },
       { name: 'Auth', description: 'Log in, log out and the current user.' },
       { name: 'Users', description: 'People in the workspace.' },
+      { name: 'Ad accounts', description: 'OAuth connections to the ad platforms.' },
       { name: 'Campaigns', description: 'Campaigns, their plan, checklist and status.' },
       { name: 'Overview', description: 'Cross-platform KPIs and the spend split.' },
     ],

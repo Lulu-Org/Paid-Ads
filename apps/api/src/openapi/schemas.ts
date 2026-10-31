@@ -1,4 +1,7 @@
 import {
+  adAccountConnectResultSchema,
+  adAccountConnectSchema,
+  adAccountSchema,
   approvalRequestSchema,
   auditEntrySchema,
   authSessionSchema,
@@ -18,6 +21,7 @@ import {
   meUpdateSchema,
   overviewSchema,
   rolePermissionsSchema,
+  syncRunSchema,
   userSchema,
 } from '@lulu/shared';
 import { z, type ZodType } from 'zod';
@@ -39,6 +43,10 @@ const COMPONENT_NAMES = {
   MeUpdateInput: meUpdateSchema,
   User: userSchema,
   RolePermissions: rolePermissionsSchema,
+  AdAccount: adAccountSchema,
+  AdAccountConnectInput: adAccountConnectSchema,
+  AdAccountConnectResult: adAccountConnectResultSchema,
+  SyncRun: syncRunSchema,
   Campaign: campaignSchema,
   CampaignListItem: campaignListItemSchema,
   CampaignDetail: campaignDetailSchema,
