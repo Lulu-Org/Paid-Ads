@@ -144,7 +144,18 @@ export const attributionSchema = z.object({
   byPlatform: z.array(z.object({ platform: adPlatformSchema, revenue: moneySchema })),
 });
 
+
 export const libraryListQuerySchema = listQuerySchema.extend({ platform: adPlatformSchema.optional() });
+
+// Sorts the library endpoints support (audiences, creatives, conversion events); anything else is a 400.
+export const libraryApiQuerySchema = libraryListQuerySchema.extend({
+  sort: z.enum(["name", "-name", "createdAt", "-createdAt"]).optional(),
+});
+
+export const attributionQuerySchema = z.object({
+  model: attributionModelSchema.default("data_driven"),
+});
+
 
 export type AudienceSource = z.infer<typeof audienceSourceSchema>;
 export type Audience = z.infer<typeof audienceSchema>;
@@ -167,3 +178,5 @@ export type TrackingHealth = z.infer<typeof trackingHealthSchema>;
 export type AttributionModel = z.infer<typeof attributionModelSchema>;
 export type Attribution = z.infer<typeof attributionSchema>;
 export type LibraryListQuery = z.infer<typeof libraryListQuerySchema>;
+export type LibraryApiQuery = z.infer<typeof libraryApiQuerySchema>;
+export type AttributionQuery = z.infer<typeof attributionQuerySchema>;

@@ -7,6 +7,9 @@ import { createHealthHandler } from './health';
 import { meRouter } from './me';
 import { overviewRouter } from './overview';
 import { usersRouter } from './users';
+import { creativesRouter, creativeTestsRouter } from './creatives';
+import { audiencesRouter } from './audiences';
+import { attributionRouter, conversionEventsRouter, trackingRouter } from './tracking';
 
 export const apiRouter = Router();
 
@@ -22,4 +25,10 @@ apiRouter.use(usersRouter);
 apiRouter.use('/audit-log', auditRouter);
 apiRouter.use('/campaigns', campaignsRouter);
 apiRouter.use('/overview', overviewRouter);
+apiRouter.use('/audiences', audiencesRouter);
+apiRouter.use('/creatives', creativesRouter);
+apiRouter.use('/creative-tests', creativeTestsRouter);
+apiRouter.use('/conversion-events', conversionEventsRouter);
+apiRouter.use('/tracking', trackingRouter);
+apiRouter.use('/attribution', attributionRouter);
 // Remaining Paid Ads routers mount here (docs/api.md): /ad-accounts, /audiences, /creatives, ...

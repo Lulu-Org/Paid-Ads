@@ -13,6 +13,7 @@ import { buildOpenApiDocument } from './openapi/document';
 import { swaggerUiCsp } from './openapi/ui';
 import { apiRouter } from './routes';
 import { createHealthHandler, liveHandler } from './routes/health';
+import path from 'path';
 
 export function createApp(): Express {
   const app = express();
@@ -41,6 +42,8 @@ export function createApp(): Express {
 
   app.use(notFound);
   app.use(errorHandler);
+
+  app.use('/uploads', express.static(path.resolve(process.env.UPLOAD_DIR ?? 'uploads')));
 
   return app;
 }
