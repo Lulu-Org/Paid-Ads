@@ -190,6 +190,7 @@ model CampaignMetricDay {
   clicks        Int
   conversions   Int
   leads         Int
+  calls         Int       @default(0)
   spendAmount   Decimal   @db.Decimal(14, 2)
   revenueAmount Decimal   @db.Decimal(14, 2)
   currency      String

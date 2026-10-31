@@ -29,6 +29,7 @@ import { scopedDb } from '../db/scoped';
 import { enqueueAdsPush } from '../jobs/queues';
 import { AppError } from '../lib/errors';
 import type { RequestContext } from '../middleware/requestContext';
+import { campaignCreationSupported } from '../providers';
 import type {
   AdAccount as AdAccountRow,
   ApprovalRequest as ApprovalRequestRow,
@@ -94,6 +95,7 @@ export function toCampaignMetricDayDto(row: CampaignMetricDayRow): CampaignMetri
     clicks: row.clicks,
     conversions: row.conversions,
     leads: row.leads,
+    calls: row.calls,
     spend: money(row.spendAmount, row.currency),
     revenue: money(row.revenueAmount, row.currency),
   };
@@ -586,6 +588,12 @@ export async function launchCampaign(
   const campaign = await findCampaign(ctx.workspaceId, campaignId);
   if (campaign.status !== 'draft') {
     throw AppError.conflict('CONFLICT', { status: campaign.status });
+  }
+  if (campaign.externalId === null && !campaignCreationSupported(campaign.platform)) {
+    throw AppError.conflict('CONFLICT', {
+      reason: 'campaign_creation_unsupported',
+      platform: campaign.platform,
+    });
   }
 
   const scoped = scopedDb(ctx.workspaceId);

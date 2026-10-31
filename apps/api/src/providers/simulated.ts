@@ -117,11 +117,12 @@ function toCampaign(sample: SampleCampaign): ExternalCampaign {
   };
 }
 
-function metricDay(externalId: string, date: Date): ExternalMetricDay {
+function metricDay(externalId: string, date: Date, platform: AdPlatform): ExternalMetricDay {
   const key = `${externalId}:${date.toISOString().slice(0, 10)}`;
   const impressions = 400 + Math.round(fraction(`${key}:impressions`) * 4600);
   const clicks = Math.max(1, Math.round(impressions * (0.02 + fraction(`${key}:clicks`) * 0.04)));
   const leads = Math.max(0, Math.round(clicks * (0.008 + fraction(`${key}:leads`) * 0.02)));
+  const calls = platform === 'google_lsa' ? leads : 0;
   const spendAmount = Math.round((20 + fraction(`${key}:spend`) * 160) * 100) / 100;
   const revenueAmount =
     Math.round(spendAmount * (1.8 + fraction(`${key}:revenue`) * 2.2) * 100) / 100;
@@ -132,6 +133,7 @@ function metricDay(externalId: string, date: Date): ExternalMetricDay {
     clicks,
     conversions: leads,
     leads,
+    calls,
     spend: { amount: spendAmount, currency: 'EUR' },
     revenue: { amount: revenueAmount, currency: 'EUR' },
   };
@@ -168,7 +170,7 @@ export class SimulatedAdsProvider implements AdsProvider {
     for (let time = first.getTime(); time <= last.getTime(); time += DAY_MS) {
       const date = new Date(time);
       for (const campaign of SAMPLE_CAMPAIGNS[this.platform]) {
-        days.push(metricDay(campaign.externalId, date));
+        days.push(metricDay(campaign.externalId, date, this.platform));
       }
     }
     return Promise.resolve(days);

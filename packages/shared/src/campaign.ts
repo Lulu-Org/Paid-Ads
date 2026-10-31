@@ -58,6 +58,7 @@ export const campaignTotalsSchema = z.object({
   clicks: z.number().int().min(0),
   conversions: z.number().int().min(0),
   leads: z.number().int().min(0),
+  calls: z.number().int().min(0),
   ctr: z.number().min(0).nullable(),
   cpl: moneySchema.nullable(),
   roas: z.number().min(0).nullable(),
@@ -81,6 +82,7 @@ export const campaignMetricDaySchema = z.object({
   clicks: z.number().int().min(0),
   conversions: z.number().int().min(0),
   leads: z.number().int().min(0),
+  calls: z.number().int().min(0),
   spend: moneySchema,
   revenue: moneySchema,
 });
