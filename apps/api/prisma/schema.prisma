@@ -73,6 +73,7 @@ model Workspace {
   audiences            Audience[]
   creatives            Creative[]
   campaignCreatives    CampaignCreative[]
+  campaignAudiences    CampaignAudience[]
   conversionEvents     ConversionEvent[]
   automationRules      AutomationRule[]
   automationActivities AutomationActivity[]
@@ -170,6 +171,7 @@ model Campaign {
   metricDays           CampaignMetricDay[]
   planSteps            CampaignPlanStep[]
   creatives            CampaignCreative[]
+  audiences            CampaignAudience[]
   approvalRequests     ApprovalRequest[]
   automationActivities AutomationActivity[]
   webhookEvents        WebhookEvent[]
@@ -233,8 +235,12 @@ model Audience {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   deletedAt    DateTime?
+  description  String?
+  matchRate    Decimal?     @db.Decimal(4, 3)
+  exclusions   String[]     @default([])
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  campaigns CampaignAudience[]
 
   @@index([workspaceId])
   @@map("audiences")
@@ -267,6 +273,9 @@ model CampaignCreative {
   campaignId  String
   creativeId  String
   variant     String
+  role        String   @default("learning")
+  spendAmount Decimal  @default(0) @db.Decimal(14, 2)
+  leads       Int      @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
@@ -278,6 +287,24 @@ model CampaignCreative {
   @@unique([campaignId, creativeId])
   @@index([workspaceId, campaignId])
   @@map("campaign_creatives")
+}
+
+model CampaignAudience {
+  id          String    @id @default(uuid())
+  workspaceId String
+  campaignId  String    
+  audienceId  String 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?   
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  campaign    Campaign  @relation(fields: [campaignId], references: [id])
+  audience    Audience  @relation(fields: [audienceId], references: [id])
+
+  @@unique([campaignId, audienceId])
+  @@index([workspaceId, audienceId])
+  @@map("campaign_audiences")
 }
 
 model ConversionEvent {

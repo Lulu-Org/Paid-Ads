@@ -8,6 +8,9 @@ import { createHealthHandler } from './health';
 import { meRouter } from './me';
 import { overviewRouter } from './overview';
 import { usersRouter } from './users';
+import { creativesRouter, creativeTestsRouter } from './creatives';
+import { audiencesRouter } from './audiences';
+import { attributionRouter, conversionEventsRouter, trackingRouter } from './tracking';
 
 export const apiRouter = Router();
 
