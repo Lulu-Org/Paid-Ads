@@ -54,8 +54,15 @@ services:
         value: simulated
       - key: ADS_PROVIDER_LINKEDIN_ADS
         value: simulated
+      # LinkedIn app (C4). Set these, then switch ADS_PROVIDER_LINKEDIN_ADS to live.
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false
+      - key: LINKEDIN_API_VERSION
+        sync: false
       # "true" loads the design's sample data on every start (the entrypoint runs the seed).
-      # Off since Oct 23, 2026: the live workspace was emptied of sample data at Dave's request.
+      # Keep it "false" once real ad accounts are connected, so samples never mix with real data.
       - key: SEED_ON_START
         value: "false"
       - key: SEED_OWNER_PASSWORD
