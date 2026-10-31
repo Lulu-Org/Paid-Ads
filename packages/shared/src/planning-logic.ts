@@ -16,18 +16,23 @@ export function channelHistory(
   const rows = campaigns.filter((c) => c.deletedAt === null).flatMap((c) => (metricDays[c.id] ?? []).map((d) => ({ platform: c.platform, d })));
   if (rows.length === 0) return {};
   const end = Math.max(...rows.map((r) => Date.parse(`${r.d.date}T00:00:00Z`)));
-  const history: Partial<Record<AdPlatform, ChannelHistory>> = {};
+  // Summed in whole cents, then turned back into amounts.
+  const totals: Partial<Record<AdPlatform, ChannelHistory>> = {};
   for (const { platform, d } of rows) {
     if (Date.parse(`${d.date}T00:00:00Z`) <= end - days * DAY_MS) continue;
-    const h = (history[platform] ??= { spend: 0, leads: 0, revenue: 0 });
-    if (d.spend.currency === currency) h.spend += d.spend.amount;
-    if (d.revenue.currency === currency) h.revenue += d.revenue.amount;
+    const h = (totals[platform] ??= { spend: 0, leads: 0, revenue: 0 });
+    if (d.spend.currency === currency) h.spend += cents(d.spend.amount);
+    if (d.revenue.currency === currency) h.revenue += cents(d.revenue.amount);
     h.leads += d.leads;
   }
-  return history;
+  return Object.fromEntries(
+    Object.entries(totals).map(([platform, h]) => [platform, { spend: fromCents(h.spend), leads: h.leads, revenue: fromCents(h.revenue) }]),
+  );
 }
 
-const round = (n: number) => Math.round(n * 100) / 100;
+// Money is summed in whole cents so totals do not pick up floating point noise (as in metrics.ts).
+const cents = (amount: number) => Math.round(amount * 100);
+const fromCents = (value: number) => value / 100;
 
 /**
  * GET /planning. Forecasts use each channel's own recent results: leads = planned ÷ its CPL,
@@ -42,7 +47,7 @@ export function buildPlanning(
 ): Planning {
   const currency = limit.currency;
   const channels = plan.channels.filter((c) => c.planned.currency === currency);
-  const allocated = channels.reduce((sum, c) => sum + c.planned.amount, 0);
+  const allocated = fromCents(channels.reduce((sum, c) => sum + cents(c.planned.amount), 0));
 
   const rows = channels.map((c) => {
     const h = history[c.platform];
@@ -52,7 +57,7 @@ export function buildPlanning(
       platform: c.platform,
       share: allocated === 0 ? 0 : c.planned.amount / allocated,
       forecastLeads: cpl ? Math.round(c.planned.amount / cpl) : null,
-      forecastRevenue: roas !== null ? { amount: round(c.planned.amount * roas), currency } : null,
+      forecastRevenue: roas !== null ? { amount: fromCents(cents(c.planned.amount * roas)), currency } : null,
     };
   });
 
@@ -63,18 +68,18 @@ export function buildPlanning(
     if (c.target.metric === "cpl" && c.target.value > 0) return sum + Math.round(c.planned.amount / c.target.value);
     return sum + (row.forecastLeads ?? 0);
   }, 0);
-  const forecastRevenue = rows.reduce((sum, r) => sum + (r.forecastRevenue?.amount ?? 0), 0);
-  const forecastSpend = pairs.filter(({ row }) => row.forecastRevenue !== null).reduce((sum, { channel }) => sum + channel.planned.amount, 0);
+  const forecastRevenue = fromCents(rows.reduce((sum, r) => sum + cents(r.forecastRevenue?.amount ?? 0), 0));
+  const forecastSpend = fromCents(pairs.filter(({ row }) => row.forecastRevenue !== null).reduce((sum, { channel }) => sum + cents(channel.planned.amount), 0));
 
   return {
     plan,
     limit,
-    allocated: { amount: round(allocated), currency },
+    allocated: { amount: allocated, currency },
     allocatedShare: limit.amount > 0 ? allocated / limit.amount : 0,
     channels: rows,
     targetLeads,
     previousTargetLeads,
-    forecastRevenue: { amount: round(forecastRevenue), currency },
+    forecastRevenue: { amount: forecastRevenue, currency },
     forecastRoas: forecastSpend > 0 ? forecastRevenue / forecastSpend : null,
   };
 }
