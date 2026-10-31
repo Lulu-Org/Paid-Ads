@@ -212,6 +212,7 @@ describe('GoogleLsaProvider', () => {
         startAt: new Date('2026-06-01T00:00:00.000Z'),
         endAt: null,
         budget: { amount: 3040, currency: 'EUR' },
+        budgetPeriod: 'monthly',
       },
       {
         externalId: '1002',
@@ -222,6 +223,7 @@ describe('GoogleLsaProvider', () => {
         startAt: new Date('2026-07-01T00:00:00.000Z'),
         endAt: new Date('2026-07-31T23:59:59.999Z'),
         budget: { amount: 1520, currency: 'EUR' },
+        budgetPeriod: 'monthly',
       },
     ]);
   });
@@ -329,7 +331,7 @@ describe('GoogleLsaProvider', () => {
   it('converts the monthly budget to Google daily micros before mutating', async () => {
     const { client, instance } = provider();
 
-    await instance.setBudget(account(), '1001', { amount: 3040, currency: 'EUR' });
+    await instance.setBudget(account(), '1001', { amount: 3040, currency: 'EUR' }, 'monthly');
 
     expect(client.budgetMutations).toEqual([
       {
@@ -345,8 +347,22 @@ describe('GoogleLsaProvider', () => {
   it('rejects a budget in another currency', async () => {
     const { instance } = provider();
     await expect(
-      instance.setBudget(account(), '1001', { amount: 3040, currency: 'USD' }),
+      instance.setBudget(account(), '1001', { amount: 3040, currency: 'USD' }, 'monthly'),
     ).rejects.toThrow(/does not match/);
+  });
+
+  it('sends a daily budget as is and refuses a total budget without mutating', async () => {
+    const { client, instance } = provider();
+
+    await instance.setBudget(account(), '1001', { amount: 100, currency: 'EUR' }, 'daily');
+    expect(client.budgetMutations).toEqual([
+      expect.objectContaining({ update: expect.objectContaining({ amountMicros: '100000000' }) }),
+    ]);
+
+    await expect(
+      instance.setBudget(account(), '1001', { amount: 3040, currency: 'EUR' }, 'total'),
+    ).rejects.toThrow(/monthly or daily/);
+    expect(client.budgetMutations).toHaveLength(1);
   });
 
   it('rejects campaign creation with a clear error', async () => {

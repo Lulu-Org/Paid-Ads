@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { AdPlatform, Campaign, CampaignStatus, Money } from '@lulu/shared';
+import type { AdPlatform, BudgetPeriod, Campaign, CampaignStatus, Money } from '@lulu/shared';
 import { env } from '../config/env';
 import type {
   AdsProvider,
@@ -51,6 +51,7 @@ interface SampleCampaign {
   startAt: string | null;
   endAt: string | null;
   budget: Money;
+  budgetPeriod: BudgetPeriod;
 }
 
 const SAMPLE_CAMPAIGNS: Record<AdPlatform, SampleCampaign[]> = {
@@ -64,6 +65,7 @@ const SAMPLE_CAMPAIGNS: Record<AdPlatform, SampleCampaign[]> = {
       startAt: '2026-06-01T00:00:00.000Z',
       endAt: null,
       budget: { amount: 3000, currency: 'EUR' },
+      budgetPeriod: 'monthly',
     },
   ],
   google_ads: [
@@ -76,6 +78,7 @@ const SAMPLE_CAMPAIGNS: Record<AdPlatform, SampleCampaign[]> = {
       startAt: '2026-06-01T00:00:00.000Z',
       endAt: '2026-06-30T23:59:59.000Z',
       budget: { amount: 6000, currency: 'EUR' },
+      budgetPeriod: 'total',
     },
   ],
   meta_ads: [
@@ -88,6 +91,7 @@ const SAMPLE_CAMPAIGNS: Record<AdPlatform, SampleCampaign[]> = {
       startAt: '2026-06-08T00:00:00.000Z',
       endAt: '2026-07-08T23:59:59.000Z',
       budget: { amount: 4500, currency: 'EUR' },
+      budgetPeriod: 'total',
     },
   ],
   // LinkedIn has no campaigns in the design sample data.
@@ -114,6 +118,7 @@ function toCampaign(sample: SampleCampaign): ExternalCampaign {
     startAt: sample.startAt === null ? null : new Date(sample.startAt),
     endAt: sample.endAt === null ? null : new Date(sample.endAt),
     budget: sample.budget,
+    budgetPeriod: sample.budgetPeriod,
   };
 }
 
@@ -184,7 +189,12 @@ export class SimulatedAdsProvider implements AdsProvider {
     return Promise.resolve();
   }
 
-  setBudget(_account: ProviderAccount, _externalId: string, _budget: Money) {
+  setBudget(
+    _account: ProviderAccount,
+    _externalId: string,
+    _budget: Money,
+    _budgetPeriod: BudgetPeriod,
+  ) {
     return Promise.resolve();
   }
 }

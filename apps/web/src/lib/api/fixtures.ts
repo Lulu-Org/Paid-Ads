@@ -74,6 +74,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-06-01T00:00:00.000Z",
     endAt: "2026-06-30T23:59:59.000Z",
     budget: eur(6000),
+    budgetPeriod: "total",
     rationale:
       "Search demand is strongest for high-intent terms around the spring launch. The campaign is connected to CRM attribution so lead quality can be reviewed beyond the click.",
     nextStep: "Review search terms and shift 8% of spend into the two highest-converting ad groups.",
@@ -92,6 +93,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-06-01T00:00:00.000Z",
     endAt: null,
     budget: eur(3000),
+    budgetPeriod: "monthly",
     rationale:
       "Local Services is producing reliable call volume in the service area. The current signal is stable, so the campaign is kept live while the lead response time is improved.",
     nextStep: "Connect the missed-call workflow and compare booked jobs against raw calls.",
@@ -110,6 +112,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-06-08T00:00:00.000Z",
     endAt: "2026-07-08T23:59:59.000Z",
     budget: eur(4500),
+    budgetPeriod: "total",
     rationale:
       "Meta is delivering the lowest cost per lead while the short-form creative receives strong engagement. The budget recommendation is based on qualified lead rate, not only volume.",
     nextStep: "Scale the winning video concept by 12% and keep the control creative for comparison.",
@@ -128,6 +131,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-10-01T00:00:00.000Z",
     endAt: "2026-12-31T23:59:59.000Z",
     budget: eur(2500),
+    budgetPeriod: "total",
     rationale: "The draft is planned around the Q4 buying cycle and is waiting for final creative approval before launch.",
     nextStep: "Approve the case study asset and define the CRM lead score threshold.",
     ownerId: "user_alex",

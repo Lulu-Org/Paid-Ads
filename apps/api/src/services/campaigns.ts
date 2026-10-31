@@ -82,6 +82,7 @@ export function toCampaignDto(row: CampaignRow): Campaign {
     startAt: row.startAt === null ? null : iso(row.startAt),
     endAt: row.endAt === null ? null : iso(row.endAt),
     budget: money(row.budgetAmount, row.budgetCurrency),
+    budgetPeriod: row.budgetPeriod,
     rationale: row.rationale,
     nextStep: row.nextStep,
     ownerId: row.ownerId,
@@ -211,6 +212,7 @@ function totalsFor(row: CampaignRow, days: CampaignMetricDayRow[]): CampaignTota
   return campaignTotals(
     days.map(toCampaignMetricDayDto),
     money(row.budgetAmount, row.budgetCurrency),
+    row.budgetPeriod,
   );
 }
 
@@ -402,6 +404,7 @@ export async function createCampaign(
     objective: input.objective,
     budgetAmount: input.budget.amount,
     budgetCurrency: input.budget.currency,
+    budgetPeriod: input.budgetPeriod,
     ownerId,
     ...(input.audienceSummary === undefined ? {} : { audienceSummary: input.audienceSummary }),
     ...(input.startAt === undefined
@@ -430,6 +433,12 @@ export async function updateCampaign(
 
   if (input.adAccountId !== undefined && input.adAccountId !== null) {
     await validateAdAccount(ctx.workspaceId, input.adAccountId, campaign.platform);
+  }
+  // The platform already holds a budget of this period, so it only changes before the first push.
+  if (input.budgetPeriod !== undefined && input.budgetPeriod !== campaign.budgetPeriod) {
+    if (campaign.status !== 'draft' || campaign.externalId !== null) {
+      throw AppError.conflict('CONFLICT', { reason: 'budget_period_locked' });
+    }
   }
   const ownerId =
     input.ownerId === undefined
@@ -474,6 +483,7 @@ export async function updateCampaign(
           budgetAmount: input.budget.amount,
           budgetCurrency: input.budget.currency,
         }),
+    ...(input.budgetPeriod === undefined ? {} : { budgetPeriod: input.budgetPeriod }),
     ...(input.rationale === undefined ? {} : { rationale: input.rationale }),
     ...(input.nextStep === undefined ? {} : { nextStep: input.nextStep }),
     ...(ownerId === undefined ? {} : { ownerId }),

@@ -712,6 +712,20 @@
     "paused": "Paused",
     "ended": "Ended"
   },
+  "budgetPeriods": {
+    "monthly": {
+      "label": "Per month",
+      "amount": "{amount} / month"
+    },
+    "daily": {
+      "label": "Per day",
+      "amount": "{amount} / day"
+    },
+    "total": {
+      "label": "Whole campaign",
+      "amount": "{amount} in total"
+    }
+  },
   "campaigns": {
     "create": {
       "eyebrow": "New campaign",
@@ -720,8 +734,9 @@
       "name": "Campaign name",
       "namePlaceholder": "e.g. Summer launch · Munich",
       "channel": "Advertising channel",
-      "budget": "Monthly budget ({currency})",
-      "budgetNoCurrency": "Monthly budget",
+      "budget": "Budget ({currency})",
+      "budgetNoCurrency": "Budget",
+      "budgetPeriod": "Budget period",
       "budgetPlaceholder": "2500",
       "objective": "Primary goal",
       "start": "Start date",

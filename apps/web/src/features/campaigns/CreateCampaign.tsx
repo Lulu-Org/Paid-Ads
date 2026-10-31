@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
-import { adPlatformSchema, type AdPlatform } from "@lulu/shared";
+import { adPlatformSchema, budgetPeriods, budgetPeriodSchema, type AdPlatform } from "@lulu/shared";
 import { adPlatformOrder } from "@/components/ads";
 import { Button, Modal, useToast } from "@/components/ui";
 import { api, realAreas } from "@/lib/api";
@@ -29,6 +29,7 @@ const formSchema = z
     name: z.string().trim().min(1, "nameRequired").max(200, "nameTooLong"),
     platform: adPlatformSchema,
     budget: z.string().trim().regex(/^\d+([.,]\d{1,2})?$/, "budgetInvalid"),
+    budgetPeriod: budgetPeriodSchema,
     objective: z.enum(objectiveKeys),
     startDate: z.string(),
     endDate: z.string(),
@@ -57,6 +58,7 @@ function CreateCampaignModal({ open, onClose, onSaved }: { open: boolean; onClos
   const t = useTranslations("campaigns.create");
   const tPlatform = useTranslations("platforms");
   const tCommon = useTranslations("common");
+  const tPeriod = useTranslations("budgetPeriods");
   const toast = useToast();
   const errorMessage = useErrorMessage();
   // The budget is in the currency of the platform's ad account.
@@ -70,7 +72,7 @@ function CreateCampaignModal({ open, onClose, onSaved }: { open: boolean; onClos
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", platform: "google_ads", budget: "", objective: "lead_generation", startDate: "", endDate: "" },
+    defaultValues: { name: "", platform: "google_ads", budget: "", budgetPeriod: "monthly", objective: "lead_generation", startDate: "", endDate: "" },
   });
 
   useEffect(() => {
@@ -93,6 +95,7 @@ function CreateCampaignModal({ open, onClose, onSaved }: { open: boolean; onClos
         name: values.name,
         objective: t(`objectives.${values.objective}`),
         budget: { amount: Number(values.budget.replace(",", ".")), currency },
+        budgetPeriod: values.budgetPeriod,
         startAt: values.startDate ? `${values.startDate}T00:00:00.000Z` : null,
         endAt: values.endDate ? `${values.endDate}T23:59:59.000Z` : null,
       });
@@ -143,7 +146,16 @@ function CreateCampaignModal({ open, onClose, onSaved }: { open: boolean; onClos
           </div>
           <div className="grid content-start gap-1.5">
             {label("budget", currency ? t("budget", { currency }) : t("budgetNoCurrency"))}
-            <input className={input} inputMode="decimal" placeholder={t("budgetPlaceholder")} {...register("budget")} {...aria("budget")} />
+            <div className="flex gap-2">
+              <input className={`${input} min-w-0 flex-1`} inputMode="decimal" placeholder={t("budgetPlaceholder")} {...register("budget")} {...aria("budget")} />
+              <select className={input.replace("w-full", "w-auto")} aria-label={t("budgetPeriod")} {...register("budgetPeriod")}>
+                {budgetPeriods.map((p) => (
+                  <option key={p} value={p}>
+                    {tPeriod(`${p}.label`)}
+                  </option>
+                ))}
+              </select>
+            </div>
             {error("budget")}
           </div>
         </div>

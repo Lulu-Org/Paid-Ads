@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { adPlatformSchema, type CampaignMetricDay, type CampaignTotals } from "./campaign";
+import { adPlatformSchema, type BudgetPeriod, type CampaignMetricDay, type CampaignTotals } from "./campaign";
 import { moneySchema, type Money } from "./common";
 
 // The numbers every view shows, computed the same way in the API and the mock (AGENTS.md rule 3).
@@ -8,8 +8,15 @@ import { moneySchema, type Money } from "./common";
 const cents = (amount: number) => Math.round(amount * 100);
 const fromCents = (value: number) => value / 100;
 
-/** Totals for one campaign from its metric days. Days in another currency are left out. */
-export function campaignTotals(days: CampaignMetricDay[], budget: Money): CampaignTotals {
+/**
+ * Totals for one campaign from its metric days. Days in another currency are left out. Progress only
+ * counts the spend in the budget's period (see `periodDays`).
+ */
+export function campaignTotals(
+  days: CampaignMetricDay[],
+  budget: Money,
+  budgetPeriod: BudgetPeriod = "monthly",
+): CampaignTotals {
   const own = days.filter((d) => d.spend.currency === budget.currency);
   const sum = (pick: (d: CampaignMetricDay) => number) => own.reduce((total, d) => total + pick(d), 0);
   const spendCents = sum((d) => cents(d.spend.amount));
@@ -29,8 +36,22 @@ export function campaignTotals(days: CampaignMetricDay[], budget: Money): Campai
     ctr: ctr(clicks, impressions),
     cpl: leads > 0 ? { amount: Math.round(spendCents / leads) / 100, currency } : null,
     roas: spendCents > 0 ? revenueCents / spendCents : null,
-    progress: progress(fromCents(spendCents), budget.amount),
+    progress: progress(
+      fromCents(periodDays(own, budgetPeriod).reduce((total, d) => total + cents(d.spend.amount), 0)),
+      budget.amount,
+    ),
   };
+}
+
+/**
+ * The days a budget covers, measured from the newest day with metrics (so the result does not depend
+ * on the clock): that day's month for `monthly`, that day for `daily`, all days for `total`.
+ */
+export function periodDays(days: CampaignMetricDay[], budgetPeriod: BudgetPeriod): CampaignMetricDay[] {
+  if (budgetPeriod === "total") return days;
+  const newest = days.reduce((max, d) => (d.date > max ? d.date : max), "");
+  const prefix = budgetPeriod === "monthly" ? newest.slice(0, 7) : newest;
+  return days.filter((d) => d.date.startsWith(prefix));
 }
 
 /** Click-through rate, 0 to 1; null without impressions. */

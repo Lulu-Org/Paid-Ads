@@ -94,7 +94,12 @@ describe('SimulatedAdsProvider', () => {
       undefined,
     );
     await expect(
-      provider.setBudget(account('meta_ads'), first.externalId, { amount: 10, currency: 'EUR' }),
+      provider.setBudget(
+        account('meta_ads'),
+        first.externalId,
+        { amount: 10, currency: 'EUR' },
+        'monthly',
+      ),
     ).resolves.toBe(undefined);
   });
 });

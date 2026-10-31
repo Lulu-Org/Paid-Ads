@@ -97,6 +97,7 @@ export function processAdsSync(payload: AdsSyncPayload): Promise<AdsSyncResult> 
             endAt: external.endAt,
             budgetAmount: external.budget.amount,
             budgetCurrency: external.budget.currency,
+            budgetPeriod: external.budgetPeriod,
             ownerId,
           };
           campaigns.push(
