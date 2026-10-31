@@ -178,6 +178,104 @@ const auditPaths: OpenApiPaths = {
   },
 };
 
+const adAccountPaths: OpenApiPaths = {
+  '/api/v1/ad-accounts': {
+    get: {
+      operationId: 'listAdAccounts',
+      summary: 'List ad accounts',
+      description:
+        'Connected accounts with their platform, status, scopes and last sync. The token is never returned. Needs integrations: view.',
+      tags: ['Ad accounts'],
+      security: bearer,
+      responses: {
+        '200': listDataResponse('Connected ad accounts.', 'AdAccount'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+      },
+    },
+  },
+  '/api/v1/ad-accounts/connect': {
+    post: {
+      operationId: 'connectAdAccount',
+      summary: 'Start an OAuth connection',
+      description:
+        'Returns the provider authorize URL with a signed, single-use state (workspace, user, platform, jti). The browser visits it and the provider returns to the public callback. Needs integrations: create.',
+      tags: ['Ad accounts'],
+      security: bearer,
+      requestBody: jsonBody('AdAccountConnectInput'),
+      responses: {
+        '200': dataResponse('The provider authorize URL.', 'AdAccountConnectResult'),
+        '400': errorResponse('Invalid platform.'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+      },
+    },
+  },
+  '/api/v1/ad-accounts/callback/{platform}': {
+    get: {
+      operationId: 'completeAdAccountConnect',
+      summary: 'OAuth callback',
+      description:
+        'Public. Verifies the signed state, consumes its jti so it cannot be replayed, exchanges the code, stores the encrypted token, queues the first ads.sync and registers the 6-hour scheduler, then redirects to CORS_ORIGIN/ads/integrations?connected=<platform>. An invalid or replayed state answers 401.',
+      tags: ['Ad accounts'],
+      security: [],
+      parameters: [
+        {
+          name: 'platform',
+          in: 'path',
+          required: true,
+          schema: { enum: ['google_lsa', 'google_ads', 'meta_ads', 'linkedin_ads'] },
+        },
+        { name: 'code', in: 'query', required: true, schema: { type: 'string' } },
+        { name: 'state', in: 'query', required: true, schema: { type: 'string' } },
+      ],
+      responses: {
+        '302': {
+          description: 'Connected; redirects to the Integrations view.',
+          headers: { Location: { schema: { type: 'string' } } },
+        },
+        '400': errorResponse('Missing code or state.'),
+        '401': errorResponse('Invalid, expired or replayed state.'),
+      },
+    },
+  },
+  '/api/v1/ad-accounts/{id}/sync': {
+    post: {
+      operationId: 'syncAdAccount',
+      summary: 'Queue a sync now',
+      description:
+        'Creates a queued SyncRun and adds an ads.sync job for it. The provider call runs in the worker, never in the request. Needs integrations: edit.',
+      tags: ['Ad accounts'],
+      security: bearer,
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+      responses: {
+        '200': dataResponse('The queued SyncRun.', 'SyncRun'),
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Ad account not found.'),
+        '409': errorResponse('The account is disconnected.'),
+      },
+    },
+  },
+  '/api/v1/ad-accounts/{id}': {
+    delete: {
+      operationId: 'disconnectAdAccount',
+      summary: 'Disconnect an ad account',
+      description:
+        'Marks the account disconnected, clears the encrypted token, scopes and error, removes its 6-hour scheduler and keeps the row and its sync history. Needs integrations: delete.',
+      tags: ['Ad accounts'],
+      security: bearer,
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+      responses: {
+        '204': { description: 'Disconnected.' },
+        '401': errorResponse('Missing, invalid or expired token.'),
+        '403': errorResponse('FORBIDDEN.'),
+        '404': errorResponse('Ad account not found.'),
+      },
+    },
+  },
+};
+
 const campaignIdParameter = {
   name: 'id',
   in: 'path',
@@ -864,6 +962,7 @@ export const paths: OpenApiPaths = {
   },
   ...authPaths,
   ...auditPaths,
+  ...adAccountPaths,
   ...campaignPaths,
   ...overviewPaths,
   ...libraryPaths

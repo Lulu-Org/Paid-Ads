@@ -19,26 +19,43 @@ Base path `/api/v1`. Request and response shapes are the Zod schemas in `package
 
 | Method | Path                                | What                                                            | Permission          |
 | ------ | ----------------------------------- | --------------------------------------------------------------- | ------------------- |
-| GET    | `/ad-accounts`                    | Connected accounts with status and last sync                    | integrations.view   |
-| POST   | `/ad-accounts/connect`            | `{ platform }` → `{ authorizeUrl }` to start OAuth         | integrations.create |
-| GET    | `/ad-accounts/callback/:platform` | OAuth return; stores the encrypted token, queues the first sync | (state check)       |
-| POST   | `/ad-accounts/:id/sync`           | Queues `ads.sync` now, returns the `SyncRun`                | integrations.edit   |
-| DELETE | `/ad-accounts/:id`                | Disconnects (revokes the token)                                 | integrations.delete |
+| --- | --- | --- | --- |
+| GET | `/ad-accounts` | Connected accounts with status and last sync (the token is never returned) | integrations.view |
+| POST | `/ad-accounts/connect` | `{ platform }` → `{ authorizeUrl }` to start OAuth, with a signed single-use state | integrations.create |
+| GET | `/ad-accounts/callback/:platform` | Public OAuth return; verifies and consumes the state, stores the encrypted token, queues the first sync, registers the 6-hour scheduler, then redirects to `CORS_ORIGIN/ads/integrations?connected=<platform>` | (state check) |
+| POST | `/ad-accounts/:id/sync` | Creates a queued `SyncRun` and adds `ads.sync` for it | integrations.edit |
+| DELETE | `/ad-accounts/:id` | Disconnects: marks it `disconnected`, clears the token, scopes and error, removes its scheduler, keeps the row and history | integrations.delete |
 
-**`AdsProvider` interface** (`apps/api/src/providers/`), one implementation per platform plus `SimulatedProvider`, which returns the design's sample data. `ADS_PROVIDER_<PLATFORM>=simulated|live` chooses per platform.
+**`AdsProvider` interface** (`apps/api/src/providers/`), one implementation per platform plus `SimulatedAdsProvider`, which returns the design's sample data. `ADS_PROVIDER_<PLATFORM>=simulated|live` chooses per platform; `live` fails fast until that provider exists (C1–C4). `ProviderAccount` is the stored account metadata plus the decrypted token — only the provider layer sees the token.
 
 ```ts
+interface ProviderAccount {
+  id: string;
+  workspaceId: string;
+  platform: AdPlatform;
+  externalId: string;
+  name: string;
+  currency: string;
+  scopes: string[];
+  token: string;
+  tokenExpiresAt: Date | null;
+}
+
 interface AdsProvider {
   platform: AdPlatform;
   authorizeUrl(state: string): string;
   exchangeCode(code: string): Promise<{ token: string; expiresAt: Date | null; accounts: ExternalAccount[] }>;
-  listCampaigns(account: AdAccount): Promise<ExternalCampaign[]>;
-  metrics(account: AdAccount, from: Date, to: Date): Promise<ExternalMetricDay[]>;
-  pushCampaign(account: AdAccount, campaign: Campaign): Promise<{ externalId: string }>;
-  setStatus(account: AdAccount, externalId: string, status: "live" | "paused"): Promise<void>;
-  setBudget(account: AdAccount, externalId: string, budget: Money): Promise<void>;
+  listCampaigns(account: ProviderAccount): Promise<ExternalCampaign[]>;
+  metrics(account: ProviderAccount, from: Date, to: Date): Promise<ExternalMetricDay[]>;
+  pushCampaign(account: ProviderAccount, campaign: Campaign): Promise<{ externalId: string }>;
+  setStatus(account: ProviderAccount, externalId: string, status: "live" | "paused"): Promise<void>;
+  setBudget(account: ProviderAccount, externalId: string, budget: Money): Promise<void>;
 }
 ```
+
+The simulated provider has one account per platform with the seed's external ids (`account_google_ads_ext`, `account_google_lsa_ext`, `account_meta_ext`, `account_linkedin_ext`), the seed's campaigns (`g_1001`, `lsa_2001`, `m_3001`; LinkedIn has none), deterministic 30-day metrics for each campaign, and a deterministic external id (`sim-<platform>-<campaignId>`) for pushed campaigns, so a retry never duplicates one.
+
+Tokens are encrypted with AES-256-GCM (`ADS_TOKEN_ENCRYPTION_KEY`, required in production). OAuth state is a short-lived signed JWT whose `jti` is stored in Redis and consumed with `GETDEL`, so a callback cannot be replayed.
 
 ## Campaigns
 
@@ -106,8 +123,8 @@ Sort: `name` (default) or `createdAt`, with `-` for descending; any other sort i
 Paid Ads publishes `<entity>.created/.updated/.deleted` through the outbox (`campaign.updated`, …) and consumes `crm.*` events (qualified lead, won deal) for attribution.
 
 ## Background jobs
-
 | Queue        | Payload                                        | Does                                                                                                                                                    |
 | ------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ads.sync` | `{ workspaceId, adAccountId }`               | Pulls campaigns and daily metrics from the provider, writes `CampaignMetricDay`, records a `SyncRun`. Runs on connect, on demand and every 6 hours. |
-| `ads.push` | `{ workspaceId, campaignId, requestedById }` | Sends a launch, status or budget change to the provider. Only after confirmation and any required approval.                                             |
+| `ads.sync` | `{ workspaceId, adAccountId, syncRunId? }` | Pulls campaigns and daily metrics from the provider, upserts them by external id and `(campaign, date)`, updates `lastSyncAt`, and finishes the `SyncRun` (the one from `syncRunId` when the endpoint created it). Runs on connect, on demand and every 6 hours. Concurrency 1. |
+| `ads.push` | `{ workspaceId, campaignId, requestedById }` | Sends a launch, status or budget change to the provider. Creates the remote campaign only while `externalId` is null, then applies status and budget. Records a `kind: push` `SyncRun`. Retries never duplicate a campaign. Only after confirmation and any required approval. |
+

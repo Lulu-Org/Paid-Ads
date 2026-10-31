@@ -1,4 +1,7 @@
 import {
+  adAccountConnectResultSchema,
+  adAccountConnectSchema,
+  adAccountSchema,
   approvalRequestSchema,
   auditEntrySchema,
   authSessionSchema,
@@ -62,6 +65,10 @@ const COMPONENT_NAMES = {
   MeUpdateInput: meUpdateSchema,
   User: userSchema,
   RolePermissions: rolePermissionsSchema,
+  AdAccount: adAccountSchema,
+  AdAccountConnectInput: adAccountConnectSchema,
+  AdAccountConnectResult: adAccountConnectResultSchema,
+  SyncRun: syncRunSchema,
   Campaign: campaignSchema,
   CampaignListItem: campaignListItemSchema,
   CampaignDetail: campaignDetailSchema,
