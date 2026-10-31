@@ -1,6 +1,6 @@
 # @lulu/api
 
-Express API for the Lulu CRM module. PostgreSQL through Prisma 7 (driver adapter: `pg`) and Redis with BullMQ for background jobs.
+Express API for the Lulu Paid Ads module. PostgreSQL through Prisma 7 (driver adapter: `pg`) and Redis with BullMQ for background jobs.
 
 ## Setup
 
@@ -32,17 +32,18 @@ Fastest: run `npm run docker:up` from the repo root — it builds this API and s
 
 ## Folders
 
-| Folder           | Purpose                                                                                                                           |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `prisma/`        | Schema (`schema.prisma`), committed migrations and the idempotent `seed.ts`                                                       |
-| `src/config`     | Env loading and parsing (`env.ts` is the only source of config)                                                                   |
-| `src/routes`     | Express routers, mounted under `/api/v1` by `routes/index.ts`                                                                     |
-| `src/services`   | Business logic used by routes                                                                                                     |
-| `src/middleware` | Express middleware (auth, errors, etc.)                                                                                           |
-| `src/jobs`       | BullMQ queues (`queues.ts`: import.process, ai.analyze, segments.refresh, notifications.send) and enqueue helpers; no workers yet |
-| `src/lib`        | Small shared helpers, including `redis.ts` (`createRedisConnection()` for health ping and queue connections)                      |
-| `src/db`         | Prisma client (`prisma.ts`) and workspace-scoped client (`scoped.ts`)                                                             |
-| `src/generated`  | Generated Prisma client, gitignored, rebuilt by `db:generate`                                                                     |
+| Folder           | Purpose                                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `prisma/`        | Schema (`schema.prisma`), committed migrations and the idempotent `seed.ts`                                                               |
+| `src/config`     | Env loading and parsing (`env.ts` is the only source of config)                                                                           |
+| `src/routes`     | Express routers, mounted under `/api/v1` by `routes/index.ts`                                                                             |
+| `src/services`   | Business logic used by routes                                                                                                             |
+| `src/middleware` | Express middleware (auth, errors, etc.)                                                                                                   |
+| `src/jobs`       | BullMQ queues (`queues.ts`: `ads.sync`, `ads.push`), their workers (`workers.ts`), sync/push processors and the 6-hour account schedulers |
+| `src/providers`  | The `AdsProvider` interface, the simulated provider and the per-platform registry (`ADS_PROVIDER_<PLATFORM>`)                             |
+| `src/lib`        | Small shared helpers, including `redis.ts` (`createRedisConnection()` for health ping and queue connections)                              |
+| `src/db`         | Prisma client (`prisma.ts`) and workspace-scoped client (`scoped.ts`)                                                                     |
+| `src/generated`  | Generated Prisma client, gitignored, rebuilt by `db:generate`                                                                             |
 
 ## Conventions
 

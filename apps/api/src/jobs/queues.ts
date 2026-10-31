@@ -12,6 +12,8 @@ export const QUEUE_NAMES = {
 export interface AdsSyncPayload {
   workspaceId: string;
   adAccountId: string;
+  // The SyncRun the endpoint created, so the worker updates that row instead of creating another.
+  syncRunId?: string;
   correlationId?: string;
 }
 

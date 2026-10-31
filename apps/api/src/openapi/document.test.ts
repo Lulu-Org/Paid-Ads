@@ -24,6 +24,7 @@ const UNAUTHENTICATED = new Set([
   '/health/live',
   '/api/v1/health',
   '/api/v1/auth/login',
+  '/api/v1/ad-accounts/callback/{platform}',
 ]);
 
 describe('OpenAPI document', () => {
@@ -40,6 +41,11 @@ describe('OpenAPI document', () => {
     const paths = doc.paths as Json;
 
     expect(Object.keys(paths).sort()).toEqual([
+      '/api/v1/ad-accounts',
+      '/api/v1/ad-accounts/callback/{platform}',
+      '/api/v1/ad-accounts/connect',
+      '/api/v1/ad-accounts/{id}',
+      '/api/v1/ad-accounts/{id}/sync',
       '/api/v1/audit-log',
       '/api/v1/auth/login',
       '/api/v1/auth/logout',
@@ -59,6 +65,11 @@ describe('OpenAPI document', () => {
     ]);
 
     const expectedMethods: Record<string, string[]> = {
+      '/api/v1/ad-accounts': ['get'],
+      '/api/v1/ad-accounts/callback/{platform}': ['get'],
+      '/api/v1/ad-accounts/connect': ['post'],
+      '/api/v1/ad-accounts/{id}': ['delete'],
+      '/api/v1/ad-accounts/{id}/sync': ['post'],
       '/api/v1/audit-log': ['get'],
       '/api/v1/auth/login': ['post'],
       '/api/v1/auth/logout': ['post'],

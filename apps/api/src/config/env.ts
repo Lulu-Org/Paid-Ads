@@ -9,6 +9,12 @@ const emptyToUndefined = (value: unknown): unknown => (value === '' ? undefined 
 // passwords keep their dev defaults everywhere (the seed is sample data).
 export const DEV_JWT_SECRET = 'lulu-dev-only-insecure-jwt-secret-do-not-ship';
 
+export const adsProviderModeSchema = z.enum(['simulated', 'live']);
+export type AdsProviderMode = z.infer<typeof adsProviderModeSchema>;
+
+const providerMode = () =>
+  z.preprocess(emptyToUndefined, adsProviderModeSchema.default('simulated'));
+
 export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']),
@@ -32,6 +38,15 @@ export const envSchema = z
     ),
     AI_PROVIDER: z.preprocess(emptyToUndefined, z.string().default('simulated')),
     AI_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
+    // Per-platform provider mode. `live` fails fast until that platform's provider exists (C1-C4).
+    ADS_PROVIDER_GOOGLE_LSA: providerMode(),
+    ADS_PROVIDER_GOOGLE_ADS: providerMode(),
+    ADS_PROVIDER_META_ADS: providerMode(),
+    ADS_PROVIDER_LINKEDIN_ADS: providerMode(),
+    // AES-256-GCM key for ad-account tokens. Required in production; development uses a fallback.
+    ADS_TOKEN_ENCRYPTION_KEY: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
+    // Public base URL of this API, used to build the simulated OAuth callback URL.
+    API_PUBLIC_URL: z.preprocess(emptyToUndefined, z.url().optional()),
   })
   .superRefine((value, ctx) => {
     // A real deployment must sign tokens with a real secret, never the dev fallback.
@@ -42,7 +57,19 @@ export const envSchema = z
         message: 'is required in production',
       });
     }
-  });
+    // Ad-account tokens must never be encrypted with the development fallback in production.
+    if (value.NODE_ENV === 'production' && value.ADS_TOKEN_ENCRYPTION_KEY === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ADS_TOKEN_ENCRYPTION_KEY'],
+        message: 'is required in production',
+      });
+    }
+  })
+  .transform((value) => ({
+    ...value,
+    API_PUBLIC_URL: value.API_PUBLIC_URL ?? `http://localhost:${value.PORT}`,
+  }));
 
 export type Env = z.infer<typeof envSchema>;
 
