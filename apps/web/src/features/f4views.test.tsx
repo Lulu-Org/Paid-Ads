@@ -16,6 +16,9 @@ vi.mock("@/i18n/navigation", () => ({
 
 const slow = { timeout: 3000 };
 
+// Amounts like "€16,000 / month" render the unit in a smaller element inside the <strong>.
+const strongText = (text: string) => (_: string, el: Element | null) => el?.tagName === "STRONG" && el.textContent === text;
+
 // Fresh modules per test, so the mock API's in-memory data starts from the design's sample data.
 async function show(load: () => Promise<React.ComponentType>) {
   const Page = await load();
@@ -81,10 +84,10 @@ describe("Operations", () => {
 describe("Billing & Controls", () => {
   it("shows the spend limit, policy, payment and statements", async () => {
     await show(async () => (await import("./billing/BillingPage")).BillingPage);
-    expect(await screen.findByText((_, el) => el?.tagName === "STRONG" && el.textContent === "€16,000 / month", {}, slow)).toBeTruthy();
+    expect(await screen.findByText(strongText("€16,000 / month"), {}, slow)).toBeTruthy();
     expect(await screen.findByText("€8,880 used · €7,120 remaining")).toBeTruthy();
     expect(screen.getByRole("progressbar", { name: "Spend limit used" }).getAttribute("aria-valuenow")).toBe("56");
-    expect(await screen.findByText("€2,500 per change")).toBeTruthy();
+    expect(await screen.findByText(strongText("€2,500 per change"))).toBeTruthy();
     expect(screen.getByText("Budget and launch changes above this amount need Finance reviewer approval.")).toBeTruthy();
     expect(await screen.findByText(/Visa ···· 2488/)).toBeTruthy();
     expect(await screen.findAllByText("June 2026")).toHaveLength(2);
@@ -94,7 +97,7 @@ describe("Billing & Controls", () => {
 
   it("saves a new limit and refuses an empty one", async () => {
     await show(async () => (await import("./billing/BillingPage")).BillingPage);
-    await screen.findByText((_, el) => el?.tagName === "STRONG" && el.textContent === "€16,000 / month", {}, slow);
+    await screen.findByText(strongText("€16,000 / month"), {}, slow);
     fireEvent.click(screen.getByRole("button", { name: "Edit limit" }));
     const dialog = await screen.findByRole("dialog");
     const amount = within(dialog).getByLabelText("Monthly workspace limit (EUR)");
@@ -107,7 +110,7 @@ describe("Billing & Controls", () => {
     await act(async () => {
       fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
     });
-    expect(await screen.findByText("€20,000 / month", {}, slow)).toBeTruthy();
+    expect(await screen.findByText(strongText("€20,000 / month"), {}, slow)).toBeTruthy();
   });
 });
 
