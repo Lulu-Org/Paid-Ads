@@ -2,11 +2,13 @@ import { adPlatforms, type AdPlatform } from '@lulu/shared';
 import { env, type AdsProviderMode } from '../config/env';
 import { GoogleAdsClient } from './googleLsaClient';
 import { GoogleLsaProvider } from './googleLsa';
+import { createLinkedInProvider } from './linkedin';
 import { simulatedProviders } from './simulated';
 import type { AdsProvider } from './types';
 
-// Per-platform provider registry. C1 adds the live Google LSA connector; C2-C4 add the rest. A
-// platform configured as `live` without a connector fails fast instead of falling back to sample data.
+// Per-platform provider registry. C1 adds the live Google LSA connector and C4 LinkedIn; C2-C3 add
+// the rest. A platform configured as `live` without a connector fails fast instead of falling back
+// to sample data.
 
 export function providerModeFor(platform: AdPlatform): AdsProviderMode {
   switch (platform) {
@@ -30,6 +32,12 @@ function liveProviderError(platform: AdPlatform): Error {
 function googleLsaCredentialsError(): Error {
   return new Error(
     'ADS_PROVIDER_GOOGLE_LSA=live requires GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_CLIENT_ID and GOOGLE_ADS_CLIENT_SECRET',
+  );
+}
+
+function linkedInCredentialsError(): Error {
+  return new Error(
+    'ADS_PROVIDER_LINKEDIN_ADS=live requires LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET and LINKEDIN_API_VERSION',
   );
 }
 
@@ -61,6 +69,29 @@ function getGoogleLsaProvider(): AdsProvider {
   return liveGoogleLsaProvider;
 }
 
+let liveLinkedInProvider: AdsProvider | null = null;
+
+function getLinkedInProvider(): AdsProvider {
+  if (liveLinkedInProvider !== null) return liveLinkedInProvider;
+
+  const { LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, LINKEDIN_API_VERSION } = env;
+  if (
+    LINKEDIN_CLIENT_ID === undefined ||
+    LINKEDIN_CLIENT_SECRET === undefined ||
+    LINKEDIN_API_VERSION === undefined
+  ) {
+    throw linkedInCredentialsError();
+  }
+
+  liveLinkedInProvider = createLinkedInProvider({
+    clientId: LINKEDIN_CLIENT_ID,
+    clientSecret: LINKEDIN_CLIENT_SECRET,
+    apiVersion: LINKEDIN_API_VERSION,
+    redirectUri: `${env.API_PUBLIC_URL.replace(/\/$/, '')}/api/v1/ad-accounts/callback/linkedin_ads`,
+  });
+  return liveLinkedInProvider;
+}
+
 export function getAdsProvider(platform: AdPlatform): AdsProvider {
   if (providerModeFor(platform) === 'simulated') {
     return simulatedProviders[platform];
@@ -68,18 +99,23 @@ export function getAdsProvider(platform: AdPlatform): AdsProvider {
   if (platform === 'google_lsa') {
     return getGoogleLsaProvider();
   }
+  if (platform === 'linkedin_ads') {
+    return getLinkedInProvider();
+  }
   throw liveProviderError(platform);
 }
 
 /**
- * Whether launching a draft can create the campaign remotely. The Google Ads API cannot create
- * standalone Local Services campaigns, so a live LSA draft must already have a remote campaign.
+ * Whether launching a draft can create the campaign remotely. Neither the Google Ads API (standalone
+ * Local Services) nor our LinkedIn connector (campaign group, targeting and creatives are not modeled
+ * yet) can create campaigns, so a live draft on those platforms must already have a remote campaign.
  */
 export function campaignCreationSupported(
   platform: AdPlatform,
   mode: AdsProviderMode = providerModeFor(platform),
 ): boolean {
-  return !(platform === 'google_lsa' && mode === 'live');
+  if (mode !== 'live') return true;
+  return platform !== 'google_lsa' && platform !== 'linkedin_ads';
 }
 
 /** Fails at startup when a platform is configured for a live provider that cannot be built. */
@@ -88,6 +124,10 @@ export function assertProviderConfiguration(): void {
     if (providerModeFor(platform) !== 'live') continue;
     if (platform === 'google_lsa') {
       getGoogleLsaProvider();
+      continue;
+    }
+    if (platform === 'linkedin_ads') {
+      getLinkedInProvider();
       continue;
     }
     throw liveProviderError(platform);

@@ -61,8 +61,21 @@ export const envSchema = z
     ),
     // Public base URL of this API, used to build the OAuth callback URL.
     API_PUBLIC_URL: z.preprocess(emptyToUndefined, z.url().optional()),
+    // LinkedIn Marketing API app (C4). Needed only when ADS_PROVIDER_LINKEDIN_ADS=live.
+    LINKEDIN_CLIENT_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+    LINKEDIN_CLIENT_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+    // The monthly API version the connector is written against, e.g. 202610 (header LinkedIn-Version).
+    LINKEDIN_API_VERSION: z.preprocess(emptyToUndefined, z.string().regex(/^\d{6}$/).optional()),
   })
   .superRefine((value, ctx) => {
+    // A live LinkedIn connection needs the app credentials and an API version; never guess them.
+    if (value.ADS_PROVIDER_LINKEDIN_ADS === 'live') {
+      for (const key of ['LINKEDIN_CLIENT_ID', 'LINKEDIN_CLIENT_SECRET', 'LINKEDIN_API_VERSION'] as const) {
+        if (value[key] === undefined) {
+          ctx.addIssue({ code: 'custom', path: [key], message: 'is required when ADS_PROVIDER_LINKEDIN_ADS=live' });
+        }
+      }
+    }
     // A real deployment must sign tokens with a real secret, never the dev fallback.
     if (value.NODE_ENV === 'production' && value.JWT_SECRET === undefined) {
       ctx.addIssue({

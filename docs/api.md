@@ -69,6 +69,22 @@ Google budgets are average daily. Synced LSA campaigns get `budgetPeriod: monthl
 
 Every campaign has `budgetPeriod`: `monthly`, `daily` or `total` (the whole run). The amount means what the period says, and it is how the platform reads it, so a sync stores the provider's period with the amount and `ads.push` passes it to `setBudget`. A provider refuses a period it cannot hold. New campaigns default to `monthly`. The period can change only while the campaign is a draft that is not on the platform yet; after that a PATCH with another period returns `409 CONFLICT` with `details.reason = budget_period_locked`. Progress compares the spend in the period with the budget, counted from the newest day with metrics: that day's month, that day, or every day (`campaignTotals` in `packages/shared/src/metrics.ts`).
 
+### LinkedIn Ads (task C4)
+
+`apps/api/src/providers/linkedin.ts`, live with `ADS_PROVIDER_LINKEDIN_ADS=live` plus `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET` and `LINKEDIN_API_VERSION` (YYYYMM; the API refuses to start in live mode without them). Redirect URI to register in the LinkedIn app: `<API_PUBLIC_URL>/api/v1/ad-accounts/callback/linkedin_ads`. Scopes `r_ads`, `r_ads_reporting`, `rw_ads`; LinkedIn must have granted the app the Advertising API product.
+
+| Operation | LinkedIn call | Notes |
+| --- | --- | --- |
+| Sign-in | OAuth 2.0 authorization code | Tokens last about 60 days; then the account shows "needs attention" and is connected again. |
+| Ad accounts | `GET /rest/adAccounts?q=search` (active) | |
+| Campaigns | `GET /rest/adAccounts/{id}/adCampaigns?q=search` (paged) | `ACTIVE`→live, `PAUSED`→paused, `DRAFT`→draft, `COMPLETED`/`ARCHIVED`/`CANCELED`→ended, removed ones left out. Budget: `totalBudget`, else `dailyBudget` (known gap: Lulu has one budget type). |
+| Metrics | `GET /rest/adAnalytics?q=analytics&pivot=CAMPAIGN&timeGranularity=DAILY` | leads = `oneClickLeads`; conversions = website conversions + leads; spend and revenue in the account currency. |
+| Pause / resume | `PARTIAL_UPDATE` of `status` | |
+| Budget | `PARTIAL_UPDATE` of `totalBudget` | Refused when the currency differs from the account's. Budget meaning differs from LSA (monthly): to be unified with a budget type before C2. |
+| Create campaign | — | Not supported yet (needs a campaign group, targeting and creatives). `campaignCreationSupported` blocks launching a live LinkedIn draft without a LinkedIn campaign, like LSA; create it in LinkedIn Campaign Manager and sync it. |
+
+Errors become `LinkedInApiError`; rate limits (429) and server errors are retried by the job, the rest fail the sync run with LinkedIn's message.
+
 ## Campaigns
 
 | Method  | Path                                  | What                                                                                                                                                                                                                                                                        | Permission                              |
