@@ -529,6 +529,347 @@ const overviewPaths: OpenApiPaths = {
   },
 };
 
+const platformEnum = ['google_lsa', 'google_ads', 'meta_ads', 'linkedin_ads'];
+
+const libraryListParameters = [
+  { name: 'q', in: 'query', required: false, schema: { type: 'string' } },
+  {
+    name: 'sort',
+    in: 'query',
+    required: false,
+    schema: { enum: ['name', '-name', 'createdAt', '-createdAt'] },
+  },
+  { name: 'page', in: 'query', required: false, schema: { type: 'integer', minimum: 1 } },
+  {
+    name: 'pageSize',
+    in: 'query',
+    required: false,
+    schema: { type: 'integer', minimum: 1, maximum: 100 },
+  },
+];
+
+const platformParameter = {
+  name: 'platform',
+  in: 'query',
+  required: false,
+  schema: { enum: platformEnum },
+};
+
+const authErrors = {
+  '401': errorResponse('Missing, invalid or expired token.'),
+  '403': errorResponse('FORBIDDEN.'),
+};
+
+const creativeUploadBody = {
+  required: true,
+  content: {
+    'application/json': { schema: { $ref: schemaRef('CreativeCreateInput') } },
+    'multipart/form-data': {
+      schema: {
+        type: 'object',
+        required: ['name', 'type'],
+        properties: {
+          file: { type: 'string', format: 'binary' },
+          name: { type: 'string' },
+          type: { type: 'string' },
+        },
+      },
+    },
+  },
+};
+
+const libraryPaths: OpenApiPaths = {
+  '/api/v1/audiences': {
+    get: {
+      operationId: 'listAudiences',
+      summary: 'List audiences',
+      description:
+        'Audience library with description, match rate, exclusions, campaign count and syncing flag. Filters: platform and q (name or description). Sort: name (default) or createdAt, with - for descending; any other sort answers 400. Needs audiences: view.',
+      tags: ['Audiences'],
+      security: bearer,
+      parameters: [platformParameter, ...libraryListParameters],
+      responses: {
+        '200': listDataResponse('A page of audiences.', 'AudienceListItem'),
+        '400': errorResponse('Invalid query, including an unsupported sort.'),
+        ...authErrors,
+      },
+    },
+    post: {
+      operationId: 'createAudience',
+      summary: 'Create an audience',
+      description: 'Creates an audience in the library. Needs audiences: create.',
+      tags: ['Audiences'],
+      security: bearer,
+      requestBody: jsonBody('AudienceCreateInput'),
+      responses: {
+        '201': dataResponse('The new audience.', 'AudienceListItem'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/audiences/{id}': {
+    get: {
+      operationId: 'getAudience',
+      summary: 'Audience detail',
+      description: 'One audience. Another workspace’s audience answers 404. Needs audiences: view.',
+      tags: ['Audiences'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The audience.', 'AudienceListItem'),
+        ...authErrors,
+        '404': errorResponse('Audience not found.'),
+      },
+    },
+    patch: {
+      operationId: 'updateAudience',
+      summary: 'Update an audience',
+      description: 'Edits name, source, consent basis or platforms. Needs audiences: edit.',
+      tags: ['Audiences'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      requestBody: jsonBody('AudienceUpdateInput'),
+      responses: {
+        '200': dataResponse('The updated audience.', 'AudienceListItem'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+        '404': errorResponse('Audience not found.'),
+      },
+    },
+    delete: {
+      operationId: 'deleteAudience',
+      summary: 'Delete an audience',
+      description: 'Soft-deletes the audience. Needs audiences: delete.',
+      tags: ['Audiences'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '204': { description: 'Deleted.' },
+        ...authErrors,
+        '404': errorResponse('Audience not found.'),
+      },
+    },
+  },
+  '/api/v1/creatives': {
+    get: {
+      operationId: 'listCreatives',
+      summary: 'List creatives',
+      description:
+        'Creative library with campaign count and a winning flag. Filter: q (name). Sort: name (default) or createdAt, with - for descending. Needs creatives: view.',
+      tags: ['Creatives'],
+      security: bearer,
+      parameters: libraryListParameters,
+      responses: {
+        '200': listDataResponse('A page of creatives.', 'CreativeListItem'),
+        '400': errorResponse('Invalid query, including an unsupported sort.'),
+        ...authErrors,
+      },
+    },
+    post: {
+      operationId: 'createCreative',
+      summary: 'Create a creative',
+      description:
+        'JSON body, or multipart/form-data with file, name and type. Files up to 25 MB; png, jpeg, webp, gif, mp4 or pdf. A wrong type or size answers 400. New creatives are pending. Needs creatives: create.',
+      tags: ['Creatives'],
+      security: bearer,
+      requestBody: creativeUploadBody,
+      responses: {
+        '201': dataResponse('The new creative.', 'CreativeListItem'),
+        '400': errorResponse('Invalid body, file type or file size.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/creatives/{id}': {
+    get: {
+      operationId: 'getCreative',
+      summary: 'Creative detail',
+      description: 'One creative. Another workspace’s creative answers 404. Needs creatives: view.',
+      tags: ['Creatives'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The creative.', 'CreativeListItem'),
+        ...authErrors,
+        '404': errorResponse('Creative not found.'),
+      },
+    },
+    patch: {
+      operationId: 'updateCreative',
+      summary: 'Update a creative',
+      description: 'Edits name, type or meta. Needs creatives: edit.',
+      tags: ['Creatives'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      requestBody: jsonBody('CreativeUpdateInput'),
+      responses: {
+        '200': dataResponse('The updated creative.', 'CreativeListItem'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+        '404': errorResponse('Creative not found.'),
+      },
+    },
+    delete: {
+      operationId: 'deleteCreative',
+      summary: 'Delete a creative',
+      description: 'Soft-deletes the creative. Needs creatives: delete.',
+      tags: ['Creatives'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '204': { description: 'Deleted.' },
+        ...authErrors,
+        '404': errorResponse('Creative not found.'),
+      },
+    },
+  },
+  '/api/v1/creatives/{id}/approve': {
+    post: {
+      operationId: 'approveCreative',
+      summary: 'Approve a creative',
+      description:
+        'Marks the creative approved by the current user. Approving twice changes nothing. Needs creatives: approve.',
+      tags: ['Creatives'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The approved creative.', 'CreativeListItem'),
+        ...authErrors,
+        '404': errorResponse('Creative not found.'),
+      },
+    },
+  },
+  '/api/v1/creative-tests': {
+    get: {
+      operationId: 'listCreativeTests',
+      summary: 'Creative tests',
+      description:
+        'Campaigns running two or more creative variants, with spend, leads and CPL per variant and the winner’s CPL advantage. Needs creatives: view.',
+      tags: ['Creatives'],
+      security: bearer,
+      responses: {
+        '200': {
+          description: 'Creative tests.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['data'],
+                properties: {
+                  data: { type: 'array', items: { $ref: schemaRef('CreativeTest') } },
+                },
+              },
+            },
+          },
+        },
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/conversion-events': {
+    get: {
+      operationId: 'listConversionEvents',
+      summary: 'List conversion events',
+      description:
+        'Event mapping. Filters: platform and q (name). Sort: name (default) or createdAt, with - for descending. Needs tracking: view.',
+      tags: ['Tracking'],
+      security: bearer,
+      parameters: [platformParameter, ...libraryListParameters],
+      responses: {
+        '200': listDataResponse('A page of conversion events.', 'ConversionEvent'),
+        '400': errorResponse('Invalid query, including an unsupported sort.'),
+        ...authErrors,
+      },
+    },
+    post: {
+      operationId: 'createConversionEvent',
+      summary: 'Create a conversion event',
+      description:
+        'A null value means the value comes with each conversion. New events start as needs_attention until a conversion arrives. Needs tracking: create.',
+      tags: ['Tracking'],
+      security: bearer,
+      requestBody: jsonBody('ConversionEventCreateInput'),
+      responses: {
+        '201': dataResponse('The new event.', 'ConversionEvent'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/conversion-events/{id}': {
+    patch: {
+      operationId: 'updateConversionEvent',
+      summary: 'Update a conversion event',
+      description: 'Edits name, source, value or platforms. Needs tracking: edit.',
+      tags: ['Tracking'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      requestBody: jsonBody('ConversionEventUpdateInput'),
+      responses: {
+        '200': dataResponse('The updated event.', 'ConversionEvent'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+        '404': errorResponse('Event not found.'),
+      },
+    },
+    delete: {
+      operationId: 'deleteConversionEvent',
+      summary: 'Delete a conversion event',
+      description: 'Soft-deletes the event. Needs tracking: delete.',
+      tags: ['Tracking'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '204': { description: 'Deleted.' },
+        ...authErrors,
+        '404': errorResponse('Event not found.'),
+      },
+    },
+  },
+  '/api/v1/tracking/health': {
+    get: {
+      operationId: 'getTrackingHealth',
+      summary: 'Tracking health',
+      description:
+        'Conversions on the newest synced day, the change against the day before, and how many events need attention. Needs tracking: view.',
+      tags: ['Tracking'],
+      security: bearer,
+      responses: {
+        '200': dataResponse('Tracking health.', 'TrackingHealth'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/attribution': {
+    get: {
+      operationId: 'getAttribution',
+      summary: 'Attribution and data quality',
+      description:
+        'Data quality, attributed revenue by platform and unmapped events. Until a CRM outcome table exists, revenue is the last 30 days of campaign revenue per platform, and model is accepted and echoed without changing the numbers. Needs reports: view.',
+      tags: ['Attribution'],
+      security: bearer,
+      parameters: [
+        {
+          name: 'model',
+          in: 'query',
+          required: false,
+          schema: {
+            enum: ['data_driven', 'last_touch', 'first_touch', 'linear'],
+            default: 'data_driven',
+          },
+        },
+      ],
+      responses: {
+        '200': dataResponse('Attribution.', 'Attribution'),
+        '400': errorResponse('Unknown model.'),
+        ...authErrors,
+      },
+    },
+  },
+};
+
+
 export const paths: OpenApiPaths = {
   '/health': {
     get: {
@@ -624,4 +965,5 @@ export const paths: OpenApiPaths = {
   ...adAccountPaths,
   ...campaignPaths,
   ...overviewPaths,
+  ...libraryPaths
 };
