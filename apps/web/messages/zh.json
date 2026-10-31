@@ -1009,7 +1009,8 @@
         "consentTooLong": "最多 300 个字符",
         "platformsRequired": "请至少选择一个渠道"
       }
-    }
+    },
+    "notSynced": "尚未同步"
   },
   "creatives": {
     "library": {

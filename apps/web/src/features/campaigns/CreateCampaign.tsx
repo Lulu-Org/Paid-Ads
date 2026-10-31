@@ -8,7 +8,7 @@ import { z } from "zod";
 import { adPlatformSchema, type AdPlatform } from "@lulu/shared";
 import { adPlatformOrder } from "@/components/ads";
 import { Button, Modal, useToast } from "@/components/ui";
-import { api } from "@/lib/api";
+import { api, realAreas } from "@/lib/api";
 import { useErrorMessage } from "@/lib/errors";
 import { useApi } from "@/lib/useApi";
 
@@ -81,13 +81,15 @@ function CreateCampaignModal({ open, onClose, onSaved }: { open: boolean; onClos
   const accountList = accounts.data?.data ?? [];
   const account = accountList.find((a) => a.platform === platform);
   const currency = account?.currency ?? accountList[0]?.currency;
+  const sameSource = realAreas.includes("adAccounts") === realAreas.includes("campaigns");
 
   const submit = async (values: FormValues) => {
     if (!currency) return;
     try {
       await api.campaigns.create({
         platform: values.platform,
-        adAccountId: account?.id ?? null,
+        // Only link an account that lives in the same API as the campaign (mock ids mean nothing to the real API).
+        adAccountId: sameSource ? (account?.id ?? null) : null,
         name: values.name,
         objective: t(`objectives.${values.objective}`),
         budget: { amount: Number(values.budget.replace(",", ".")), currency },

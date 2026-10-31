@@ -21,6 +21,9 @@ const sourceIcon: Record<AudienceSource, { icon: string; className: string }> = 
   customer_list: { icon: "☷", className: "bg-[#fff2d8] text-[#a5792d]" },
 };
 
+// Refreshing now, or never synced yet: the card offers "Refresh now" instead of "View audience".
+const needsSync = (a: AudienceListItem) => a.syncing || a.lastSyncedAt === null;
+
 export function AudiencesPage() {
   const t = useTranslations("audiences");
   const tCommon = useTranslations("common");
@@ -78,8 +81,8 @@ export function AudiencesPage() {
                         <span aria-hidden className={`grid size-[31px] place-items-center rounded-[10px] text-[13px] ${sourceIcon[a.source].className}`}>
                           {sourceIcon[a.source].icon}
                         </span>
-                        <b className={`rounded-[20px] px-2 py-1 text-[8px] ${a.syncing ? "bg-[#fff2d8] text-[#a5792d]" : "bg-[#e7f7ee] text-[#2d986f]"}`}>
-                          {a.syncing ? t("syncing") : t("synced")}
+                        <b className={`rounded-[20px] px-2 py-1 text-[8px] ${needsSync(a) ? "bg-[#fff2d8] text-[#a5792d]" : "bg-[#e7f7ee] text-[#2d986f]"}`}>
+                          {a.syncing ? t("syncing") : a.lastSyncedAt === null ? t("notSynced") : t("synced")}
                         </b>
                       </div>
                       <h3 className="mt-[15px] mb-1 text-[12px] font-medium text-[#35364d]">{a.name}</h3>
@@ -97,7 +100,7 @@ export function AudiencesPage() {
                           <b className="mt-[3px] block text-[9px] text-[#53546a]">{t("campaigns", { count: a.campaignCount })}</b>
                         </span>
                       </div>
-                      {a.syncing ? (
+                      {needsSync(a) ? (
                         <Button variant="outline" className="mt-3.5 !px-2.5 !py-2 !text-[9px]" loading={refreshing === a.id} onClick={() => refresh(a)}>
                           {t("refresh")}
                         </Button>

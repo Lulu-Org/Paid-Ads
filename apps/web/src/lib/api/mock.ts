@@ -168,7 +168,8 @@ export const mockApi = {
       const campaign: Campaign = {
         ...record(),
         id: newId("campaign"),
-        adAccountId: parsed.adAccountId ?? db.adAccounts.find((a) => a.platform === parsed.platform)?.id ?? null,
+        // Like the API: the campaign is linked to an ad account only when one is given.
+        adAccountId: parsed.adAccountId ?? null,
         platform: parsed.platform,
         externalId: null,
         name: parsed.name,
@@ -271,7 +272,8 @@ export const mockApi = {
         matchRate: null,
         exclusions: [],
         campaignIds: [] as string[],
-        syncing: true,
+        // Like the API: `syncing` is true only while a sync job runs; a new audience has never synced.
+        syncing: false,
       };
       db.audiences.unshift(audience);
       return delay(audience);

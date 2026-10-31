@@ -1009,7 +1009,8 @@
         "consentTooLong": "Use at most 300 characters",
         "platformsRequired": "Choose at least one channel"
       }
-    }
+    },
+    "notSynced": "Not synced yet"
   },
   "creatives": {
     "library": {
