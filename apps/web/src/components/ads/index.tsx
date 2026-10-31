@@ -172,3 +172,21 @@ export function StepList({ steps }: { steps: { label: string; detail: string; st
     </ol>
   );
 }
+
+const statusTones = {
+  success: { text: "text-[#299c76]", dot: "bg-[#42b98f]" },
+  warning: { text: "text-[#b47a2a]", dot: "bg-[#e0a43a]" },
+  info: { text: "text-[#3e88d4]", dot: "bg-[#60a7de]" },
+  neutral: { text: "text-[#85828f]", dot: "bg-[#b3b1c0]" },
+  violet: { text: "text-[#5e53bd]", dot: "bg-[#8b74e8]" },
+} as const;
+
+/** The design's status in tables and cards: a small dot and coloured text (.table-success, ● Healthy). */
+export function StatusText({ tone, children }: { tone: keyof typeof statusTones; children: React.ReactNode }) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-[9px] font-semibold whitespace-nowrap ${statusTones[tone].text}`}>
+      <i aria-hidden className={`size-[5px] rounded-full ${statusTones[tone].dot}`} />
+      {children}
+    </span>
+  );
+}

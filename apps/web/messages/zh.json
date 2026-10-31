@@ -364,6 +364,11 @@
         "digest_sent": "已发送给团队",
         "budget_shifted": "已调整预算"
       }
+    },
+    "section": {
+      "eyebrow": "自动化与提醒",
+      "title": "让工作区关注细节。",
+      "description": "当条件满足时，规则可以发送通知、给出建议或暂停广告活动。"
     }
   },
   "integrations": {
@@ -389,12 +394,19 @@
         "queued": "排队中",
         "running": "进行中",
         "succeeded": "成功",
-        "failed": "失败"
+        "failed": "失败",
+        "retry_queued": "已排队重试"
       },
       "kind": {
         "sync": "广告活动、花费和转化",
-        "push": "已发送广告活动更改"
+        "push": "已发送广告活动更改",
+        "both": "双向：数据接收与变更发送"
       }
+    },
+    "section": {
+      "eyebrow": "广告平台连接",
+      "title": "保持每个广告账户的连接。",
+      "description": "查看权限、同步状态以及最近一次成功的数据交换。"
     }
   },
   "setup": {
@@ -424,7 +436,13 @@
       "policyValidation": "政策验证",
       "policyValidationHint": "上线前根据平台政策检查广告。",
       "saved": "已保存保护规则。"
-    }
+    },
+    "section": {
+      "eyebrow": "平台设置",
+      "title": "放心配置每个渠道。",
+      "description": "发布前，账户、出价、追踪和政策设置都清晰可见。"
+    },
+    "configure": "配置渠道"
   },
   "checklist": {
     "campaign": "广告活动",
@@ -583,14 +601,14 @@
     },
     "limit": {
       "eyebrow": "工作区花费上限",
-      "perMonth": "{amount} / 月",
+      "perMonth": "{amount} <unit>/ 月</unit>",
       "used": "已使用的花费上限",
       "usage": "已用 {used} · 剩余 {remaining}",
       "edit": "编辑上限"
     },
     "policy": {
       "eyebrow": "审批阈值",
-      "perChange": "每次更改 {amount}",
+      "perChange": "<unit>每次更改</unit> {amount}",
       "edit": "编辑政策",
       "summary": {
         "budget_and_launch": "超过此金额的预算和上线更改需要{role}审批。",
@@ -704,6 +722,11 @@
       "invalid": "请输入有效的邮箱地址。",
       "submit": "发送邀请",
       "sent": "已向 {email} 发送邀请。"
+    },
+    "section": {
+      "eyebrow": "团队权限",
+      "title": "为每位成员分配合适的权限。",
+      "description": "区分谁可以查看结果、修改预算、审批创意和发布广告活动。"
     }
   },
   "campaignStatus": {

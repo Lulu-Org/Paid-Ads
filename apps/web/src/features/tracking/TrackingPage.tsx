@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, Pill, SkeletonRows, useToast } from "@/components/ui";
-import { HealthCard, SectionHeading } from "@/components/ads";
+import { Button, Card, SkeletonRows, useToast } from "@/components/ui";
+import { HealthCard, SectionHeading, StatusText } from "@/components/ads";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useFormat } from "@/i18n/format";
 import { api } from "@/lib/api";
@@ -69,7 +69,7 @@ export function TrackingPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[460px] text-left text-[11px]">
-                <thead className="text-[9px] tracking-[0.12em] text-text-subtle uppercase">
+                <thead className="text-[8px] font-bold tracking-[0.08em] text-[#a0a1ad]">
                   <tr>
                     <th className="py-2 font-black">{t("events.event")}</th>
                     <th className="py-2 font-black">{t("events.source")}</th>
@@ -86,9 +86,9 @@ export function TrackingPage() {
                         {event.lastReceivedAt ? format.relative(event.lastReceivedAt) : t("events.never")}
                       </td>
                       <td className="py-3">
-                        <Pill tone={event.health === "mapped" ? "success" : "warning"}>
+                        <StatusText tone={event.health === "mapped" ? "success" : "warning"}>
                           {t(`eventHealth.${event.health}`)}
-                        </Pill>
+                        </StatusText>
                       </td>
                     </tr>
                   ))}

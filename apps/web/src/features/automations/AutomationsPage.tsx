@@ -68,12 +68,15 @@ export function AutomationsPage() {
 
   return (
     <>
-      <PageHeader
-        page="automations"
-        actions={
-          <Button icon="＋" onClick={() => setCreating(true)}>
-            {t("create")}
-          </Button>
+      <PageHeader page="automations" />
+      <SectionHeading
+        eyebrow={t("section.eyebrow")}
+        title={t("section.title")}
+        description={t("section.description")}
+        action={
+      <Button icon="＋" onClick={() => setCreating(true)}>
+        {t("create")}
+      </Button>
         }
       />
       {rules.loading && !rules.data ? (
@@ -112,7 +115,7 @@ export function AutomationsPage() {
         <SectionHeading eyebrow={t("activity.eyebrow")} title={t("activity.title")} />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[460px] text-left text-[11px]">
-            <thead className="text-[9px] tracking-[0.12em] text-text-subtle uppercase">
+            <thead className="text-[8px] font-bold tracking-[0.08em] text-[#a0a1ad]">
               <tr>
                 <th className="py-2 font-black">{t("activity.rule")}</th>
                 <th className="py-2 font-black">{t("activity.action")}</th>

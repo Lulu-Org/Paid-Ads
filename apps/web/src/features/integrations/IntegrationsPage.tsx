@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { AdAccount, AdPlatform } from "@lulu/shared";
-import { Button, Card, Pill, SkeletonRows, useToast } from "@/components/ui";
-import { PlatformMark, SectionHeading, adPlatformOrder } from "@/components/ads";
+import { Button, Card, SkeletonRows, useToast } from "@/components/ui";
+import { PlatformMark, SectionHeading, adPlatformOrder, StatusText } from "@/components/ads";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useFormat } from "@/i18n/format";
 import { api, useMock } from "@/lib/api";
@@ -61,6 +61,7 @@ export function IntegrationsPage() {
   return (
     <>
       <PageHeader page="integrations" />
+      <SectionHeading eyebrow={t("section.eyebrow")} title={t("section.title")} description={t("section.description")} />
       {accounts.loading && !accounts.data ? (
         <SkeletonRows rows={4} />
       ) : (
@@ -76,7 +77,7 @@ export function IntegrationsPage() {
                     <h3 className="text-[13px] font-semibold text-text-strong">{tPlatform(`${platform}.name`)}</h3>
                     <small className="block text-[10px] text-text-subtle">{tPlatform(`${platform}.detail`)}</small>
                   </div>
-                  <Pill tone={isConnected ? "success" : "neutral"}>{t(isConnected ? "statusConnected" : "statusNotConnected")}</Pill>
+                  <StatusText tone={isConnected ? "success" : "neutral"}>{t(isConnected ? "statusConnected" : "statusNotConnected")}</StatusText>
                 </div>
                 <ul className="mt-4 flex flex-wrap gap-1.5 text-[10px] text-text-muted">
                   {(["campaigns", "assets", "performance"] as const).map((scope) => (
@@ -112,9 +113,9 @@ export function IntegrationsPage() {
         <ul className="grid gap-2">
           {runs.data?.data.map((run) => (
             <li key={run.id} className="flex flex-wrap items-center gap-3 border-t border-surface-muted py-2.5 text-[11px] first:border-t-0">
-              <Pill tone={run.status === "succeeded" ? "success" : run.status === "failed" ? "warning" : "info"}>
+              <StatusText tone={run.status === "succeeded" ? "success" : run.status === "failed" ? "warning" : "info"}>
                 {t(`history.status.${run.status}`)}
-              </Pill>
+              </StatusText>
               <b className="text-text-strong">{tPlatform(`${run.platform}.name`)}</b>
               <span className="flex-1 text-text-muted">{t(`history.kind.${run.kind}`)}</span>
               <time dateTime={run.finishedAt ?? run.startedAt} className="text-text-subtle">

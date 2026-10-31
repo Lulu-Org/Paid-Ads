@@ -364,6 +364,11 @@
         "digest_sent": "Sent to team",
         "budget_shifted": "Budget shifted"
       }
+    },
+    "section": {
+      "eyebrow": "Automations and alerts",
+      "title": "Let the workspace watch the details.",
+      "description": "Rules can notify, recommend or pause campaigns when conditions are met."
     }
   },
   "integrations": {
@@ -389,12 +394,19 @@
         "queued": "Queued",
         "running": "Running",
         "succeeded": "Success",
-        "failed": "Failed"
+        "failed": "Failed",
+        "retry_queued": "Retry queued"
       },
       "kind": {
         "sync": "Campaigns, spend and conversions",
-        "push": "Campaign changes sent"
+        "push": "Campaign changes sent",
+        "both": "Both directions: data in, changes out"
       }
+    },
+    "section": {
+      "eyebrow": "Ad platform connections",
+      "title": "Keep every ad account connected.",
+      "description": "See permissions, sync health and the last successful data exchange."
     }
   },
   "setup": {
@@ -424,7 +436,13 @@
       "policyValidation": "Policy validation",
       "policyValidationHint": "Check ads against platform policies before launch.",
       "saved": "Guardrails saved."
-    }
+    },
+    "section": {
+      "eyebrow": "Platform setup",
+      "title": "Configure each channel with confidence.",
+      "description": "Account, bidding, tracking and policy settings stay visible before launch."
+    },
+    "configure": "Configure channel"
   },
   "checklist": {
     "campaign": "Campaign",
@@ -583,14 +601,14 @@
     },
     "limit": {
       "eyebrow": "Workspace spend limit",
-      "perMonth": "{amount} / month",
+      "perMonth": "{amount} <unit>/ month</unit>",
       "used": "Spend limit used",
       "usage": "{used} used · {remaining} remaining",
       "edit": "Edit limit"
     },
     "policy": {
       "eyebrow": "Approval threshold",
-      "perChange": "{amount} per change",
+      "perChange": "{amount} <unit>per change</unit>",
       "edit": "Edit policy",
       "summary": {
         "budget_and_launch": "Budget and launch changes above this amount need {role} approval.",
@@ -704,6 +722,11 @@
       "invalid": "Enter a valid email address.",
       "submit": "Send invite",
       "sent": "Invite sent to {email}."
+    },
+    "section": {
+      "eyebrow": "Team access",
+      "title": "Give every teammate the right access.",
+      "description": "Separate who can see results, change budgets, approve creatives and launch campaigns."
     }
   },
   "campaignStatus": {

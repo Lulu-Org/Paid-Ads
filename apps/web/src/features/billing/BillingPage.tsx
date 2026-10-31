@@ -8,8 +8,8 @@ import {
   type ApprovalScope,
   type SpendLimit,
 } from "@lulu/shared";
-import { Button, Card, Modal, Pill, useToast } from "@/components/ui";
-import { SectionHeading } from "@/components/ads";
+import { Button, Card, Modal, useToast } from "@/components/ui";
+import { SectionHeading, StatusText } from "@/components/ads";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useFormat } from "@/i18n/format";
 import { api } from "@/lib/api";
@@ -44,7 +44,7 @@ export function BillingPage() {
         <Card className="flex min-w-0 flex-col">
           <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{t("limit.eyebrow")}</span>
           <strong className="mt-2 text-[22px] font-semibold text-text-strong">
-            {l ? t("limit.perMonth", { amount: format.money(l.monthly) }) : "–"}
+            {l ? t.rich("limit.perMonth", { amount: format.money(l.monthly), unit: (chunks) => <small className="text-[10px] font-normal text-text-subtle">{chunks}</small> }) : "–"}
           </strong>
           <i
             className="mt-3 block h-1.5 rounded-full bg-surface-muted"
@@ -75,7 +75,7 @@ export function BillingPage() {
         <Card className="flex min-w-0 flex-col">
           <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{t("policy.eyebrow")}</span>
           <strong className="mt-2 text-[22px] font-semibold text-text-strong">
-            {policy.data ? t("policy.perChange", { amount: format.money(policy.data.threshold) }) : "–"}
+            {policy.data ? t.rich("policy.perChange", { amount: format.money(policy.data.threshold), unit: (chunks) => <small className="text-[10px] font-normal text-text-subtle">{chunks}</small> }) : "–"}
           </strong>
           <p className="mt-2 flex-1 text-[10px] text-text-muted">
             {policy.data
@@ -108,7 +108,7 @@ export function BillingPage() {
         <SectionHeading eyebrow={t("history.eyebrow")} title={t("history.title")} />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[460px] text-left text-[11px]">
-            <thead className="text-[9px] tracking-[0.12em] text-text-subtle uppercase">
+            <thead className="text-[8px] font-bold tracking-[0.08em] text-[#a0a1ad]">
               <tr>
                 <th className="py-2 font-black">{t("history.statement")}</th>
                 <th className="py-2 font-black">{t("history.provider")}</th>
@@ -123,7 +123,7 @@ export function BillingPage() {
                   <td className="py-3 text-text-muted">{tPlatform(`${row.platform}.name`)}</td>
                   <td className="py-3 text-text-strong">{format.money(row.amount)}</td>
                   <td className="py-3">
-                    <Pill tone={row.status === "paid" ? "success" : "warning"}>{t(`history.statuses.${row.status}`)}</Pill>
+                    <StatusText tone={row.status === "paid" ? "success" : "warning"}>{t(`history.statuses.${row.status}`)}</StatusText>
                   </td>
                 </tr>
               ))}

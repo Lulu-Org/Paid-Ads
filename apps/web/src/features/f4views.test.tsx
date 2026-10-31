@@ -81,7 +81,7 @@ describe("Operations", () => {
 describe("Billing & Controls", () => {
   it("shows the spend limit, policy, payment and statements", async () => {
     await show(async () => (await import("./billing/BillingPage")).BillingPage);
-    expect(await screen.findByText("€16,000 / month", {}, slow)).toBeTruthy();
+    expect(await screen.findByText((_, el) => el?.tagName === "STRONG" && el.textContent === "€16,000 / month", {}, slow)).toBeTruthy();
     expect(await screen.findByText("€8,880 used · €7,120 remaining")).toBeTruthy();
     expect(screen.getByRole("progressbar", { name: "Spend limit used" }).getAttribute("aria-valuenow")).toBe("56");
     expect(await screen.findByText("€2,500 per change")).toBeTruthy();
@@ -94,7 +94,7 @@ describe("Billing & Controls", () => {
 
   it("saves a new limit and refuses an empty one", async () => {
     await show(async () => (await import("./billing/BillingPage")).BillingPage);
-    await screen.findByText("€16,000 / month", {}, slow);
+    await screen.findByText((_, el) => el?.tagName === "STRONG" && el.textContent === "€16,000 / month", {}, slow);
     fireEvent.click(screen.getByRole("button", { name: "Edit limit" }));
     const dialog = await screen.findByRole("dialog");
     const amount = within(dialog).getByLabelText("Monthly workspace limit (EUR)");

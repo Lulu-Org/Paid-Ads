@@ -364,6 +364,11 @@
         "digest_sent": "An Team gesendet",
         "budget_shifted": "Budget verschoben"
       }
+    },
+    "section": {
+      "eyebrow": "Automatisierungen und Hinweise",
+      "title": "Den Arbeitsbereich auf die Details achten lassen.",
+      "description": "Regeln können benachrichtigen, empfehlen oder Kampagnen pausieren, wenn Bedingungen erfüllt sind."
     }
   },
   "integrations": {
@@ -389,12 +394,19 @@
         "queued": "Wartet",
         "running": "Läuft",
         "succeeded": "Erfolgreich",
-        "failed": "Fehlgeschlagen"
+        "failed": "Fehlgeschlagen",
+        "retry_queued": "Wiederholung geplant"
       },
       "kind": {
         "sync": "Kampagnen, Ausgaben und Conversions",
-        "push": "Kampagnenänderungen gesendet"
+        "push": "Kampagnenänderungen gesendet",
+        "both": "Beide Richtungen: Daten rein, Änderungen raus"
       }
+    },
+    "section": {
+      "eyebrow": "Verbindungen zu Werbeplattformen",
+      "title": "Jedes Werbekonto verbunden halten.",
+      "description": "Berechtigungen, Synchronisierungsstatus und den letzten erfolgreichen Datenaustausch sehen."
     }
   },
   "setup": {
@@ -424,7 +436,13 @@
       "policyValidation": "Richtlinienprüfung",
       "policyValidationHint": "Anzeigen vor dem Start gegen Plattformrichtlinien prüfen.",
       "saved": "Leitplanken gespeichert."
-    }
+    },
+    "section": {
+      "eyebrow": "Plattform-Einrichtung",
+      "title": "Jeden Kanal sicher konfigurieren.",
+      "description": "Konto-, Gebots-, Tracking- und Richtlinieneinstellungen bleiben vor dem Start sichtbar."
+    },
+    "configure": "Kanal konfigurieren"
   },
   "checklist": {
     "campaign": "Kampagne",
@@ -583,14 +601,14 @@
     },
     "limit": {
       "eyebrow": "Ausgabenlimit des Workspace",
-      "perMonth": "{amount} / Monat",
+      "perMonth": "{amount} <unit>/ Monat</unit>",
       "used": "Genutztes Ausgabenlimit",
       "usage": "{used} genutzt · {remaining} übrig",
       "edit": "Limit bearbeiten"
     },
     "policy": {
       "eyebrow": "Freigabeschwelle",
-      "perChange": "{amount} pro Änderung",
+      "perChange": "{amount} <unit>pro Änderung</unit>",
       "edit": "Richtlinie bearbeiten",
       "summary": {
         "budget_and_launch": "Budget- und Startänderungen über diesem Betrag brauchen die Freigabe der {role}.",
@@ -704,6 +722,11 @@
       "invalid": "Gültige E-Mail-Adresse eingeben.",
       "submit": "Einladung senden",
       "sent": "Einladung an {email} gesendet."
+    },
+    "section": {
+      "eyebrow": "Teamzugriff",
+      "title": "Jedem Teammitglied den richtigen Zugriff geben.",
+      "description": "Trennen Sie, wer Ergebnisse sieht, Budgets ändert, Creatives freigibt und Kampagnen startet."
     }
   },
   "campaignStatus": {

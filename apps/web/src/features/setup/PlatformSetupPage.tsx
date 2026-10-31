@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { CampaignDefaults } from "@lulu/shared";
-import { Button, Card, Modal, Pill, SkeletonRows, useToast } from "@/components/ui";
-import { PlatformMark, SectionHeading, adPlatformOrder } from "@/components/ads";
+import { Button, Card, Modal, SkeletonRows, useToast } from "@/components/ui";
+import { PlatformMark, SectionHeading, adPlatformOrder, StatusText } from "@/components/ads";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useFormat } from "@/i18n/format";
 import { Link } from "@/i18n/navigation";
@@ -28,15 +28,18 @@ export function PlatformSetupPage() {
 
   return (
     <>
-      <PageHeader
-        page="setup"
-        actions={
-          <Link
-            href={adsHref("integrations")}
-            className="inline-flex items-center rounded-md border border-[#dad8ec] px-3.5 py-2.5 text-[11px] font-extrabold text-primary-hover hover:bg-[#f7f5ff]"
-          >
-            {t("connectProvider")}
-          </Link>
+      <PageHeader page="setup" />
+      <SectionHeading
+        eyebrow={t("section.eyebrow")}
+        title={t("section.title")}
+        description={t("section.description")}
+        action={
+      <Link
+        href={adsHref("integrations")}
+        className="inline-flex items-center rounded-md border border-[#dad8ec] px-3.5 py-2.5 text-[11px] font-extrabold text-primary-hover hover:bg-[#f7f5ff]"
+      >
+        {t("connectProvider")}
+      </Link>
         }
       />
       {accounts.loading && !accounts.data ? (
@@ -51,9 +54,9 @@ export function PlatformSetupPage() {
               [
                 t("tracking"),
                 connected ? (
-                  <Pill tone={health.data?.healthy === false ? "warning" : "success"}>
+                  <StatusText tone={health.data?.healthy === false ? "warning" : "success"}>
                     {t(health.data?.healthy === false ? "trackingReview" : "trackingHealthy")}
-                  </Pill>
+                  </StatusText>
                 ) : (
                   "–"
                 ),
@@ -67,21 +70,27 @@ export function PlatformSetupPage() {
                   <PlatformMark platform={platform} />
                   <div className="min-w-0">
                     <h3 className="text-[13px] font-semibold text-text-strong">{tPlatform(`${platform}.name`)}</h3>
-                    <small className="block text-[10px] text-text-subtle">
+                    <small className={`block text-[10px] ${connected ? "text-[#299c76]" : "text-text-subtle"}`}>
                       {connected && account?.lastSyncAt
                         ? t("connectedAgo", { time: format.relative(account.lastSyncAt) })
                         : t("notConnected")}
                     </small>
                   </div>
                 </div>
-                <dl className="mt-4">
+                <dl className="mt-4 rounded-[10px] border border-[#ecebf2] bg-[#fbfbfd] px-3.5 py-1.5">
                   {rows.map(([label, value]) => (
-                    <div key={label} className="flex justify-between gap-3 border-t border-surface-muted py-2.5 text-[11px]">
-                      <dt className="text-text-subtle">{label}</dt>
+                    <div key={label} className="flex justify-between gap-3 border-b border-[#efeff3] py-2 text-[10px] last:border-b-0">
+                      <dt className="text-[#9293a3]">{label}</dt>
                       <dd className="text-right font-semibold text-text-strong">{value}</dd>
                     </div>
                   ))}
                 </dl>
+                <Link
+                  href={adsHref("integrations")}
+                  className="mt-3.5 inline-flex rounded-md border border-[#dad8ec] px-2.5 py-1.5 text-[10px] font-extrabold text-text-strong hover:bg-[#f7f5ff]"
+                >
+                  {t("configure")}
+                </Link>
               </Card>
             );
           })}

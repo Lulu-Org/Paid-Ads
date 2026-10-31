@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ChecklistItemKey } from "@lulu/shared";
-import { Button, Card, Pill, SkeletonRows, useToast } from "@/components/ui";
-import { SectionHeading } from "@/components/ads";
+import { Button, SkeletonRows, useToast } from "@/components/ui";
+import { AdsCard, StatusText } from "@/components/ads";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { api } from "@/lib/api";
 import { useErrorMessage } from "@/lib/errors";
@@ -78,88 +78,86 @@ export function LaunchChecklistPage() {
         }
       />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <Card className="min-w-0">
-          <SectionHeading
-            eyebrow={t("eyebrow")}
-            title={t("title")}
-            description={t("description")}
-            action={
-              checklist.data && (
-                <div className="text-right">
-                  <strong className="block text-[22px] font-semibold text-text-strong">
-                    {t("score", { passed: checklist.data.passed, total: checklist.data.total })}
-                  </strong>
-                  <small className="text-[10px] text-text-subtle">{t("completed")}</small>
-                </div>
-              )
-            }
-          />
-          {checklist.loading && !checklist.data ? (
-            <SkeletonRows rows={5} />
-          ) : (
-            <ul className="grid gap-2" aria-label={t("title")}>
-              {items.map((item) => (
-                <li key={item.key} className="flex items-center gap-3 rounded-lg border border-border p-3">
-                  <span
-                    aria-hidden
-                    className={`grid size-7 shrink-0 place-items-center rounded-full text-xs font-black ${
-                      item.passed ? "bg-success-soft text-success" : "bg-warning-soft text-warning"
-                    }`}
-                  >
-                    {item.passed ? "✓" : "!"}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <strong className="block text-[11px] text-text-strong">{t(`items.${item.key}.label`)}</strong>
-                    <small className="block text-[10px] text-text-subtle">{t(`items.${item.key}.hint`)}</small>
-                  </span>
-                  {item.passed ? (
-                    <Pill tone="success">{t("complete")}</Pill>
-                  ) : item.key === "approval_granted" ? (
-                    <Button variant="outline" loading={requesting} onClick={requestApproval}>
-                      {t("request")}
-                    </Button>
-                  ) : (
-                    <Pill tone="warning">{t("open")}</Pill>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Card className="min-w-0 self-start">
-          <SectionHeading eyebrow={t("decision.eyebrow")} title={t("decision.title")} />
-          <dl className="grid gap-3 text-[11px]">
-            <div>
-              <dt className="font-extrabold text-success">{t("decision.ready")}</dt>
-              <dd className="mt-0.5 text-text-muted">{passing.length ? names(passing) : "–"}</dd>
-            </div>
-            <div>
-              <dt className="font-extrabold text-warning">{t("decision.needsReview")}</dt>
-              <dd className="mt-0.5 text-text-muted">{failing.length ? names(failing) : t("decision.nothing")}</dd>
-            </div>
-            <div>
-              <dt className="font-extrabold text-text-strong">{t("decision.next")}</dt>
-              <dd className="mt-0.5 text-text-muted">
-                {failing.length ? t(`items.${failing[0]!.key}.next`) : t("decision.readyToLaunch")}
-              </dd>
-            </div>
-          </dl>
-          <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-[#efedf4] pt-4">
-            <Button variant="outline" onClick={share}>
-              {t("decision.share")}
-            </Button>
-            <Button
-              loading={requesting}
-              disabled={!failing.some((i) => i.key === "approval_granted")}
-              onClick={requestApproval}
-            >
-              {t("decision.requestApprovals")}
-            </Button>
+      <AdsCard className="mb-4 p-[21px]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{t("eyebrow")}</span>
+            <h2 className="mt-[7px] text-[16px] font-medium tracking-[-0.03em] text-[#292a43]">{t("title")}</h2>
+            <p className="mt-1 text-[12px] text-[#8b8c9c]">{t("description")}</p>
           </div>
-        </Card>
-      </div>
+          {checklist.data && (
+            <div className="rounded-xl bg-[#f1efff] px-4 py-2.5 text-center">
+              <strong className="block text-[20px] font-semibold text-[#5e53bd]">
+                {t("score", { passed: checklist.data.passed, total: checklist.data.total })}
+              </strong>
+              <small className="text-[9px] text-[#8178c0]">{t("completed")}</small>
+            </div>
+          )}
+        </div>
+      </AdsCard>
+
+      <AdsCard className="mb-4 px-[21px] py-2">
+        {checklist.loading && !checklist.data ? (
+          <div className="py-4">
+            <SkeletonRows rows={5} />
+          </div>
+        ) : (
+          <ul aria-label={t("title")}>
+            {items.map((item) => (
+              <li key={item.key} className="flex items-center gap-3 border-b border-[#efeff3] py-3.5 last:border-b-0">
+                <span
+                  aria-hidden
+                  className={`grid size-[22px] shrink-0 place-items-center rounded-full border text-[10px] ${
+                    item.passed ? "border-[#9bdfc4] bg-[#e8faf2] text-[#299c76]" : "border-[#f3d39c] bg-[#fff6e6] text-[#b47a2a]"
+                  }`}
+                >
+                  {item.passed ? "✓" : "!"}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <strong className="block text-[10px] font-semibold text-[#3d3e55]">{t(`items.${item.key}.label`)}</strong>
+                  <small className="mt-0.5 block text-[9px] text-[#8e8f9f]">{t(`items.${item.key}.hint`)}</small>
+                </span>
+                {item.passed ? (
+                  <StatusText tone="success">{t("complete")}</StatusText>
+                ) : item.key === "approval_granted" ? (
+                  <button type="button" disabled={requesting} onClick={requestApproval} className="text-[10px] font-extrabold text-primary-hover hover:underline disabled:opacity-50">
+                    {t("request")}
+                  </button>
+                ) : (
+                  <StatusText tone="warning">{t("open")}</StatusText>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </AdsCard>
+
+      <AdsCard className="mb-4 p-[21px]">
+        <span className="text-[9px] font-black tracking-[0.16em] text-rail-label uppercase">{t("decision.eyebrow")}</span>
+        <h2 className="mt-[7px] mb-4 text-[16px] font-medium tracking-[-0.03em] text-[#292a43]">{t("decision.title")}</h2>
+        <dl className="grid gap-3 md:grid-cols-3">
+          {(
+            [
+              ["ready", t("decision.ready"), passing.length ? names(passing) : "–"],
+              ["needsReview", t("decision.needsReview"), failing.length ? names(failing) : t("decision.nothing")],
+              ["next", t("decision.next"), failing.length ? t(`items.${failing[0]!.key}.next`) : t("decision.readyToLaunch")],
+            ] as const
+          ).map(([key, label, value]) => (
+            <div key={key} className="rounded-[10px] border border-[#ecebf2] bg-[#fcfcfe] p-3.5">
+              <dt className="text-[9px] font-bold tracking-[0.08em] text-[#5b51d2] uppercase">{label}</dt>
+              <dd className="mt-[7px] text-[10px] leading-[1.6] text-[#77788a]">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-4 flex flex-wrap justify-end gap-2">
+          <Button variant="outline" onClick={share}>
+            {t("decision.share")}
+          </Button>
+          <Button loading={requesting} disabled={!failing.some((i) => i.key === "approval_granted")} onClick={requestApproval}>
+            {t("decision.requestApprovals")}
+          </Button>
+        </div>
+      </AdsCard>
     </>
   );
 }

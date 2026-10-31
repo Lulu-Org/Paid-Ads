@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { attributionModelSchema, type AttributionModel } from "@lulu/shared";
-import { Button, Card, Pill, SkeletonRows } from "@/components/ui";
-import { HealthCard, PlatformMark, SectionHeading } from "@/components/ads";
+import { Button, Card, SkeletonRows } from "@/components/ui";
+import { HealthCard, SectionHeading, StatusText } from "@/components/ads";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AddEventModal } from "@/features/tracking/AddEventModal";
 import { useFormat } from "@/i18n/format";
@@ -82,16 +82,13 @@ export function AttributionPage() {
             <ul className="grid gap-3.5" aria-label={t("model.byPlatform")}>
               {data?.byPlatform.map((row) => (
                 <li key={row.platform} className="grid gap-1.5">
-                  <span className="flex items-center justify-between gap-2 text-[11px]">
-                    <span className="flex items-center gap-2">
-                      <PlatformMark platform={row.platform} />
-                      {tPlatform(`${row.platform}.name`)}
-                    </span>
-                    <b className="text-text-strong">{format.money(row.revenue)}</b>
+                  <span className="flex items-center justify-between gap-2 text-[10px] text-[#5d5e70]">
+                    {tPlatform(`${row.platform}.name`)}
+                    <b className="text-[11px] text-[#33344a]">{format.money(row.revenue)}</b>
                   </span>
-                  <i className="block h-1.5 rounded-full bg-surface-muted" aria-hidden>
+                  <i className="block h-[7px] overflow-hidden rounded-[5px] bg-[#efedf7]" aria-hidden>
                     <em
-                      className="block h-full rounded-full bg-[#6259d6]"
+                      className="block h-full rounded-[5px] bg-gradient-to-r from-[#6c5de3] to-[#67d5d6]"
                       style={{ width: `${Math.round((row.revenue.amount / top) * 100)}%` }}
                     />
                   </i>
@@ -113,7 +110,7 @@ export function AttributionPage() {
           />
           <div className="overflow-x-auto">
             <table className="w-full min-w-[380px] text-left text-[11px]">
-              <thead className="text-[9px] tracking-[0.12em] text-text-subtle uppercase">
+              <thead className="text-[8px] font-bold tracking-[0.08em] text-[#a0a1ad]">
                 <tr>
                   <th className="py-2 font-black">{tTracking("events.event")}</th>
                   <th className="py-2 font-black">{tTracking("events.source")}</th>
@@ -128,9 +125,9 @@ export function AttributionPage() {
                     <td className="py-3 text-text-muted">{tSource(event.source)}</td>
                     <td className="py-3 text-text-muted">{event.value ? format.money(event.value) : t("mapping.dynamic")}</td>
                     <td className="py-3">
-                      <Pill tone={event.health === "mapped" ? "success" : "warning"}>
+                      <StatusText tone={event.health === "mapped" ? "success" : "warning"}>
                         {t(`mapping.status.${event.health}`)}
-                      </Pill>
+                      </StatusText>
                     </td>
                   </tr>
                 ))}
@@ -145,7 +142,11 @@ export function AttributionPage() {
         <ol className="flex flex-wrap items-center gap-2 text-[11px]" aria-label={t("lineage.title")}>
           {lineage.map((step, i) => (
             <li key={step} className="flex items-center gap-2">
-              <span className="rounded-md border border-border bg-surface-muted px-2.5 py-1.5 font-semibold text-text-strong">
+              <span
+                className={`rounded-md border px-2.5 py-1.5 text-[10px] font-medium ${
+                  i === lineage.length - 1 ? "border-[#9bdfc4] bg-[#e8faf2] text-[#299c76]" : "border-[#e5e3ec] bg-surface text-[#5d5e70]"
+                }`}
+              >
                 {t(`lineage.${step}`)}
               </span>
               {i < lineage.length - 1 && (
