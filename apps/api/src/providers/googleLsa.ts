@@ -1,4 +1,4 @@
-import type { AdPlatform, Campaign, CampaignStatus, Money } from '@lulu/shared';
+import type { AdPlatform, BudgetPeriod, Campaign, CampaignStatus, Money } from '@lulu/shared';
 import { customerId, type GoogleOAuthTokenResult } from './googleLsaClient';
 import type {
   AdsProvider,
@@ -326,7 +326,18 @@ export class GoogleLsaProvider implements AdsProvider {
     ]);
   }
 
-  async setBudget(account: ProviderAccount, externalId: string, budget: Money): Promise<void> {
+  async setBudget(
+    account: ProviderAccount,
+    externalId: string,
+    budget: Money,
+    budgetPeriod: BudgetPeriod,
+  ): Promise<void> {
+    // Google holds an average daily budget; a total for the whole run has no equivalent.
+    if (budgetPeriod === 'total') {
+      throw new Error(
+        'Google Local Services budgets are monthly or daily, not a total for the whole campaign',
+      );
+    }
     if (budget.currency !== account.currency) {
       throw new Error(
         `Budget currency ${budget.currency} does not match the Google Ads account currency ${account.currency}`,
@@ -345,7 +356,11 @@ export class GoogleLsaProvider implements AdsProvider {
       {
         update: {
           resourceName: budgetResource,
-          amountMicros: String(monthlyToDailyMicros(budget.amount)),
+          amountMicros: String(
+            budgetPeriod === 'daily'
+              ? Math.round(budget.amount * 1_000_000)
+              : monthlyToDailyMicros(budget.amount),
+          ),
         },
         updateMask: 'amount_micros',
       },
@@ -387,6 +402,7 @@ export class GoogleLsaProvider implements AdsProvider {
           amount: dailyMicrosToMonthly(row.campaignBudget?.amountMicros),
           currency,
         },
+        budgetPeriod: 'monthly',
       });
     }
     return campaigns;

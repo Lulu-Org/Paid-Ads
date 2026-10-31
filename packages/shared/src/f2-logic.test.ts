@@ -8,7 +8,7 @@ const base = { workspaceId: "w", createdAt: "2026-01-01T00:00:00.000Z", updatedA
 const eur = (amount: number) => ({ amount, currency: "EUR" });
 const campaign = (id: string, platform: Campaign["platform"], extra: Partial<Campaign> = {}): Campaign => ({
   ...base, id, adAccountId: null, platform, externalId: null, name: id, status: "live", objective: "Leads",
-  audienceSummary: null, startAt: null, endAt: null, budget: eur(1000), rationale: null, nextStep: null, ownerId: "u", ...extra,
+  audienceSummary: null, startAt: null, endAt: null, budget: eur(1000), budgetPeriod: "monthly", rationale: null, nextStep: null, ownerId: "u", ...extra,
 });
 const day = (date: string, spend: number, revenue: number, leads: number, clicks = 100): CampaignMetricDay => ({
   date, impressions: 1000, clicks, conversions: leads, leads, calls: 0, spend: eur(spend), revenue: eur(revenue),

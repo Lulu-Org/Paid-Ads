@@ -1,4 +1,4 @@
-import type { AdPlatform, Campaign, CampaignStatus, Money } from '@lulu/shared';
+import type { AdPlatform, BudgetPeriod, Campaign, CampaignStatus, Money } from '@lulu/shared';
 
 // The boundary between Lulu and an ad platform (docs/api.md "Ad accounts and providers"). Live
 // connectors implement this; the simulated provider answers until developer access arrives, so the
@@ -26,6 +26,8 @@ export interface ExternalCampaign {
   startAt: Date | null;
   endAt: Date | null;
   budget: Money;
+  // How the platform reads the amount; Lulu stores it as is (docs/api.md "Budget periods").
+  budgetPeriod: BudgetPeriod;
 }
 
 export interface ExternalMetricDay {
@@ -68,5 +70,11 @@ export interface AdsProvider {
   metrics(account: ProviderAccount, from: Date, to: Date): Promise<ExternalMetricDay[]>;
   pushCampaign(account: ProviderAccount, campaign: Campaign): Promise<PushCampaignResult>;
   setStatus(account: ProviderAccount, externalId: string, status: 'live' | 'paused'): Promise<void>;
-  setBudget(account: ProviderAccount, externalId: string, budget: Money): Promise<void>;
+  // Rejects a period the platform cannot hold, without changing anything.
+  setBudget(
+    account: ProviderAccount,
+    externalId: string,
+    budget: Money,
+    budgetPeriod: BudgetPeriod,
+  ): Promise<void>;
 }

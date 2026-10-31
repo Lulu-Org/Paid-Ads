@@ -128,6 +128,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     endAt: new Date('2026-06-30T23:59:59.000Z'),
     budgetAmount: money(6000),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'total',
     rationale:
       'Search demand is strongest for high-intent terms around the spring launch. The campaign is connected to CRM attribution so lead quality can be reviewed beyond the click.',
     nextStep:
@@ -147,6 +148,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     startAt: new Date('2026-06-01T00:00:00.000Z'),
     budgetAmount: money(3000),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'monthly',
     rationale:
       'Local Services is producing reliable call volume in the service area. The current signal is stable, so the campaign is kept live while the lead response time is improved.',
     nextStep: 'Connect the missed-call workflow and compare booked jobs against raw calls.',
@@ -166,6 +168,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     endAt: new Date('2026-07-08T23:59:59.000Z'),
     budgetAmount: money(4500),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'total',
     rationale:
       'Meta is delivering the lowest cost per lead while the short-form creative receives strong engagement. The budget recommendation is based on qualified lead rate, not only volume.',
     nextStep:
@@ -184,6 +187,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     endAt: new Date('2026-12-31T23:59:59.000Z'),
     budgetAmount: money(2500),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'total',
     rationale:
       'The draft is planned around the Q4 buying cycle and is waiting for final creative approval before launch.',
     nextStep: 'Approve the case study asset and define the CRM lead score threshold.',

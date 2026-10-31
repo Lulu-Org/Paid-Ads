@@ -55,10 +55,11 @@ async function metricDaysFor(campaignId: string): Promise<CampaignMetricDay[]> {
 
 async function totalsFor(campaignId: string) {
   const campaign = await db.campaign.findUniqueOrThrow({ where: { id: campaignId } });
-  return campaignTotals(await metricDaysFor(campaignId), {
-    amount: campaign.budgetAmount.toNumber(),
-    currency: campaign.budgetCurrency,
-  });
+  return campaignTotals(
+    await metricDaysFor(campaignId),
+    { amount: campaign.budgetAmount.toNumber(), currency: campaign.budgetCurrency },
+    campaign.budgetPeriod,
+  );
 }
 
 describe('seed (int)', () => {

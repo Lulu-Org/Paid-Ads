@@ -68,10 +68,12 @@ export function processAdsPush(payload: AdsPushPayload): Promise<AdsPushResult> 
         if (campaign.status === 'live' || campaign.status === 'paused') {
           await provider.setStatus(providerAccount, externalId, campaign.status);
         }
-        await provider.setBudget(providerAccount, externalId, {
-          amount: campaign.budgetAmount.toNumber(),
-          currency: campaign.budgetCurrency,
-        });
+        await provider.setBudget(
+          providerAccount,
+          externalId,
+          { amount: campaign.budgetAmount.toNumber(), currency: campaign.budgetCurrency },
+          campaign.budgetPeriod,
+        );
 
         const now = new Date();
         await scoped.syncRun.update({

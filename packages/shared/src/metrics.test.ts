@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CampaignMetricDay } from "./campaign";
-import { campaignTotals, change, ctr, overviewQuerySchema, progress } from "./metrics";
+import { campaignTotals, change, ctr, overviewQuerySchema, periodDays, progress } from "./metrics";
 
 const day = (date: string, spend: number, leads: number, extra: Partial<CampaignMetricDay> = {}): CampaignMetricDay => ({
   date,
@@ -42,6 +42,27 @@ describe("campaignTotals", () => {
       { amount: 2500, currency: "EUR" },
     );
     expect(totals).toMatchObject({ ctr: null, cpl: null, roas: null, progress: 0, leads: 0 });
+  });
+
+  it("measures progress against the budget's period, from the newest synced day", () => {
+    const days = [day("2026-09-30", 300, 1), day("2026-10-01", 100, 1), day("2026-10-02", 50, 1)];
+    const budget = { amount: 1000, currency: "EUR" };
+    expect(campaignTotals(days, budget, "total").progress).toBeCloseTo(0.45);
+    expect(campaignTotals(days, budget, "monthly").progress).toBeCloseTo(0.15);
+    expect(campaignTotals(days, budget, "daily").progress).toBeCloseTo(0.05);
+    // Spend and the other totals always cover every day.
+    expect(campaignTotals(days, budget, "daily").spend.amount).toBe(450);
+  });
+});
+
+describe("periodDays", () => {
+  const days = [day("2026-10-31", 1, 0), day("2026-11-01", 1, 0), day("2026-11-02", 1, 0)];
+
+  it("keeps the newest day's month, the newest day, or everything", () => {
+    expect(periodDays(days, "monthly").map((d) => d.date)).toEqual(["2026-11-01", "2026-11-02"]);
+    expect(periodDays(days, "daily").map((d) => d.date)).toEqual(["2026-11-02"]);
+    expect(periodDays(days, "total")).toHaveLength(3);
+    expect(periodDays([], "monthly")).toEqual([]);
   });
 });
 

@@ -108,9 +108,9 @@ describe("Create campaign pop-up", () => {
     await screen.findByText("Spring launch · Berlin", {}, slow);
     fireEvent.click(screen.getByRole("button", { name: /Create campaign/ }));
     const dialog = await screen.findByRole("dialog", { name: "Start a connected campaign." });
-    await waitFor(() => expect(within(dialog).getByLabelText("Monthly budget (EUR)")).toBeTruthy(), slow);
+    await waitFor(() => expect(within(dialog).getByLabelText("Budget (EUR)")).toBeTruthy(), slow);
 
-    fireEvent.change(within(dialog).getByLabelText("Monthly budget (EUR)"), { target: { value: "lots" } });
+    fireEvent.change(within(dialog).getByLabelText("Budget (EUR)"), { target: { value: "lots" } });
     fireEvent.change(within(dialog).getByLabelText("Start date"), { target: { value: "2026-11-10" } });
     fireEvent.change(within(dialog).getByLabelText("End date (optional)"), { target: { value: "2026-11-01" } });
     fireEvent.click(within(dialog).getByRole("button", { name: "Save campaign draft" }));
@@ -120,7 +120,8 @@ describe("Create campaign pop-up", () => {
 
     fireEvent.change(within(dialog).getByLabelText("Campaign name"), { target: { value: "Winter promo" } });
     fireEvent.change(within(dialog).getByLabelText("Advertising channel"), { target: { value: "meta_ads" } });
-    fireEvent.change(within(dialog).getByLabelText("Monthly budget (EUR)"), { target: { value: "1500,50" } });
+    fireEvent.change(within(dialog).getByLabelText("Budget (EUR)"), { target: { value: "1500,50" } });
+    fireEvent.change(within(dialog).getByLabelText("Budget period"), { target: { value: "daily" } });
     fireEvent.change(within(dialog).getByLabelText("End date (optional)"), { target: { value: "" } });
     fireEvent.click(within(dialog).getByRole("button", { name: "Save campaign draft" }));
 
@@ -128,7 +129,7 @@ describe("Create campaign pop-up", () => {
     await waitFor(() => expect(rowNames()).toContain("Winter promo"), slow);
     const { api } = await import("@/lib/api");
     const saved = (await api.campaigns.list({ pageSize: 100 })).data.find((c) => c.name === "Winter promo")!;
-    expect(saved).toMatchObject({ status: "draft", platform: "meta_ads", budget: { amount: 1500.5, currency: "EUR" }, objective: "Lead generation", endAt: null });
+    expect(saved).toMatchObject({ status: "draft", platform: "meta_ads", budget: { amount: 1500.5, currency: "EUR" }, budgetPeriod: "daily", objective: "Lead generation", endAt: null });
   });
 });
 

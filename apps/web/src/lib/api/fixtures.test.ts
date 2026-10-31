@@ -28,7 +28,7 @@ import {
 
 const totalsOf = (id: string) => {
   const campaign = demoCampaigns.find((c) => c.id === id)!;
-  return campaignTotals(demoMetricDays[id]!, campaign.budget);
+  return campaignTotals(demoMetricDays[id]!, campaign.budget, campaign.budgetPeriod);
 };
 
 describe("sample data", () => {
