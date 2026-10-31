@@ -195,6 +195,7 @@ interface MetricTotals {
   impressions: number;
   clicks: number;
   leads: number;
+  calls?: number;
   spend: number;
   revenue: number;
 }
@@ -216,19 +217,21 @@ function spreadMetricDays(
   const cents = (n: number) => Math.round(n * 100) / 100;
   const share = (total: number, i: number, round: (n: number) => number, used: number): number =>
     i === count - 1 ? round(total - used) : round((total * weights[i]!) / sumWeights);
-  const used = { impressions: 0, clicks: 0, leads: 0, spend: 0, revenue: 0 };
+  const used = { impressions: 0, clicks: 0, leads: 0, calls: 0, spend: 0, revenue: 0 };
 
   return weights.map((_, i) => {
     const row = {
       impressions: share(totals.impressions, i, Math.round, used.impressions),
       clicks: share(totals.clicks, i, Math.round, used.clicks),
       leads: share(totals.leads, i, Math.round, used.leads),
+      calls: share(totals.calls ?? 0, i, Math.round, used.calls),
       spend: share(totals.spend, i, cents, used.spend),
       revenue: share(totals.revenue, i, cents, used.revenue),
     };
     used.impressions += row.impressions;
     used.clicks += row.clicks;
     used.leads += row.leads;
+    used.calls += row.calls;
     used.spend = cents(used.spend + row.spend);
     used.revenue = cents(used.revenue + row.revenue);
     const date = new Date(Date.parse(`${start}T00:00:00.000Z`) + i * 86_400_000)
@@ -243,6 +246,7 @@ function spreadMetricDays(
       clicks: row.clicks,
       conversions: row.leads,
       leads: row.leads,
+      calls: row.calls,
       spendAmount: money(row.spend),
       revenueAmount: money(row.revenue),
       currency: 'EUR',
@@ -262,6 +266,7 @@ const metricDays: WithId<Prisma.CampaignMetricDayUncheckedCreateInput>[] = [
     impressions: 86100,
     clicks: 7800,
     leads: 96,
+    calls: 96,
     spend: 1940,
     revenue: 11520,
   }),

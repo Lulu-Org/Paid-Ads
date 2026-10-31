@@ -107,6 +107,7 @@ describe('ads processors (int)', () => {
 
     const days = await db.campaignMetricDay.findMany({ where: { workspaceId } });
     expect(days).toHaveLength(30);
+    expect(days.every((day) => day.calls === 0)).toBe(true);
 
     const account = await db.adAccount.findFirst({ where: { id: googleAdsId } });
     expect(account).toMatchObject({ status: 'connected', lastError: null });
@@ -131,6 +132,17 @@ describe('ads processors (int)', () => {
     const account = await db.adAccount.findFirst({ where: { id: lsaId } });
     expect(account).toMatchObject({ status: 'needs_attention', lastError: 'provider down' });
   });
+
+  it('persists calls for the LSA campaign', async () => {
+    const result = await processAdsSync({ workspaceId, adAccountId: lsaId });
+    expect(result.metricDays).toBe(30);
+
+    const days = await db.campaignMetricDay.findMany({
+      where: { workspaceId, campaign: { platform: 'google_lsa' } },
+    });
+    expect(days).toHaveLength(30);
+    expect(days.every((day) => day.calls === day.leads)).toBe(true);
+  }, 60_000);
 
   it('pushes a campaign once and keeps the external id on retry', async () => {
     const spy = vi.spyOn(simulatedProviders.meta_ads, 'pushCampaign');

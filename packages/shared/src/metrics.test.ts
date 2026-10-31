@@ -8,6 +8,7 @@ const day = (date: string, spend: number, leads: number, extra: Partial<Campaign
   clicks: 50,
   conversions: leads,
   leads,
+  calls: 0,
   spend: { amount: spend, currency: "EUR" },
   revenue: { amount: spend * 4, currency: "EUR" },
   ...extra,
@@ -15,10 +16,10 @@ const day = (date: string, spend: number, leads: number, extra: Partial<Campaign
 
 describe("campaignTotals", () => {
   it("sums days in cents and computes CTR, CPL, ROAS and progress", () => {
-    const totals = campaignTotals([day("2026-10-01", 0.1, 1), day("2026-10-02", 0.2, 2)], { amount: 3, currency: "EUR" });
+    const totals = campaignTotals([day("2026-10-01", 0.1, 1), day("2026-10-02", 0.2, 2, { calls: 2 })], { amount: 3, currency: "EUR" });
     expect(totals.spend).toEqual({ amount: 0.3, currency: "EUR" });
     expect(totals.revenue).toEqual({ amount: 1.2, currency: "EUR" });
-    expect(totals).toMatchObject({ impressions: 2000, clicks: 100, leads: 3, conversions: 3 });
+    expect(totals).toMatchObject({ impressions: 2000, clicks: 100, leads: 3, conversions: 3, calls: 2 });
     expect(totals.ctr).toBe(0.05);
     expect(totals.cpl).toEqual({ amount: 0.1, currency: "EUR" });
     expect(totals.roas).toBe(4);

@@ -36,6 +36,8 @@ export interface ExternalMetricDay {
   clicks: number;
   conversions: number;
   leads: number;
+  // Charged phone calls, a subset of leads on Local Services.
+  calls: number;
   spend: Money;
   revenue: Money;
 }

@@ -25,6 +25,7 @@ export function campaignTotals(days: CampaignMetricDay[], budget: Money): Campai
     clicks,
     conversions: sum((d) => d.conversions),
     leads,
+    calls: sum((d) => d.calls),
     ctr: ctr(clicks, impressions),
     cpl: leads > 0 ? { amount: Math.round(spendCents / leads) / 100, currency } : null,
     roas: spendCents > 0 ? revenueCents / spendCents : null,

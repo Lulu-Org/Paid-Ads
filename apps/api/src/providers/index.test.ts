@@ -23,4 +23,25 @@ describe('provider registry', () => {
     expect(() => getAdsProvider('google_ads')).toThrow(/No live provider is implemented/);
     expect(() => assertProviderConfiguration()).toThrow(/ADS_PROVIDER_GOOGLE_ADS=simulated/);
   });
+
+  it('returns the live Google LSA provider when its credentials are set', async () => {
+    vi.stubEnv('ADS_PROVIDER_GOOGLE_LSA', 'live');
+    vi.stubEnv('GOOGLE_ADS_DEVELOPER_TOKEN', 'developer-token');
+    vi.stubEnv('GOOGLE_ADS_CLIENT_ID', 'client-id');
+    vi.stubEnv('GOOGLE_ADS_CLIENT_SECRET', 'client-secret');
+    const { assertProviderConfiguration, getAdsProvider, providerModeFor } =
+      await import('./index');
+
+    expect(providerModeFor('google_lsa')).toBe('live');
+    expect(getAdsProvider('google_lsa').platform).toBe('google_lsa');
+    expect(() => assertProviderConfiguration()).not.toThrow();
+  });
+
+  it('knows that live Google LSA cannot create campaigns', async () => {
+    const { campaignCreationSupported } = await import('./index');
+
+    expect(campaignCreationSupported('google_lsa', 'simulated')).toBe(true);
+    expect(campaignCreationSupported('google_lsa', 'live')).toBe(false);
+    expect(campaignCreationSupported('google_ads', 'live')).toBe(true);
+  });
 });

@@ -10,7 +10,7 @@ const campaign = (id: string, platform: Campaign["platform"], extra: Partial<Cam
   audienceSummary: null, startAt: null, endAt: null, budget: eur(1000), rationale: null, nextStep: null, ownerId: "u", ...extra,
 });
 const day = (date: string, spend: number, revenue: number, leads: number, currency = "EUR"): CampaignMetricDay => ({
-  date, impressions: 100, clicks: 10, conversions: leads, leads, spend: { amount: spend, currency }, revenue: { amount: revenue, currency },
+  date, impressions: 100, clicks: 10, conversions: leads, leads, calls: 0, spend: { amount: spend, currency }, revenue: { amount: revenue, currency },
 });
 const account = (platform: AdAccount["platform"], status: AdAccount["status"]): AdAccount => ({
   ...base, id: `a_${platform}`, platform, externalId: "x", name: platform, currency: "EUR", status, scopes: [], lastSyncAt: null, lastError: null,

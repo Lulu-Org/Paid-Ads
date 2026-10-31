@@ -63,6 +63,7 @@ describe('overview route (int)', () => {
         clicks: 50,
         conversions: leads,
         leads,
+        calls: 0,
         spendAmount: spend,
         revenueAmount: revenue,
         currency: 'EUR',

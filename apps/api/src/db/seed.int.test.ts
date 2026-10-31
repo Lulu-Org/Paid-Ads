@@ -47,6 +47,7 @@ async function metricDaysFor(campaignId: string): Promise<CampaignMetricDay[]> {
     clicks: row.clicks,
     conversions: row.conversions,
     leads: row.leads,
+    calls: row.calls,
     spend: { amount: row.spendAmount.toNumber(), currency: row.currency },
     revenue: { amount: row.revenueAmount.toNumber(), currency: row.currency },
   }));
@@ -119,6 +120,7 @@ describe('seed (int)', () => {
       spend: { amount: 1940, currency: 'EUR' },
       revenue: { amount: 11520, currency: 'EUR' },
       leads: 96,
+      calls: 96,
       cpl: { amount: 20.21, currency: 'EUR' },
     });
     expect(local.progress).toBeCloseTo(0.65, 2);
@@ -139,6 +141,7 @@ describe('seed (int)', () => {
       clicks: 0,
       conversions: 0,
       leads: 0,
+      calls: 0,
       ctr: null,
       cpl: null,
       roas: null,
