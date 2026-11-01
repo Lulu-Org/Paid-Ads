@@ -8,8 +8,10 @@ services:
       POSTGRES_DB: lulu
     volumes:
       - pg-data:/var/lib/postgresql/data
+    # Host port from .env (POSTGRES_PORT, default 5433 so a locally installed Postgres on 5432
+    # does not clash). Containers always reach it as postgres:5432.
     ports:
-      - "127.0.0.1:5433:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     healthcheck:
       # -h 127.0.0.1 forces TCP: initdb's temporary server only listens on the
       # unix socket, so without it the healthcheck passes before the real
@@ -25,7 +27,7 @@ services:
     volumes:
       - redis-data:/data
     ports:
-      - "6379:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -46,11 +48,12 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "4000:4000"
+      - "${API_PORT:-4000}:4000"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: "4000"
-      DATABASE_URL: postgresql://lulu:lulu_dev_password@postgres:5433/lulu
+      # Inside the Docker network: service name and the container port, never the host port.
+      DATABASE_URL: postgresql://lulu:lulu_dev_password@postgres:5432/lulu
       REDIS_URL: redis://redis:6379
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       SEED_ON_START: ${SEED_ON_START:-true}
@@ -68,6 +71,9 @@ services:
       GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${GOOGLE_ADS_LOGIN_CUSTOMER_ID:-}
       GOOGLE_ADS_API_VERSION: ${GOOGLE_ADS_API_VERSION:-v26}
       API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:4000}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+      LINKEDIN_API_VERSION: ${LINKEDIN_API_VERSION:-}
 
 volumes:
   pg-data:
