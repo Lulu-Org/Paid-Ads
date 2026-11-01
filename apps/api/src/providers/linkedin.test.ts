@@ -38,11 +38,13 @@ interface Call {
 /** A fake fetch that answers in order and records every request. */
 function fakeFetch(...responses: Array<{ status?: number; body?: unknown }>) {
   const calls: Call[] = [];
-  const fn = async (url: string, init?: RequestInit) => {
+  const fn = (url: string, init?: RequestInit) => {
     calls.push({ url, init });
     const next = responses.shift() ?? { status: 500, body: { message: 'no response queued' } };
     const status = next.status ?? 200;
-    return new Response(status === 204 ? null : JSON.stringify(next.body ?? {}), { status });
+    return Promise.resolve(
+      new Response(status === 204 ? null : JSON.stringify(next.body ?? {}), { status }),
+    );
   };
   return { fn, calls };
 }

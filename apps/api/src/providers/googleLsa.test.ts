@@ -356,7 +356,13 @@ describe('GoogleLsaProvider', () => {
 
     await instance.setBudget(account(), '1001', { amount: 100, currency: 'EUR' }, 'daily');
     expect(client.budgetMutations).toEqual([
-      expect.objectContaining({ update: expect.objectContaining({ amountMicros: '100000000' }) }),
+      {
+        update: {
+          resourceName: 'customers/222/campaignBudgets/9001',
+          amountMicros: '100000000',
+        },
+        updateMask: 'amount_micros',
+      },
     ]);
 
     await expect(
