@@ -33,7 +33,8 @@ services:
       # Public API URL used for the OAuth callback (the Render link).
       - key: API_PUBLIC_URL
         sync: false
-      # Google Ads API credentials for live Google LSA (required when the provider is live).
+      # Google Ads API credentials shared by live Google LSA and Google Ads (required when either
+      # provider is live).
       - key: GOOGLE_ADS_DEVELOPER_TOKEN
         sync: false
       - key: GOOGLE_ADS_CLIENT_ID
@@ -44,8 +45,8 @@ services:
         sync: false
       - key: GOOGLE_ADS_API_VERSION
         value: v26
-      # Provider per platform: simulated | live. Google LSA is live-capable (C1); live fails for
-      # the other platforms until their connector exists (C2-C4).
+      # Provider per platform: simulated | live. Google LSA (C1), Google Ads (C2) and LinkedIn (C4)
+      # are live-capable; live fails for Meta until its connector exists (C3).
       - key: ADS_PROVIDER_GOOGLE_LSA
         value: simulated
       - key: ADS_PROVIDER_GOOGLE_ADS

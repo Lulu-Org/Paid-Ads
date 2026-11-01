@@ -1,5 +1,18 @@
-import type { AdPlatform, BudgetPeriod, Campaign, CampaignStatus, Money } from '@lulu/shared';
-import { customerId, type GoogleOAuthTokenResult } from './googleLsaClient';
+import type { AdPlatform, BudgetPeriod, Campaign, Money } from '@lulu/shared';
+import {
+  campaignIdFromResource,
+  dailyMicrosToMonthly,
+  isoDay,
+  mapStatus,
+  monthlyToDailyMicros,
+  parseDate,
+  parseDateTime,
+  roundMoney,
+  startOfUtcDay,
+  toNumber,
+  type GoogleAdsApiClient,
+} from './googleAdsCommon';
+import { customerId } from './googleLsaClient';
 import type {
   AdsProvider,
   ExchangeCodeResult,
@@ -10,12 +23,12 @@ import type {
   PushCampaignResult,
 } from './types';
 
+export { MONTHLY_DAYS, dailyMicrosToMonthly, monthlyToDailyMicros } from './googleAdsCommon';
+
 // Live Google Local Services provider (C1). Standalone LOCAL_SERVICES campaigns and Local Services
 // Performance Max campaigns are read through GAQL; spend and charged leads are reconciled per day.
 // Google does not allow creating standalone Local Services campaigns through the API, so pushes only
 // update existing campaigns (status and budget).
-
-export const MONTHLY_DAYS = 30.4;
 
 const LSA_CAMPAIGN_FILTER =
   "(campaign.advertising_channel_type = 'LOCAL_SERVICES' OR (campaign.advertising_channel_type = 'PERFORMANCE_MAX' AND campaign.pmax_campaign_settings.local_services_enabled = true))";
@@ -89,89 +102,12 @@ interface GoogleCustomerRow {
   };
 }
 
-/** The subset of the REST client the provider uses, so tests can inject a fake. */
-export interface GoogleLsaClient {
-  authorizeUrl(state: string, redirectUri: string): string;
-  exchangeCode(code: string, redirectUri: string): Promise<GoogleOAuthTokenResult>;
-  listAccessibleCustomers(refreshToken: string): Promise<string[]>;
-  search<T>(refreshToken: string, customerIdValue: string, query: string): Promise<T[]>;
-  mutateCampaigns(
-    refreshToken: string,
-    customerIdValue: string,
-    operations: unknown[],
-  ): Promise<unknown>;
-  mutateCampaignBudgets(
-    refreshToken: string,
-    customerIdValue: string,
-    operations: unknown[],
-  ): Promise<unknown>;
-}
+/** The subset of the REST client the provider uses (kept as the C1 name for existing tests). */
+export type GoogleLsaClient = GoogleAdsApiClient;
 
 export interface GoogleLsaProviderOptions {
   client: GoogleLsaClient;
   apiPublicUrl: string;
-}
-
-function toNumber(value: string | number | undefined): number {
-  if (typeof value === 'number') return value;
-  if (typeof value === 'string' && value.length > 0) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-  return 0;
-}
-
-function roundMoney(amount: number): number {
-  return Math.round(amount * 100) / 100;
-}
-
-function startOfUtcDay(date: Date): Date {
-  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-}
-
-function isoDay(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-function parseDate(value: string | undefined, endOfDay = false): Date | null {
-  if (value === undefined || value.length === 0) return null;
-  const date = new Date(`${value.slice(0, 10)}T${endOfDay ? '23:59:59.999' : '00:00:00.000'}Z`);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function parseDateTime(value: string | undefined): Date | null {
-  if (value === undefined || value.length === 0) return null;
-  const normalized = value.includes('T') ? value : value.replace(' ', 'T');
-  const date = new Date(normalized.endsWith('Z') ? normalized : `${normalized}Z`);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function mapStatus(status: string | undefined): CampaignStatus {
-  switch (status) {
-    case 'ENABLED':
-      return 'live';
-    case 'REMOVED':
-      return 'ended';
-    case 'PAUSED':
-    default:
-      return 'paused';
-  }
-}
-
-function campaignIdFromResource(value: string | undefined): string | null {
-  if (value === undefined || value.length === 0) return null;
-  const id = value.split('/').filter(Boolean).at(-1);
-  return id === undefined ? null : id;
-}
-
-/** Google's average daily budget to Lulu's monthly budget. */
-export function dailyMicrosToMonthly(amountMicros: string | number | undefined): number {
-  return roundMoney((toNumber(amountMicros) / 1_000_000) * MONTHLY_DAYS);
-}
-
-/** Lulu's monthly budget to Google's average daily budget, in micros. */
-export function monthlyToDailyMicros(monthlyAmount: number): number {
-  return Math.round((monthlyAmount / MONTHLY_DAYS) * 1_000_000);
 }
 
 export class GoogleLsaProvider implements AdsProvider {

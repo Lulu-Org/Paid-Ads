@@ -38,15 +38,15 @@ export const envSchema = z
     ),
     AI_PROVIDER: z.preprocess(emptyToUndefined, z.string().default('simulated')),
     AI_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
-    // Per-platform provider mode. Google LSA is live-capable (C1); `live` fails fast for the
-    // other platforms until their provider exists (C2-C4).
+    // Per-platform provider mode. Google LSA (C1), Google Ads (C2) and LinkedIn (C4) are
+    // live-capable; `live` fails fast for Meta until C3.
     ADS_PROVIDER_GOOGLE_LSA: providerMode(),
     ADS_PROVIDER_GOOGLE_ADS: providerMode(),
     ADS_PROVIDER_META_ADS: providerMode(),
     ADS_PROVIDER_LINKEDIN_ADS: providerMode(),
     // AES-256-GCM key for ad-account tokens. Required in production; development uses a fallback.
     ADS_TOKEN_ENCRYPTION_KEY: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
-    // Google Ads API credentials. The three secrets are required when Google LSA runs live.
+    // Google Ads API credentials for the live Google LSA and Google Ads connectors.
     GOOGLE_ADS_DEVELOPER_TOKEN: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
     GOOGLE_ADS_CLIENT_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
     GOOGLE_ADS_CLIENT_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
@@ -106,8 +106,9 @@ export const envSchema = z
         message: 'is required in production',
       });
     }
-    // The live Google LSA connector cannot talk to Google without its OAuth client and token.
-    if (value.ADS_PROVIDER_GOOGLE_LSA === 'live') {
+    // The live Google connectors cannot talk to Google without the OAuth client and developer token.
+    // Google LSA and Google Ads share the same Google Cloud project credentials.
+    if (value.ADS_PROVIDER_GOOGLE_LSA === 'live' || value.ADS_PROVIDER_GOOGLE_ADS === 'live') {
       const required = [
         'GOOGLE_ADS_DEVELOPER_TOKEN',
         'GOOGLE_ADS_CLIENT_ID',
@@ -118,7 +119,8 @@ export const envSchema = z
           ctx.addIssue({
             code: 'custom',
             path: [key],
-            message: 'is required when ADS_PROVIDER_GOOGLE_LSA=live',
+            message:
+              'is required when ADS_PROVIDER_GOOGLE_LSA=live or ADS_PROVIDER_GOOGLE_ADS=live',
           });
         }
       }

@@ -1,6 +1,7 @@
-// Minimal Google Ads API v26 REST client (docs/api.md "Ad accounts and providers"). No vendor SDK:
-// OAuth tokens and GAQL search go over `fetch`, and every error is sanitized before it can reach a
-// log or the API response. Tokens are only ever sent in headers or the token request body.
+// Minimal Google Ads API v26 REST client (docs/api.md "Ad accounts and providers"), shared by the
+// Google LSA (C1) and Google Ads (C2) connectors. No vendor SDK: OAuth tokens and GAQL search go over
+// `fetch`, and every error is sanitized before it can reach a log or the API response. Tokens are only
+// ever sent in headers or the token request body.
 
 export const GOOGLE_ADS_SCOPE = 'https://www.googleapis.com/auth/adwords';
 export const DEFAULT_GOOGLE_ADS_API_VERSION = 'v26';

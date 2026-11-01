@@ -17,11 +17,11 @@ describe('provider registry', () => {
   });
 
   it('fails fast when a platform is set to live before its connector exists', async () => {
-    vi.stubEnv('ADS_PROVIDER_GOOGLE_ADS', 'live');
+    vi.stubEnv('ADS_PROVIDER_META_ADS', 'live');
     const { assertProviderConfiguration, getAdsProvider } = await import('./index');
 
-    expect(() => getAdsProvider('google_ads')).toThrow(/No live provider is implemented/);
-    expect(() => assertProviderConfiguration()).toThrow(/ADS_PROVIDER_GOOGLE_ADS=simulated/);
+    expect(() => getAdsProvider('meta_ads')).toThrow(/No live provider is implemented/);
+    expect(() => assertProviderConfiguration()).toThrow(/ADS_PROVIDER_META_ADS=simulated/);
   });
 
   it('returns the live Google LSA provider when its credentials are set', async () => {
@@ -42,8 +42,42 @@ describe('provider registry', () => {
 
     expect(campaignCreationSupported('google_lsa', 'simulated')).toBe(true);
     expect(campaignCreationSupported('google_lsa', 'live')).toBe(false);
-    expect(campaignCreationSupported('google_ads', 'live')).toBe(true);
+    expect(campaignCreationSupported('google_ads', 'simulated')).toBe(true);
+    expect(campaignCreationSupported('google_ads', 'live')).toBe(false);
+    expect(campaignCreationSupported('meta_ads', 'live')).toBe(true);
     expect(campaignCreationSupported('linkedin_ads', 'live')).toBe(false);
+  });
+
+  it('returns the live Google Ads provider when its credentials are set', async () => {
+    vi.stubEnv('ADS_PROVIDER_GOOGLE_ADS', 'live');
+    vi.stubEnv('GOOGLE_ADS_DEVELOPER_TOKEN', 'developer-token');
+    vi.stubEnv('GOOGLE_ADS_CLIENT_ID', 'client-id');
+    vi.stubEnv('GOOGLE_ADS_CLIENT_SECRET', 'client-secret');
+    vi.stubEnv('API_PUBLIC_URL', 'https://api.example.com/');
+    const { assertProviderConfiguration, getAdsProvider, providerModeFor } =
+      await import('./index');
+
+    expect(providerModeFor('google_ads')).toBe('live');
+    expect(getAdsProvider('google_ads').platform).toBe('google_ads');
+    expect(() => assertProviderConfiguration()).not.toThrow();
+    const url = new URL(getAdsProvider('google_ads').authorizeUrl('state'));
+    expect(url.searchParams.get('redirect_uri')).toBe(
+      'https://api.example.com/api/v1/ad-accounts/callback/google_ads',
+    );
+  });
+
+  it('refuses to start Google Ads live without its Google credentials', async () => {
+    vi.stubEnv('ADS_PROVIDER_GOOGLE_ADS', 'live');
+    vi.stubEnv('GOOGLE_ADS_CLIENT_ID', '');
+    // The env check stops the process before any provider is built.
+    const exit = vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`exit ${String(code)}`);
+    });
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    await expect(import('./index')).rejects.toThrow('exit 1');
+    expect(String(log.mock.calls[0]?.[0])).toMatch(/GOOGLE_ADS_CLIENT_ID/);
+    exit.mockRestore();
+    log.mockRestore();
   });
 
   it('uses the live LinkedIn connector when configured', async () => {
