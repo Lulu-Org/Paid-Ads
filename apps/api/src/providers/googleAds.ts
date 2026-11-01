@@ -55,7 +55,7 @@ const CUSTOMER_QUERY = `
 `;
 
 const CAMPAIGN_BUDGET_QUERY = (externalId: string) => `
-  SELECT campaign.id, campaign.campaign_budget
+  SELECT campaign.id, campaign.campaign_budget, campaign_budget.explicitly_shared
   FROM campaign
   WHERE campaign.id = ${externalId}
 `;
@@ -73,6 +73,7 @@ interface GoogleCampaignRow {
   campaignBudget?: {
     amountMicros?: string | number;
     currencyCode?: string;
+    explicitlyShared?: boolean;
   };
 }
 
@@ -268,6 +269,13 @@ export class GoogleAdsProvider implements AdsProvider {
     const budgetResource = rows[0]?.campaign?.campaignBudget;
     if (budgetResource === undefined) {
       throw new Error(`Google Ads campaign ${externalId} has no campaign budget`);
+    }
+    // A shared budget funds other campaigns too, so changing it here would raise or cut their
+    // spend without anyone approving that. Leave it to Google Ads.
+    if (rows[0]?.campaignBudget?.explicitlyShared === true) {
+      throw new Error(
+        `Google Ads campaign ${externalId} uses a shared budget; change it in Google Ads so every campaign on it is reviewed`,
+      );
     }
     await this.client.mutateCampaignBudgets(account.token, account.externalId, [
       {

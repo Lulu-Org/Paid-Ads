@@ -61,6 +61,7 @@ class FakeClient implements GoogleAdsApiClient {
   ]);
   metricRows: unknown[] = [];
   budgetResource = 'customers/222/campaignBudgets/9001';
+  budgetShared = false;
   campaignMutations: unknown[] = [];
   budgetMutations: unknown[] = [];
   lastAuthorize: { state: string; redirectUri: string } | null = null;
@@ -85,7 +86,10 @@ class FakeClient implements GoogleAdsApiClient {
     }
     if (query.includes('campaign.campaign_budget')) {
       return Promise.resolve([
-        { campaign: { id: 1001, campaignBudget: this.budgetResource } },
+        {
+          campaign: { id: 1001, campaignBudget: this.budgetResource },
+          campaignBudget: { explicitlyShared: this.budgetShared },
+        },
       ] as T[]);
     }
     if (query.includes('metrics.impressions')) {
@@ -382,6 +386,16 @@ describe('GoogleAdsProvider', () => {
     await expect(
       instance.setBudget(account(), '1001', { amount: 3040, currency: 'EUR' }, 'total'),
     ).rejects.toThrow(/monthly or daily/);
+    expect(client.budgetMutations).toHaveLength(0);
+  });
+
+  it('refuses a shared budget without mutating', async () => {
+    const { client, instance } = provider();
+    client.budgetShared = true;
+
+    await expect(
+      instance.setBudget(account(), '1001', { amount: 3040, currency: 'EUR' }, 'monthly'),
+    ).rejects.toThrow(/shared budget/);
     expect(client.budgetMutations).toHaveLength(0);
   });
 
