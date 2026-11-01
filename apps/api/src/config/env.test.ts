@@ -35,7 +35,13 @@ describe('envSchema', () => {
 
   it('accepts simulated or live provider modes and rejects anything else', () => {
     expect(
-      envSchema.parse({ ...validSource, ADS_PROVIDER_GOOGLE_ADS: 'live' }).ADS_PROVIDER_GOOGLE_ADS,
+      envSchema.parse({
+        ...validSource,
+        ADS_PROVIDER_GOOGLE_ADS: 'live',
+        GOOGLE_ADS_DEVELOPER_TOKEN: 'developer-token',
+        GOOGLE_ADS_CLIENT_ID: 'client-id',
+        GOOGLE_ADS_CLIENT_SECRET: 'client-secret',
+      }).ADS_PROVIDER_GOOGLE_ADS,
     ).toBe('live');
     expect(envSchema.safeParse({ ...validSource, ADS_PROVIDER_GOOGLE_ADS: 'real' }).success).toBe(
       false,
@@ -65,6 +71,23 @@ describe('envSchema', () => {
       GOOGLE_ADS_CLIENT_ID: 'client-id.apps.googleusercontent.com',
       GOOGLE_ADS_CLIENT_SECRET: 'client-secret',
       GOOGLE_ADS_LOGIN_CUSTOMER_ID: '1234567890',
+    });
+    expect(withCredentials.success).toBe(true);
+  });
+
+  it('requires the same Google Ads credentials when Google Ads runs live', () => {
+    const without = envSchema.safeParse({
+      ...validSource,
+      ADS_PROVIDER_GOOGLE_ADS: 'live',
+    });
+    expect(without.success).toBe(false);
+
+    const withCredentials = envSchema.safeParse({
+      ...validSource,
+      ADS_PROVIDER_GOOGLE_ADS: 'live',
+      GOOGLE_ADS_DEVELOPER_TOKEN: 'developer-token',
+      GOOGLE_ADS_CLIENT_ID: 'client-id.apps.googleusercontent.com',
+      GOOGLE_ADS_CLIENT_SECRET: 'client-secret',
     });
     expect(withCredentials.success).toBe(true);
   });
