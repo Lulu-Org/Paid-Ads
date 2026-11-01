@@ -712,6 +712,20 @@
     "paused": "已暂停",
     "ended": "已结束"
   },
+  "budgetPeriods": {
+    "monthly": {
+      "label": "每月",
+      "amount": "{amount} / 月"
+    },
+    "daily": {
+      "label": "每天",
+      "amount": "{amount} / 天"
+    },
+    "total": {
+      "label": "整个广告系列",
+      "amount": "共 {amount}"
+    }
+  },
   "campaigns": {
     "create": {
       "eyebrow": "新广告活动",
@@ -720,8 +734,9 @@
       "name": "广告活动名称",
       "namePlaceholder": "例如：夏季发布 · 慕尼黑",
       "channel": "广告渠道",
-      "budget": "月度预算（{currency}）",
-      "budgetNoCurrency": "月度预算",
+      "budget": "预算（{currency}）",
+      "budgetNoCurrency": "预算",
+      "budgetPeriod": "预算周期",
       "budgetPlaceholder": "2500",
       "objective": "主要目标",
       "start": "开始日期",
@@ -1009,7 +1024,8 @@
         "consentTooLong": "最多 300 个字符",
         "platformsRequired": "请至少选择一个渠道"
       }
-    }
+    },
+    "notSynced": "尚未同步"
   },
   "creatives": {
     "library": {

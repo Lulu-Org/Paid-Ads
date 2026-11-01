@@ -712,6 +712,20 @@
     "paused": "Pausiert",
     "ended": "Beendet"
   },
+  "budgetPeriods": {
+    "monthly": {
+      "label": "Pro Monat",
+      "amount": "{amount} / Monat"
+    },
+    "daily": {
+      "label": "Pro Tag",
+      "amount": "{amount} / Tag"
+    },
+    "total": {
+      "label": "Gesamte Kampagne",
+      "amount": "{amount} insgesamt"
+    }
+  },
   "campaigns": {
     "create": {
       "eyebrow": "Neue Kampagne",
@@ -720,8 +734,9 @@
       "name": "Kampagnenname",
       "namePlaceholder": "z. B. Sommerstart · München",
       "channel": "Werbekanal",
-      "budget": "Monatsbudget ({currency})",
-      "budgetNoCurrency": "Monatsbudget",
+      "budget": "Budget ({currency})",
+      "budgetNoCurrency": "Budget",
+      "budgetPeriod": "Budgetzeitraum",
       "budgetPlaceholder": "2500",
       "objective": "Hauptziel",
       "start": "Startdatum",
@@ -1009,7 +1024,8 @@
         "consentTooLong": "Höchstens 300 Zeichen",
         "platformsRequired": "Bitte mindestens einen Kanal wählen"
       }
-    }
+    },
+    "notSynced": "Noch nicht synchronisiert"
   },
   "creatives": {
     "library": {

@@ -33,6 +33,12 @@ enum CampaignStatus {
   ended
 }
 
+enum BudgetPeriod {
+  monthly
+  daily
+  total
+}
+
 enum PlanStepStatus {
   done
   current
@@ -158,6 +164,7 @@ model Campaign {
   endAt           DateTime?
   budgetAmount    Decimal        @db.Decimal(14, 2)
   budgetCurrency  String
+  budgetPeriod    BudgetPeriod   @default(monthly)
   rationale       String?
   nextStep        String?
   ownerId         String
@@ -190,6 +197,7 @@ model CampaignMetricDay {
   clicks        Int
   conversions   Int
   leads         Int
+  calls         Int       @default(0)
   spendAmount   Decimal   @db.Decimal(14, 2)
   revenueAmount Decimal   @db.Decimal(14, 2)
   currency      String

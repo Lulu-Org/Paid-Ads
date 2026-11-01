@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CampaignMetricDay } from "./campaign";
-import { campaignTotals, change, ctr, overviewQuerySchema, progress } from "./metrics";
+import { campaignTotals, change, ctr, overviewQuerySchema, periodDays, progress } from "./metrics";
 
 const day = (date: string, spend: number, leads: number, extra: Partial<CampaignMetricDay> = {}): CampaignMetricDay => ({
   date,
@@ -8,6 +8,7 @@ const day = (date: string, spend: number, leads: number, extra: Partial<Campaign
   clicks: 50,
   conversions: leads,
   leads,
+  calls: 0,
   spend: { amount: spend, currency: "EUR" },
   revenue: { amount: spend * 4, currency: "EUR" },
   ...extra,
@@ -15,10 +16,10 @@ const day = (date: string, spend: number, leads: number, extra: Partial<Campaign
 
 describe("campaignTotals", () => {
   it("sums days in cents and computes CTR, CPL, ROAS and progress", () => {
-    const totals = campaignTotals([day("2026-10-01", 0.1, 1), day("2026-10-02", 0.2, 2)], { amount: 3, currency: "EUR" });
+    const totals = campaignTotals([day("2026-10-01", 0.1, 1), day("2026-10-02", 0.2, 2, { calls: 2 })], { amount: 3, currency: "EUR" });
     expect(totals.spend).toEqual({ amount: 0.3, currency: "EUR" });
     expect(totals.revenue).toEqual({ amount: 1.2, currency: "EUR" });
-    expect(totals).toMatchObject({ impressions: 2000, clicks: 100, leads: 3, conversions: 3 });
+    expect(totals).toMatchObject({ impressions: 2000, clicks: 100, leads: 3, conversions: 3, calls: 2 });
     expect(totals.ctr).toBe(0.05);
     expect(totals.cpl).toEqual({ amount: 0.1, currency: "EUR" });
     expect(totals.roas).toBe(4);
@@ -41,6 +42,27 @@ describe("campaignTotals", () => {
       { amount: 2500, currency: "EUR" },
     );
     expect(totals).toMatchObject({ ctr: null, cpl: null, roas: null, progress: 0, leads: 0 });
+  });
+
+  it("measures progress against the budget's period, from the newest synced day", () => {
+    const days = [day("2026-09-30", 300, 1), day("2026-10-01", 100, 1), day("2026-10-02", 50, 1)];
+    const budget = { amount: 1000, currency: "EUR" };
+    expect(campaignTotals(days, budget, "total").progress).toBeCloseTo(0.45);
+    expect(campaignTotals(days, budget, "monthly").progress).toBeCloseTo(0.15);
+    expect(campaignTotals(days, budget, "daily").progress).toBeCloseTo(0.05);
+    // Spend and the other totals always cover every day.
+    expect(campaignTotals(days, budget, "daily").spend.amount).toBe(450);
+  });
+});
+
+describe("periodDays", () => {
+  const days = [day("2026-10-31", 1, 0), day("2026-11-01", 1, 0), day("2026-11-02", 1, 0)];
+
+  it("keeps the newest day's month, the newest day, or everything", () => {
+    expect(periodDays(days, "monthly").map((d) => d.date)).toEqual(["2026-11-01", "2026-11-02"]);
+    expect(periodDays(days, "daily").map((d) => d.date)).toEqual(["2026-11-02"]);
+    expect(periodDays(days, "total")).toHaveLength(3);
+    expect(periodDays([], "monthly")).toEqual([]);
   });
 });
 

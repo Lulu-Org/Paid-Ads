@@ -24,7 +24,7 @@ Base path `/api/v1`. Request and response shapes are the Zod schemas in `package
 | POST   | `/ad-accounts/:id/sync`           | Creates a queued `SyncRun` and adds `ads.sync` for it                                                                                                                                                        | integrations.edit   |
 | DELETE | `/ad-accounts/:id`                | Disconnects: marks it `disconnected`, clears the token, scopes and error, removes its scheduler, keeps the row and history                                                                                     | integrations.delete |
 
-**`AdsProvider` interface** (`apps/api/src/providers/`), one implementation per platform plus `SimulatedAdsProvider`, which returns the design's sample data. `ADS_PROVIDER_<PLATFORM>=simulated|live` chooses per platform; `live` fails fast until that provider exists (C1–C4). `ProviderAccount` is the stored account metadata plus the decrypted token — only the provider layer sees the token.
+**`AdsProvider` interface** (`apps/api/src/providers/`), one implementation per platform plus `SimulatedAdsProvider`, which returns the design's sample data. `ADS_PROVIDER_<PLATFORM>=simulated|live` chooses per platform. Google LSA has a live connector (C1); `live` for the other platforms fails fast until C2–C4. `ProviderAccount` is the stored account metadata plus the decrypted token — only the provider layer sees the token.
 
 ```ts
 interface ProviderAccount {
@@ -55,15 +55,43 @@ The simulated provider has one account per platform with the seed's external ids
 
 Tokens are encrypted with AES-256-GCM (`ADS_TOKEN_ENCRYPTION_KEY`, required in production). OAuth state is a short-lived signed JWT whose `jti` is stored in Redis and consumed with `GETDEL`, so a callback cannot be replayed.
 
+### Google LSA (live, C1)
+
+`ADS_PROVIDER_GOOGLE_LSA=live` uses the Google Ads API **v26 REST** endpoints through `GoogleAdsClient` (`providers/googleLsaClient.ts`) and `GoogleLsaProvider` (`providers/googleLsa.ts`). It needs `GOOGLE_ADS_DEVELOPER_TOKEN`, `GOOGLE_ADS_CLIENT_ID`, `GOOGLE_ADS_CLIENT_SECRET`, and optionally `GOOGLE_ADS_LOGIN_CUSTOMER_ID` and `GOOGLE_ADS_API_VERSION` (default `v26`). OAuth requests the `https://www.googleapis.com/auth/adwords` scope with offline access. The refresh token is stored encrypted; access tokens are cached in memory and refreshed on expiry or a `401`.
+
+The connector reads standalone `LOCAL_SERVICES` campaigns and Local Services Performance Max campaigns (`PERFORMANCE_MAX` with `pmax_campaign_settings.local_services_enabled = true`). On connect it lists accessible customers and keeps non-manager accounts that already have at least one such campaign. An account with LSA set up but no existing campaign is not discovered yet (C1 limitation).
+
+Google budgets are average daily. Synced LSA campaigns get `budgetPeriod: monthly`, read as `daily micros × 30.4`; `setBudget` writes a monthly budget as `monthly ÷ 30.4` in micros, a daily one as is, and refuses a `total` budget without changing anything. Spend comes from campaign cost, leads from charged `local_services_lead` rows, and calls are charged `PHONE_CALL` leads, so spend, CPL and call counts reconcile. Revenue is `0` because LSA revenue is not in this module. Pause/resume and budget changes mutate existing campaigns only. The Google Ads API cannot create standalone LSA campaigns, so `pushCampaign` fails and launching a live LSA draft without an `externalId` returns `409 CONFLICT` with `details.reason = campaign_creation_unsupported`; the campaign stays `draft`.
+
+### Budget periods
+
+Every campaign has `budgetPeriod`: `monthly`, `daily` or `total` (the whole run). The amount means what the period says, and it is how the platform reads it, so a sync stores the provider's period with the amount and `ads.push` passes it to `setBudget`. A provider refuses a period it cannot hold. New campaigns default to `monthly`. The period can change only while the campaign is a draft that is not on the platform yet; after that a PATCH with another period returns `409 CONFLICT` with `details.reason = budget_period_locked`. Progress compares the spend in the period with the budget, counted from the newest day with metrics: that day's month, that day, or every day (`campaignTotals` in `packages/shared/src/metrics.ts`).
+
+### LinkedIn Ads (task C4)
+
+`apps/api/src/providers/linkedin.ts`, live with `ADS_PROVIDER_LINKEDIN_ADS=live` plus `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET` and `LINKEDIN_API_VERSION` (YYYYMM; the API refuses to start in live mode without them). Redirect URI to register in the LinkedIn app: `<API_PUBLIC_URL>/api/v1/ad-accounts/callback/linkedin_ads`. Scopes `r_ads`, `r_ads_reporting`, `rw_ads`; LinkedIn must have granted the app the Advertising API product.
+
+| Operation | LinkedIn call | Notes |
+| --- | --- | --- |
+| Sign-in | OAuth 2.0 authorization code | Tokens last about 60 days; then the account shows "needs attention" and is connected again. |
+| Ad accounts | `GET /rest/adAccounts?q=search` (active) | |
+| Campaigns | `GET /rest/adAccounts/{id}/adCampaigns?q=search` (paged) | `ACTIVE`→live, `PAUSED`→paused, `DRAFT`→draft, `COMPLETED`/`ARCHIVED`/`CANCELED`→ended, removed ones left out. Budget: `totalBudget`, else `dailyBudget` (known gap: Lulu has one budget type). |
+| Metrics | `GET /rest/adAnalytics?q=analytics&pivot=CAMPAIGN&timeGranularity=DAILY` | leads = `oneClickLeads`; conversions = website conversions + leads; spend and revenue in the account currency. |
+| Pause / resume | `PARTIAL_UPDATE` of `status` | |
+| Budget | `PARTIAL_UPDATE` of `totalBudget` | Refused when the currency differs from the account's. Budget meaning differs from LSA (monthly): to be unified with a budget type before C2. |
+| Create campaign | — | Not supported yet (needs a campaign group, targeting and creatives). `campaignCreationSupported` blocks launching a live LinkedIn draft without a LinkedIn campaign, like LSA; create it in LinkedIn Campaign Manager and sync it. |
+
+Errors become `LinkedInApiError`; rate limits (429) and server errors are retried by the job, the rest fail the sync run with LinkedIn's message.
+
 ## Campaigns
 
 | Method  | Path                                  | What                                                                                                                                                                                                                                                                        | Permission                              |
 | ------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| GET     | `/campaigns`                        | List with totals (spend, leads, CPL, progress = spend ÷ budget). Filters `platform`, `status`; `q` matches name or objective; sort `name` (default), `createdAt`, `startAt` or `budget`, with `-` for descending                                           | campaigns.view                          |
+| GET     | `/campaigns`                        | List with totals (spend, leads, CPL, progress = spend in the budget period ÷ budget). Filters `platform`, `status`; `q` matches name or objective; sort `name` (default), `createdAt`, `startAt` or `budget`, with `-` for descending                                           | campaigns.view                          |
 | POST    | `/campaigns`                        | Create a draft; the owner defaults to the current user and an `adAccountId` must exist in the workspace and match the platform                                                                                                                                            | campaigns.create                        |
 | GET     | `/campaigns/:id`                    | Detail: metrics, plan steps, creatives, rationale, next step                                                                                                                                                                                                                | campaigns.view                          |
-| PATCH   | `/campaigns/:id`                    | Edit a draft or its details. A budget change whose absolute amount is above the policy threshold holds the whole PATCH: the campaign is unchanged and the response is `202` with the open `budget_change` `ApprovalRequest`                                           | campaigns.edit                          |
-| POST    | `/campaigns/:id/launch`             | Runs the launch checklist. A required approval returns `202` with the open `launch` `ApprovalRequest` and keeps the campaign in draft; a failed checklist returns `409` with it in `details`; on success the status becomes `live`, then `ads.push` is queued | campaigns.edit (+ approval if required) |
+| PATCH   | `/campaigns/:id`                    | Edit a draft or its details. A budget change whose absolute amount is above the policy threshold holds the whole PATCH: the campaign is unchanged and the response is `202` with the open `budget_change` `ApprovalRequest`. `budgetPeriod` changes only on a draft not yet pushed, otherwise `409` with `reason = budget_period_locked` | campaigns.edit                          |
+| POST    | `/campaigns/:id/launch`             | Runs the launch checklist. A required approval returns `202` with the open `launch` `ApprovalRequest` and keeps the campaign in draft; a failed checklist returns `409` with it in `details`; a live Google LSA draft without an `externalId` returns `409` with `reason = campaign_creation_unsupported`; on success the status becomes `live`, then `ads.push` is queued | campaigns.edit (+ approval if required) |
 | POST    | `/campaigns/:id/pause`, `/resume` | Only `live → paused` and `paused → live`; the status changes locally, then `ads.push` is queued. Any other status returns `409`                                                                                                                                   | campaigns.edit                          |
 | GET     | `/campaigns/:id/checklist`          | The launch checklist items and which pass                                                                                                                                                                                                                                   | campaigns.view                          |
 | GET/PUT | `/campaigns/:id/plan`               | `{ steps: [...] }`, ordered; PUT replaces all active steps (at most 20)                                                                                                                                                                                                   | campaigns.view / edit                   |

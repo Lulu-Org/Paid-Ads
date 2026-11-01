@@ -30,10 +30,22 @@ services:
       # AES-256-GCM key for ad-account tokens (required in production).
       - key: ADS_TOKEN_ENCRYPTION_KEY
         generateValue: true
-      # Public API URL used for the simulated OAuth callback (the Render link).
+      # Public API URL used for the OAuth callback (the Render link).
       - key: API_PUBLIC_URL
         sync: false
-      # Provider per platform: simulated | live. live fails until that connector exists (C1-C4).
+      # Google Ads API credentials for live Google LSA (required when the provider is live).
+      - key: GOOGLE_ADS_DEVELOPER_TOKEN
+        sync: false
+      - key: GOOGLE_ADS_CLIENT_ID
+        sync: false
+      - key: GOOGLE_ADS_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_ADS_LOGIN_CUSTOMER_ID
+        sync: false
+      - key: GOOGLE_ADS_API_VERSION
+        value: v26
+      # Provider per platform: simulated | live. Google LSA is live-capable (C1); live fails for
+      # the other platforms until their connector exists (C2-C4).
       - key: ADS_PROVIDER_GOOGLE_LSA
         value: simulated
       - key: ADS_PROVIDER_GOOGLE_ADS
@@ -42,8 +54,15 @@ services:
         value: simulated
       - key: ADS_PROVIDER_LINKEDIN_ADS
         value: simulated
+      # LinkedIn app (C4). Set these, then switch ADS_PROVIDER_LINKEDIN_ADS to live.
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false
+      - key: LINKEDIN_API_VERSION
+        sync: false
       # "true" loads the design's sample data on every start (the entrypoint runs the seed).
-      # Off since Oct 23, 2026: the live workspace was emptied of sample data at Dave's request.
+      # Keep it "false" once real ad accounts are connected, so samples never mix with real data.
       - key: SEED_ON_START
         value: "false"
       - key: SEED_OWNER_PASSWORD

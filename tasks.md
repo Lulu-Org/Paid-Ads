@@ -29,10 +29,10 @@ Team: Sudais (PM), Abdul (Samteck), Franklin, theLady.
 | ID | Task | Owner | Status | Waits for |
 | --- | --- | --- | --- | --- |
 | C0 | `AdsProvider` interface, simulated provider, `ads.sync` and `ads.push` workers, OAuth connect flow, encrypted tokens | Franklin | open | B2 |
-| C1 | Google LSA provider (Google Ads API, Local Services) | Franklin | open | C0, Dave's Google Ads developer token |
+| C1 | Google LSA provider (Google Ads API, Local Services) | Franklin | done | C0, Dave's Google Ads developer token |
 | C2 | Google Ads provider | Franklin | open | C1 |
 | C3 | Meta Ads provider | theLady | open | C0, Dave's Meta app |
-| C4 | LinkedIn Ads provider | Sudais | open | C0, Dave's LinkedIn access |
+| C4 | LinkedIn Ads provider | Sudais | in review | C0, Dave's LinkedIn access |
 | R | Each phase: deploy, test with Dave, fix his review | Sudais | open | |
 
 Pages move from mock to the real API one area at a time with `NEXT_PUBLIC_REAL_API` (`apps/web/src/lib/api/index.ts`), as in the CRM.

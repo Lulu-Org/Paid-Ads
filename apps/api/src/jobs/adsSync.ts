@@ -97,6 +97,7 @@ export function processAdsSync(payload: AdsSyncPayload): Promise<AdsSyncResult> 
             endAt: external.endAt,
             budgetAmount: external.budget.amount,
             budgetCurrency: external.budget.currency,
+            budgetPeriod: external.budgetPeriod,
             ownerId,
           };
           campaigns.push(
@@ -124,6 +125,7 @@ export function processAdsSync(payload: AdsSyncPayload): Promise<AdsSyncResult> 
             clicks: metric.clicks,
             conversions: metric.conversions,
             leads: metric.leads,
+            calls: metric.calls,
             spendAmount: metric.spend.amount,
             revenueAmount: metric.revenue.amount,
             currency: metric.spend.currency,

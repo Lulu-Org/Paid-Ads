@@ -376,7 +376,7 @@ const campaignPaths: OpenApiPaths = {
       operationId: 'updateCampaign',
       summary: 'Update a campaign',
       description:
-        'Edits details and schedule. The platform cannot change. A budget change whose absolute amount is above the policy threshold holds the whole PATCH: the campaign stays unchanged and the response is 202 with the open budget_change ApprovalRequest. Otherwise the change is applied and the campaign returned. Needs campaigns: edit.',
+        'Edits details and schedule. The platform cannot change. A budget change whose absolute amount is above the policy threshold holds the whole PATCH: the campaign stays unchanged and the response is 202 with the open budget_change ApprovalRequest. The budget period changes only on a draft not yet pushed; otherwise 409 with reason budget_period_locked. Otherwise the change is applied and the campaign returned. Needs campaigns: edit.',
       tags: ['Campaigns'],
       security: bearer,
       parameters: [campaignIdParameter],
@@ -388,6 +388,7 @@ const campaignPaths: OpenApiPaths = {
         '401': errorResponse('Missing, invalid or expired token.'),
         '403': errorResponse('FORBIDDEN.'),
         '404': errorResponse('Campaign not found.'),
+        '409': errorResponse('The budget period is locked once the campaign is on the platform.'),
       },
     },
   },
@@ -1441,8 +1442,6 @@ export const paths: OpenApiPaths = {
   ...campaignPaths,
   ...overviewPaths,
   ...libraryPaths,
-  ...libraryPaths,
   ...opsPaths,
   ...controlPaths,
-  ...opsPaths,
 };

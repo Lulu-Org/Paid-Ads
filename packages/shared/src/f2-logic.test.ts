@@ -8,10 +8,10 @@ const base = { workspaceId: "w", createdAt: "2026-01-01T00:00:00.000Z", updatedA
 const eur = (amount: number) => ({ amount, currency: "EUR" });
 const campaign = (id: string, platform: Campaign["platform"], extra: Partial<Campaign> = {}): Campaign => ({
   ...base, id, adAccountId: null, platform, externalId: null, name: id, status: "live", objective: "Leads",
-  audienceSummary: null, startAt: null, endAt: null, budget: eur(1000), rationale: null, nextStep: null, ownerId: "u", ...extra,
+  audienceSummary: null, startAt: null, endAt: null, budget: eur(1000), budgetPeriod: "monthly", rationale: null, nextStep: null, ownerId: "u", ...extra,
 });
 const day = (date: string, spend: number, revenue: number, leads: number, clicks = 100): CampaignMetricDay => ({
-  date, impressions: 1000, clicks, conversions: leads, leads, spend: eur(spend), revenue: eur(revenue),
+  date, impressions: 1000, clicks, conversions: leads, leads, calls: 0, spend: eur(spend), revenue: eur(revenue),
 });
 
 const campaigns = [campaign("g", "google_ads"), campaign("m", "meta_ads"), campaign("gone", "meta_ads", { deletedAt: "2026-06-01T00:00:00.000Z" })];
@@ -50,6 +50,19 @@ describe("buildReport", () => {
 });
 
 describe("buildPlanning", () => {
+  it("adds money in whole cents, without floating point noise", () => {
+    const tenths = (id: string, amount: number) => ({ platform: id as "google_ads", planned: eur(amount), target: { metric: "leads" as const, value: 1 } });
+    const plan: BudgetPlan = {
+      ...base, id: "p", name: "Cents", month: "2026-06", status: "draft",
+      channels: [tenths("google_ads", 0.1), tenths("meta_ads", 0.2)],
+      steps: [], rationale: { goal: "", constraint: "", signal: "" }, nextReviewAt: null, nextReviewNote: null,
+    };
+    expect(0.1 + 0.2).not.toBe(0.3);
+    expect(buildPlanning(plan, eur(16000), {}, null).allocated).toEqual(eur(0.3));
+    const history = channelHistory([campaign("c", "google_ads")], { c: [day("2026-06-01", 0.1, 0.1, 1), day("2026-06-02", 0.2, 0.2, 1)] }, "EUR");
+    expect(history.google_ads).toEqual({ spend: 0.3, leads: 2, revenue: 0.3 });
+  });
+
   const plan: BudgetPlan = {
     ...base, id: "p", name: "June", month: "2026-06", status: "draft",
     channels: [

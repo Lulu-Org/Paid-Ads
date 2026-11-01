@@ -74,6 +74,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-06-01T00:00:00.000Z",
     endAt: "2026-06-30T23:59:59.000Z",
     budget: eur(6000),
+    budgetPeriod: "total",
     rationale:
       "Search demand is strongest for high-intent terms around the spring launch. The campaign is connected to CRM attribution so lead quality can be reviewed beyond the click.",
     nextStep: "Review search terms and shift 8% of spend into the two highest-converting ad groups.",
@@ -92,6 +93,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-06-01T00:00:00.000Z",
     endAt: null,
     budget: eur(3000),
+    budgetPeriod: "monthly",
     rationale:
       "Local Services is producing reliable call volume in the service area. The current signal is stable, so the campaign is kept live while the lead response time is improved.",
     nextStep: "Connect the missed-call workflow and compare booked jobs against raw calls.",
@@ -110,6 +112,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-06-08T00:00:00.000Z",
     endAt: "2026-07-08T23:59:59.000Z",
     budget: eur(4500),
+    budgetPeriod: "total",
     rationale:
       "Meta is delivering the lowest cost per lead while the short-form creative receives strong engagement. The budget recommendation is based on qualified lead rate, not only volume.",
     nextStep: "Scale the winning video concept by 12% and keep the control creative for comparison.",
@@ -128,6 +131,7 @@ export const demoCampaigns: Campaign[] = [
     startAt: "2026-10-01T00:00:00.000Z",
     endAt: "2026-12-31T23:59:59.000Z",
     budget: eur(2500),
+    budgetPeriod: "total",
     rationale: "The draft is planned around the Q4 buying cycle and is waiting for final creative approval before launch.",
     nextStep: "Approve the case study asset and define the CRM lead score threshold.",
     ownerId: "user_alex",
@@ -141,25 +145,27 @@ export const demoCampaigns: Campaign[] = [
 export function spreadDays(
   start: string,
   count: number,
-  totals: { impressions: number; clicks: number; leads: number; spend: number; revenue: number },
+  totals: { impressions: number; clicks: number; leads: number; calls?: number; spend: number; revenue: number },
 ): CampaignMetricDay[] {
   const weights = Array.from({ length: count }, (_, i) => 0.8 + (0.4 * i) / Math.max(1, count - 1));
   const sumWeights = weights.reduce((a, b) => a + b, 0);
   const cents = (n: number) => Math.round(n * 100) / 100;
   const share = (total: number, i: number, round: (n: number) => number, used: number) =>
     i === count - 1 ? round(total - used) : round((total * weights[i]!) / sumWeights);
-  const used = { impressions: 0, clicks: 0, leads: 0, spend: 0, revenue: 0 };
+  const used = { impressions: 0, clicks: 0, leads: 0, calls: 0, spend: 0, revenue: 0 };
   return weights.map((_, i) => {
     const row = {
       impressions: share(totals.impressions, i, Math.round, used.impressions),
       clicks: share(totals.clicks, i, Math.round, used.clicks),
       leads: share(totals.leads, i, Math.round, used.leads),
+      calls: share(totals.calls ?? 0, i, Math.round, used.calls),
       spend: share(totals.spend, i, cents, used.spend),
       revenue: share(totals.revenue, i, cents, used.revenue),
     };
     used.impressions += row.impressions;
     used.clicks += row.clicks;
     used.leads += row.leads;
+    used.calls += row.calls;
     used.spend = cents(used.spend + row.spend);
     used.revenue = cents(used.revenue + row.revenue);
     const date = new Date(Date.parse(`${start}T00:00:00.000Z`) + i * 86_400_000).toISOString().slice(0, 10);
@@ -169,6 +175,7 @@ export function spreadDays(
       clicks: row.clicks,
       conversions: row.leads,
       leads: row.leads,
+      calls: row.calls,
       spend: eur(row.spend),
       revenue: eur(row.revenue),
     };
@@ -178,7 +185,7 @@ export function spreadDays(
 // Totals from the design: impressions, clicks, leads (= conversions), spend, revenue.
 export const demoMetricDays: Record<string, CampaignMetricDay[]> = {
   campaign_spring_berlin: spreadDays("2026-06-01", 30, { impressions: 412800, clicks: 18400, leads: 184, spend: 4280, revenue: 20480 }),
-  campaign_local_calls: spreadDays("2026-06-01", 30, { impressions: 86100, clicks: 7800, leads: 96, spend: 1940, revenue: 11520 }),
+  campaign_local_calls: spreadDays("2026-06-01", 30, { impressions: 86100, clicks: 7800, leads: 96, calls: 96, spend: 1940, revenue: 11520 }),
   campaign_studio_awareness: spreadDays("2026-06-08", 30, { impressions: 628400, clicks: 31700, leads: 231, spend: 2660, revenue: 18920 }),
   campaign_b2b_q4: [],
 };

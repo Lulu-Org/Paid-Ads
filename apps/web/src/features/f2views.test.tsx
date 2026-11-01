@@ -104,7 +104,10 @@ describe("Audiences", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Create audience" }));
     expect(await screen.findByText("CRM · Won customers created. The first sync is running.", {}, slow)).toBeTruthy();
     const saved = (await api.audiences.list()).data.find((a) => a.name === "CRM · Won customers");
-    expect(saved).toMatchObject({ source: "crm_segment", platforms: ["meta_ads"], syncing: true });
+    // Like the API: a new audience is not syncing, it has just never synced.
+    expect(saved).toMatchObject({ source: "crm_segment", platforms: ["meta_ads"], syncing: false, lastSyncedAt: null });
+    await waitFor(() => expect(screen.getAllByText("Not synced yet").length).toBeGreaterThan(0), slow);
+    expect(screen.getAllByRole("button", { name: "Refresh now" }).length).toBe(2);
   });
 });
 

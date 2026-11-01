@@ -23,6 +23,7 @@ const campaign: Campaign = {
   startAt: "2026-11-01T00:00:00.000Z",
   endAt: null,
   budget: { amount: 2000, currency: "EUR" },
+  budgetPeriod: "monthly",
   rationale: null,
   nextStep: null,
   ownerId: "u1",

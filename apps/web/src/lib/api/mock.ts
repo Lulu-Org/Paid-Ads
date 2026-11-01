@@ -97,7 +97,7 @@ const db = {
 
 // Spend so far this month: the campaigns' spend in the sample data.
 const usedThisMonth = () =>
-  db.campaigns.reduce((sum, c) => sum + campaignTotals(demoMetricDays[c.id] ?? [], c.budget).spend.amount, 0);
+  db.campaigns.reduce((sum, c) => sum + campaignTotals(demoMetricDays[c.id] ?? [], c.budget, c.budgetPeriod).spend.amount, 0);
 
 function findMember(userId: string) {
   const member = db.team.find((m) => m.userId === userId);
@@ -149,7 +149,7 @@ export const mockApi = {
     list(query: Partial<CampaignListQuery> = {}) {
       const rows: CampaignListItem[] = db.campaigns
         .filter((c) => (!query.platform || c.platform === query.platform) && (!query.status || c.status === query.status))
-        .map((c) => ({ ...c, totals: campaignTotals(demoMetricDays[c.id] ?? [], c.budget) }));
+        .map((c) => ({ ...c, totals: campaignTotals(demoMetricDays[c.id] ?? [], c.budget, c.budgetPeriod) }));
       return delay(paginate(rows, query.page, query.pageSize));
     },
     async get(id: string): Promise<CampaignDetail> {
@@ -157,7 +157,7 @@ export const mockApi = {
       const days = demoMetricDays[id] ?? [];
       return delay({
         ...campaign,
-        totals: campaignTotals(days, campaign.budget),
+        totals: campaignTotals(days, campaign.budget, campaign.budgetPeriod),
         plan: demoPlans[id] ?? [],
         creativeIds: demoCampaignCreatives[id] ?? [],
         days,
@@ -168,7 +168,8 @@ export const mockApi = {
       const campaign: Campaign = {
         ...record(),
         id: newId("campaign"),
-        adAccountId: parsed.adAccountId ?? db.adAccounts.find((a) => a.platform === parsed.platform)?.id ?? null,
+        // Like the API: the campaign is linked to an ad account only when one is given.
+        adAccountId: parsed.adAccountId ?? null,
         platform: parsed.platform,
         externalId: null,
         name: parsed.name,
@@ -178,6 +179,7 @@ export const mockApi = {
         startAt: parsed.startAt ?? null,
         endAt: parsed.endAt ?? null,
         budget: parsed.budget,
+        budgetPeriod: parsed.budgetPeriod,
         rationale: parsed.rationale ?? null,
         nextStep: parsed.nextStep ?? null,
         ownerId: parsed.ownerId ?? CURRENT_USER_ID,
@@ -271,7 +273,8 @@ export const mockApi = {
         matchRate: null,
         exclusions: [],
         campaignIds: [] as string[],
-        syncing: true,
+        // Like the API: `syncing` is true only while a sync job runs; a new audience has never synced.
+        syncing: false,
       };
       db.audiences.unshift(audience);
       return delay(audience);

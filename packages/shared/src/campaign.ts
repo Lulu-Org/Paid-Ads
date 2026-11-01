@@ -10,6 +10,9 @@ export const adPlatformSchema = z.enum(adPlatforms);
 export const connectionStatusSchema = z.enum(["connected", "needs_attention", "disconnected"]);
 export const campaignStatusSchema = z.enum(["draft", "live", "paused", "ended"]);
 export const planStepStatusSchema = z.enum(["done", "current", "upcoming"]);
+// What a budget amount covers: a calendar month, one day, or the whole run of the campaign.
+export const budgetPeriods = ["monthly", "daily", "total"] as const;
+export const budgetPeriodSchema = z.enum(budgetPeriods);
 
 // ---------- Ad accounts ----------
 
@@ -43,6 +46,7 @@ export const campaignSchema = baseRecordSchema.extend({
   // Null = always on.
   endAt: timestampSchema.nullable(),
   budget: moneySchema,
+  budgetPeriod: budgetPeriodSchema,
   // The design's "Why this campaign" and "Next step".
   rationale: z.string().max(2000).nullable(),
   nextStep: z.string().max(1000).nullable(),
@@ -58,10 +62,12 @@ export const campaignTotalsSchema = z.object({
   clicks: z.number().int().min(0),
   conversions: z.number().int().min(0),
   leads: z.number().int().min(0),
+  calls: z.number().int().min(0),
   ctr: z.number().min(0).nullable(),
   cpl: moneySchema.nullable(),
   roas: z.number().min(0).nullable(),
-  // Spend ÷ budget, 0 to 1 (capped).
+  // Spend in the budget's period ÷ budget, 0 to 1 (capped): the newest synced month for a monthly
+  // budget, the newest synced day for a daily one, everything for a total one.
   progress: z.number().min(0).max(1),
 });
 
@@ -81,6 +87,7 @@ export const campaignMetricDaySchema = z.object({
   clicks: z.number().int().min(0),
   conversions: z.number().int().min(0),
   leads: z.number().int().min(0),
+  calls: z.number().int().min(0),
   spend: moneySchema,
   revenue: moneySchema,
 });
@@ -102,13 +109,17 @@ export const campaignCreateSchema = z.object({
   startAt: timestampSchema.nullable().optional(),
   endAt: timestampSchema.nullable().optional(),
   budget: moneySchema.refine((m) => m.amount > 0, "budgetPositive"),
+  budgetPeriod: budgetPeriodSchema.default("monthly"),
   rationale: campaignSchema.shape.rationale.optional(),
   nextStep: campaignSchema.shape.nextStep.optional(),
   ownerId: idSchema.optional(),
 });
 
-// PATCH /campaigns/:id. The platform cannot change after creation.
-export const campaignUpdateSchema = campaignCreateSchema.omit({ platform: true }).partial();
+// PATCH /campaigns/:id. The platform cannot change after creation; the budget period only while a draft.
+export const campaignUpdateSchema = campaignCreateSchema
+  .omit({ platform: true })
+  .extend({ budgetPeriod: budgetPeriodSchema })
+  .partial();
 
 export const campaignSortSchema = z.enum([
   "name",
@@ -161,6 +172,7 @@ export type AdAccountConnectResult = z.infer<typeof adAccountConnectResultSchema
 export type ConnectionStatus = z.infer<typeof connectionStatusSchema>;
 export type CampaignStatus = z.infer<typeof campaignStatusSchema>;
 export type PlanStepStatus = z.infer<typeof planStepStatusSchema>;
+export type BudgetPeriod = z.infer<typeof budgetPeriodSchema>;
 export type AdAccount = z.infer<typeof adAccountSchema>;
 export type Campaign = z.infer<typeof campaignSchema>;
 export type CampaignTotals = z.infer<typeof campaignTotalsSchema>;

@@ -28,7 +28,7 @@ import {
 
 const totalsOf = (id: string) => {
   const campaign = demoCampaigns.find((c) => c.id === id)!;
-  return campaignTotals(demoMetricDays[id]!, campaign.budget);
+  return campaignTotals(demoMetricDays[id]!, campaign.budget, campaign.budgetPeriod);
 };
 
 describe("sample data", () => {
@@ -55,10 +55,10 @@ describe("sample data", () => {
       cpl: { amount: 23.26 },
     });
     expect(Math.round(totalsOf("campaign_spring_berlin").progress * 100)).toBe(71);
-    expect(totalsOf("campaign_local_calls")).toMatchObject({ spend: { amount: 1940 }, leads: 96, cpl: { amount: 20.21 } });
+    expect(totalsOf("campaign_local_calls")).toMatchObject({ spend: { amount: 1940 }, leads: 96, calls: 96, cpl: { amount: 20.21 } });
     expect(Math.round(totalsOf("campaign_local_calls").progress * 100)).toBe(65);
     expect(totalsOf("campaign_studio_awareness")).toMatchObject({ spend: { amount: 2660 }, leads: 231, cpl: { amount: 11.52 } });
-    expect(totalsOf("campaign_b2b_q4")).toMatchObject({ spend: { amount: 0 }, leads: 0, cpl: null, progress: 0 });
+    expect(totalsOf("campaign_b2b_q4")).toMatchObject({ spend: { amount: 0 }, leads: 0, calls: 0, cpl: null, progress: 0 });
   });
 
   it("links every campaign to existing creatives, plans and accounts", () => {

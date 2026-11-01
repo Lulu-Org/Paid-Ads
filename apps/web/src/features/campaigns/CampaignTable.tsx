@@ -28,6 +28,7 @@ export function CampaignTable({
   const t = useTranslations("campaigns.table");
   const tPlatform = useTranslations("platforms");
   const tStatus = useTranslations("campaignStatus");
+  const tPeriod = useTranslations("budgetPeriods");
   const format = useFormat();
 
   // "+ Filter" adds a status filter on top of the platform pills.
@@ -183,7 +184,7 @@ export function CampaignTable({
                   </td>
                   <td className="px-3 py-3">
                     <strong className="block text-[11px] text-text-strong">{format.money(c.totals.spend)}</strong>
-                    <small className="block text-[10px] text-text-faint">{format.money(c.budget)}</small>
+                    <small className="block text-[10px] text-text-faint">{tPeriod(`${c.budgetPeriod}.amount`, { amount: format.money(c.budget) })}</small>
                     <i className="mt-1.5 block h-1 w-24 overflow-hidden rounded bg-[#f0eff4]" aria-hidden>
                       <em className="block h-full rounded bg-[#7065df]" style={{ width: `${c.totals.progress * 100}%` }} />
                     </i>

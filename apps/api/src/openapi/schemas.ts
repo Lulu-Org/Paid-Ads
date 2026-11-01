@@ -32,6 +32,7 @@ import {
   meUpdateSchema,
   overviewSchema,
   rolePermissionsSchema,
+  syncRunSchema,
   trackingHealthSchema,
   userSchema,
   approvalPolicySchema,

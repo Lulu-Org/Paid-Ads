@@ -37,6 +37,7 @@ interface CampaignBody {
     ownerId: string;
     externalId: string | null;
     budget: { amount: number; currency: string };
+    budgetPeriod: string;
     totals?: {
       spend: { amount: number; currency: string };
       leads: number;
@@ -249,7 +250,26 @@ describe('campaign routes (int)', () => {
         ownerId: SEED_JAMIE_ID,
         externalId: null,
         budget: { amount: 1000, currency: 'EUR' },
+        budgetPeriod: 'monthly',
       });
+    });
+
+    it('changes the budget period of a draft, and refuses it once the campaign is on the platform', async () => {
+      const draft = await createCampaignRow();
+      const changed = await auth(request(app).patch(`/api/v1/campaigns/${draft}`)).send({
+        budgetPeriod: 'daily',
+      });
+      expect(changed.status).toBe(200);
+      expect((changed.body as CampaignBody).data.budgetPeriod).toBe('daily');
+
+      const live = await createCampaignRow({ status: 'live', externalId: `ext-${randomUUID()}` });
+      const locked = await auth(request(app).patch(`/api/v1/campaigns/${live}`)).send({
+        budgetPeriod: 'total',
+      });
+      expect(locked.status).toBe(409);
+      expect((locked.body as ErrorBody).error.details).toEqual({ reason: 'budget_period_locked' });
+      const detail = await auth(request(app).get(`/api/v1/campaigns/${live}`));
+      expect((detail.body as CampaignBody).data.budgetPeriod).toBe('monthly');
     });
 
     it('rejects an unknown ad account and an account on another platform', async () => {

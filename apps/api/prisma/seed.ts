@@ -128,6 +128,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     endAt: new Date('2026-06-30T23:59:59.000Z'),
     budgetAmount: money(6000),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'total',
     rationale:
       'Search demand is strongest for high-intent terms around the spring launch. The campaign is connected to CRM attribution so lead quality can be reviewed beyond the click.',
     nextStep:
@@ -147,6 +148,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     startAt: new Date('2026-06-01T00:00:00.000Z'),
     budgetAmount: money(3000),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'monthly',
     rationale:
       'Local Services is producing reliable call volume in the service area. The current signal is stable, so the campaign is kept live while the lead response time is improved.',
     nextStep: 'Connect the missed-call workflow and compare booked jobs against raw calls.',
@@ -166,6 +168,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     endAt: new Date('2026-07-08T23:59:59.000Z'),
     budgetAmount: money(4500),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'total',
     rationale:
       'Meta is delivering the lowest cost per lead while the short-form creative receives strong engagement. The budget recommendation is based on qualified lead rate, not only volume.',
     nextStep:
@@ -184,6 +187,7 @@ const campaigns: WithId<Prisma.CampaignUncheckedCreateInput>[] = [
     endAt: new Date('2026-12-31T23:59:59.000Z'),
     budgetAmount: money(2500),
     budgetCurrency: 'EUR',
+    budgetPeriod: 'total',
     rationale:
       'The draft is planned around the Q4 buying cycle and is waiting for final creative approval before launch.',
     nextStep: 'Approve the case study asset and define the CRM lead score threshold.',
@@ -195,6 +199,7 @@ interface MetricTotals {
   impressions: number;
   clicks: number;
   leads: number;
+  calls?: number;
   spend: number;
   revenue: number;
 }
@@ -216,19 +221,21 @@ function spreadMetricDays(
   const cents = (n: number) => Math.round(n * 100) / 100;
   const share = (total: number, i: number, round: (n: number) => number, used: number): number =>
     i === count - 1 ? round(total - used) : round((total * weights[i]!) / sumWeights);
-  const used = { impressions: 0, clicks: 0, leads: 0, spend: 0, revenue: 0 };
+  const used = { impressions: 0, clicks: 0, leads: 0, calls: 0, spend: 0, revenue: 0 };
 
   return weights.map((_, i) => {
     const row = {
       impressions: share(totals.impressions, i, Math.round, used.impressions),
       clicks: share(totals.clicks, i, Math.round, used.clicks),
       leads: share(totals.leads, i, Math.round, used.leads),
+      calls: share(totals.calls ?? 0, i, Math.round, used.calls),
       spend: share(totals.spend, i, cents, used.spend),
       revenue: share(totals.revenue, i, cents, used.revenue),
     };
     used.impressions += row.impressions;
     used.clicks += row.clicks;
     used.leads += row.leads;
+    used.calls += row.calls;
     used.spend = cents(used.spend + row.spend);
     used.revenue = cents(used.revenue + row.revenue);
     const date = new Date(Date.parse(`${start}T00:00:00.000Z`) + i * 86_400_000)
@@ -243,6 +250,7 @@ function spreadMetricDays(
       clicks: row.clicks,
       conversions: row.leads,
       leads: row.leads,
+      calls: row.calls,
       spendAmount: money(row.spend),
       revenueAmount: money(row.revenue),
       currency: 'EUR',
@@ -262,6 +270,7 @@ const metricDays: WithId<Prisma.CampaignMetricDayUncheckedCreateInput>[] = [
     impressions: 86100,
     clicks: 7800,
     leads: 96,
+    calls: 96,
     spend: 1940,
     revenue: 11520,
   }),

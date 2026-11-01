@@ -42,6 +42,42 @@ describe('envSchema', () => {
     );
   });
 
+  it('defaults the Google Ads API version and leaves credentials unset', () => {
+    const parsed = envSchema.parse(validSource);
+    expect(parsed.GOOGLE_ADS_API_VERSION).toBe('v26');
+    expect(parsed.GOOGLE_ADS_DEVELOPER_TOKEN).toBeUndefined();
+    expect(parsed.GOOGLE_ADS_CLIENT_ID).toBeUndefined();
+    expect(parsed.GOOGLE_ADS_CLIENT_SECRET).toBeUndefined();
+    expect(parsed.GOOGLE_ADS_LOGIN_CUSTOMER_ID).toBeUndefined();
+  });
+
+  it('requires Google Ads credentials when Google LSA runs live', () => {
+    const without = envSchema.safeParse({
+      ...validSource,
+      ADS_PROVIDER_GOOGLE_LSA: 'live',
+    });
+    expect(without.success).toBe(false);
+
+    const withCredentials = envSchema.safeParse({
+      ...validSource,
+      ADS_PROVIDER_GOOGLE_LSA: 'live',
+      GOOGLE_ADS_DEVELOPER_TOKEN: 'developer-token',
+      GOOGLE_ADS_CLIENT_ID: 'client-id.apps.googleusercontent.com',
+      GOOGLE_ADS_CLIENT_SECRET: 'client-secret',
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: '1234567890',
+    });
+    expect(withCredentials.success).toBe(true);
+  });
+
+  it('rejects a Google Ads API version that is not v<number>', () => {
+    expect(envSchema.safeParse({ ...validSource, GOOGLE_ADS_API_VERSION: '26' }).success).toBe(
+      false,
+    );
+    expect(
+      envSchema.parse({ ...validSource, GOOGLE_ADS_API_VERSION: 'v27' }).GOOGLE_ADS_API_VERSION,
+    ).toBe('v27');
+  });
+
   it('coerces PORT to a number', () => {
     const parsed = envSchema.parse({ ...validSource, PORT: '8080' });
     expect(parsed.PORT).toBe(8080);
