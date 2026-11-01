@@ -35,6 +35,25 @@ import {
   syncRunSchema,
   trackingHealthSchema,
   userSchema,
+  approvalPolicySchema,
+  approvalRequestCreateSchema,
+  automationActivitySchema,
+  automationRuleCreateSchema,
+  automationRuleSchema,
+  automationRuleUpdateSchema,
+  reportCreateSchema,
+  reportRunSchema,
+  reportSchema,
+  reportUpdateSchema,
+  spendLimitSchema,
+  spendLimitUpdateSchema,
+  operationsSummarySchema,
+  paymentMethodSchema,
+  statementSchema,
+  syncRunSchema,
+  teamInviteSchema,
+  teamMemberSchema,
+  teamMemberUpdateSchema,
 } from '@lulu/shared';
 import { z, type ZodType } from 'zod';
 
@@ -81,6 +100,24 @@ const COMPONENT_NAMES = {
   ApprovalRequest: approvalRequestSchema,
   Overview: overviewSchema,
   TrackingHealth: trackingHealthSchema,
+  SpendLimit: spendLimitSchema,
+  SpendLimitUpdateInput: spendLimitUpdateSchema,
+  ApprovalPolicy: approvalPolicySchema,
+  ApprovalRequestCreateInput: approvalRequestCreateSchema,
+  Report: reportSchema,
+  ReportCreateInput: reportCreateSchema,
+  ReportUpdateInput: reportUpdateSchema,
+  ReportRun: reportRunSchema,
+  AutomationRule: automationRuleSchema,
+  AutomationRuleCreateInput: automationRuleCreateSchema,
+  AutomationRuleUpdateInput: automationRuleUpdateSchema,
+  AutomationActivity: automationActivitySchema,
+  OperationsSummary: operationsSummarySchema,
+  TeamMember: teamMemberSchema,
+  TeamInviteInput: teamInviteSchema,
+  TeamMemberUpdateInput: teamMemberUpdateSchema,
+  PaymentMethod: paymentMethodSchema,
+  Statement: statementSchema,
 } as const satisfies Record<string, ZodType>;
 
 export type ComponentName = keyof typeof COMPONENT_NAMES;
@@ -106,6 +143,9 @@ export function toJsonSchema(schema: ZodType): JsonObject {
 // Single source of component schemas: every entry is a Zod schema from packages/shared.
 export function buildComponentSchemas(): Record<ComponentName, JsonObject> {
   return Object.fromEntries(
-    Object.entries(COMPONENT_NAMES).map(([name, schema]) => [name, toJsonSchema(schema)]),
+    Object.keys(COMPONENT_NAMES).map((name) => {
+      const componentName = name as ComponentName;
+      return [componentName, toJsonSchema(COMPONENT_NAMES[componentName])];
+    }),
   ) as Record<ComponentName, JsonObject>;
 }

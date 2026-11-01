@@ -22,7 +22,7 @@ COPY packages/shared packages/shared
 COPY apps/api apps/api
 
 # prisma generate reads DATABASE_URL from prisma.config.ts but never connects at build time
-ENV DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build"
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 
 RUN npm run db:generate -w @lulu/api
 RUN npm run build -w @lulu/api

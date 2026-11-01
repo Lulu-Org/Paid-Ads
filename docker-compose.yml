@@ -9,7 +9,7 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5433:5432"
     healthcheck:
       # -h 127.0.0.1 forces TCP: initdb's temporary server only listens on the
       # unix socket, so without it the healthcheck passes before the real
@@ -50,7 +50,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: "4000"
-      DATABASE_URL: postgresql://lulu:lulu_dev_password@postgres:5432/lulu
+      DATABASE_URL: postgresql://lulu:lulu_dev_password@postgres:5433/lulu
       REDIS_URL: redis://redis:6379
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       SEED_ON_START: ${SEED_ON_START:-true}

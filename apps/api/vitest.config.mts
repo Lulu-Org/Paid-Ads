@@ -7,7 +7,7 @@ export default defineConfig({
     exclude: ['**/*.int.test.ts'],
     env: {
       NODE_ENV: 'test',
-      DATABASE_URL: 'postgresql://user:pass@localhost:5432/crm_test',
+      DATABASE_URL: 'postgresql://user:pass@localhost:5433/crm_test',
       REDIS_URL: 'redis://localhost:6379',
     },
   },

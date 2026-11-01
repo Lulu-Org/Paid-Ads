@@ -90,7 +90,12 @@ describe('library routes (int)', () => {
       },
     });
     await db.creative.create({
-      data: { id: otherCreativeId, workspaceId: otherWorkspaceId, name: 'Other creative', type: 'image' },
+      data: {
+        id: otherCreativeId,
+        workspaceId: otherWorkspaceId,
+        name: 'Other creative',
+        type: 'image',
+      },
     });
     await db.conversionEvent.create({
       data: {
@@ -256,13 +261,21 @@ describe('library routes (int)', () => {
     it('answers 404 for another workspace creative', async () => {
       const get = await owner(request(app).get(`/api/v1/creatives/${otherCreativeId}`));
       expect(get.status).toBe(404);
-      const approve = await owner(request(app).post(`/api/v1/creatives/${otherCreativeId}/approve`));
+      const approve = await owner(
+        request(app).post(`/api/v1/creatives/${otherCreativeId}/approve`),
+      );
       expect(approve.status).toBe(404);
     });
 
     it('lists a creative test with the winner CPL advantage', async () => {
-      const a = await owner(request(app).post('/api/v1/creatives')).send({ name: 'Variant A', type: 'image' });
-      const b = await owner(request(app).post('/api/v1/creatives')).send({ name: 'Variant B', type: 'image' });
+      const a = await owner(request(app).post('/api/v1/creatives')).send({
+        name: 'Variant A',
+        type: 'image',
+      });
+      const b = await owner(request(app).post('/api/v1/creatives')).send({
+        name: 'Variant B',
+        type: 'image',
+      });
       const creativeA = (a.body as One).data.id;
       const creativeB = (b.body as One).data.id;
       creativeIds.push(creativeA, creativeB);
@@ -284,8 +297,24 @@ describe('library routes (int)', () => {
       });
       await db.campaignCreative.createMany({
         data: [
-          { workspaceId: SEED_WORKSPACE_ID, campaignId, creativeId: creativeA, variant: 'A', role: 'control', spendAmount: 100, leads: 10 },
-          { workspaceId: SEED_WORKSPACE_ID, campaignId, creativeId: creativeB, variant: 'B', role: 'winner', spendAmount: 100, leads: 20 },
+          {
+            workspaceId: SEED_WORKSPACE_ID,
+            campaignId,
+            creativeId: creativeA,
+            variant: 'A',
+            role: 'control',
+            spendAmount: 100,
+            leads: 10,
+          },
+          {
+            workspaceId: SEED_WORKSPACE_ID,
+            campaignId,
+            creativeId: creativeB,
+            variant: 'B',
+            role: 'winner',
+            spendAmount: 100,
+            leads: 20,
+          },
         ],
       });
 
@@ -308,7 +337,9 @@ describe('library routes (int)', () => {
       expect(test?.winnerLead).toBe(0.5);
 
       const winning = await owner(request(app).get(`/api/v1/creatives/${creativeB}`));
-      expect((winning.body as { data: { winning: boolean; campaignCount: number } }).data).toMatchObject({
+      expect(
+        (winning.body as { data: { winning: boolean; campaignCount: number } }).data,
+      ).toMatchObject({
         winning: true,
         campaignCount: 1,
       });
@@ -328,15 +359,19 @@ describe('library routes (int)', () => {
       eventIds.push(event.id);
       expect(event).toMatchObject({ value: null, health: 'needs_attention' });
 
-      const patched = await owner(request(app).patch(`/api/v1/conversion-events/${event.id}`)).send({
-        value: { amount: 50, currency: 'EUR' },
-      });
+      const patched = await owner(request(app).patch(`/api/v1/conversion-events/${event.id}`)).send(
+        {
+          value: { amount: 50, currency: 'EUR' },
+        },
+      );
       expect(patched.status).toBe(200);
       expect((patched.body as One).data.value).toEqual({ amount: 50, currency: 'EUR' });
     });
 
     it('answers 404 for another workspace event and 403 for a member delete', async () => {
-      const other = await owner(request(app).patch(`/api/v1/conversion-events/${otherEventId}`)).send({
+      const other = await owner(
+        request(app).patch(`/api/v1/conversion-events/${otherEventId}`),
+      ).send({
         name: 'Nope',
       });
       expect(other.status).toBe(404);
@@ -357,7 +392,12 @@ describe('library routes (int)', () => {
       expect(res.status).toBe(200);
       const body = (
         res.body as {
-          data: { model: string; dataQuality: number; revenue: { currency: string }; byPlatform: unknown[] };
+          data: {
+            model: string;
+            dataQuality: number;
+            revenue: { currency: string };
+            byPlatform: unknown[];
+          };
         }
       ).data;
       expect(body.model).toBe('data_driven');
