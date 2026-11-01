@@ -65,6 +65,14 @@ describe('provider registry', () => {
   it('refuses to start LinkedIn live without its app credentials', async () => {
     vi.stubEnv('ADS_PROVIDER_LINKEDIN_ADS', 'live');
     vi.stubEnv('LINKEDIN_CLIENT_ID', '');
-    await expect(import('./index')).rejects.toThrow(/LINKEDIN_CLIENT_ID/);
+    // The env check stops the process before any provider is built.
+    const exit = vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`exit ${String(code)}`);
+    });
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    await expect(import('./index')).rejects.toThrow('exit 1');
+    expect(String(log.mock.calls[0]?.[0])).toMatch(/LINKEDIN_CLIENT_ID/);
+    exit.mockRestore();
+    log.mockRestore();
   });
 });

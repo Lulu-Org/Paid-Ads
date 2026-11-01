@@ -50,7 +50,6 @@ import {
   operationsSummarySchema,
   paymentMethodSchema,
   statementSchema,
-  syncRunSchema,
   teamInviteSchema,
   teamMemberSchema,
   teamMemberUpdateSchema,
