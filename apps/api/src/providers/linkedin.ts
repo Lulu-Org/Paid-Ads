@@ -1,4 +1,4 @@
-import type { Campaign, CampaignStatus, Money } from '@lulu/shared';
+import type { BudgetPeriod, Campaign, CampaignStatus, Money } from '@lulu/shared';
 import type {
   AdsProvider,
   ExchangeCodeResult,
@@ -53,7 +53,9 @@ export class LinkedInApiError extends Error {
 /** An operation LinkedIn's API (or our model of it) cannot do; shown as a manual step, never faked. */
 export class ProviderOperationUnsupportedError extends Error {
   constructor(operation: string) {
-    super(`LinkedIn: ${operation} is not supported through the API yet; do it in LinkedIn Campaign Manager`);
+    super(
+      `LinkedIn: ${operation} is not supported through the API yet; do it in LinkedIn Campaign Manager`,
+    );
     this.name = 'ProviderOperationUnsupportedError';
   }
 }
@@ -124,12 +126,16 @@ const campaignIdFromUrn = (urn: string) => urn.slice(urn.lastIndexOf(':') + 1);
 const restliDate = (d: Date) =>
   `(year:${d.getUTCFullYear()},month:${d.getUTCMonth() + 1},day:${d.getUTCDate()})`;
 
-export function mapLinkedInCampaign(campaign: LiCampaign, accountCurrency: string): ExternalCampaign | null {
+export function mapLinkedInCampaign(
+  campaign: LiCampaign,
+  accountCurrency: string,
+): ExternalCampaign | null {
   const status = STATUS[campaign.status];
   if (status === undefined || status === null) return null;
-  // Lulu's campaign budget is a total. LinkedIn's total budget maps directly; a campaign with only a
-  // daily budget keeps that amount (budget types are a known gap, catalog PA-08-02).
+  // A lifetime budget is a total; a campaign with only a daily budget keeps it as daily.
   const budget = campaign.totalBudget ?? campaign.dailyBudget;
+  const budgetPeriod =
+    campaign.totalBudget === undefined && campaign.dailyBudget !== undefined ? 'daily' : 'total';
   return {
     externalId: String(campaign.id),
     name: campaign.name,
@@ -141,10 +147,14 @@ export function mapLinkedInCampaign(campaign: LiCampaign, accountCurrency: strin
     budget: budget
       ? { amount: decimal(budget.amount), currency: budget.currencyCode }
       : { amount: 0, currency: accountCurrency },
+    budgetPeriod,
   };
 }
 
-export function mapLinkedInAnalytics(row: LiAnalyticsRow, currency: string): ExternalMetricDay | null {
+export function mapLinkedInAnalytics(
+  row: LiAnalyticsRow,
+  currency: string,
+): ExternalMetricDay | null {
   const urn = row.pivotValues?.[0];
   if (!urn || !row.dateRange) return null;
   const leads = row.oneClickLeads ?? 0;
@@ -155,6 +165,8 @@ export function mapLinkedInAnalytics(row: LiAnalyticsRow, currency: string): Ext
     clicks: row.clicks ?? 0,
     conversions: (row.externalWebsiteConversions ?? 0) + leads,
     leads,
+    // LinkedIn has no charged phone calls.
+    calls: 0,
     spend: { amount: decimal(row.costInLocalCurrency), currency },
     revenue: { amount: decimal(row.conversionValueInLocalCurrency), currency },
   };
@@ -162,7 +174,10 @@ export function mapLinkedInAnalytics(row: LiAnalyticsRow, currency: string): Ext
 
 // ---------- Provider ----------
 
-export function createLinkedInProvider(config: LinkedInConfig, fetchFn: FetchLike = fetch): AdsProvider {
+export function createLinkedInProvider(
+  config: LinkedInConfig,
+  fetchFn: FetchLike = fetch,
+): AdsProvider {
   const headers = (token: string): Record<string, string> => ({
     Authorization: `Bearer ${token}`,
     'LinkedIn-Version': config.apiVersion,
@@ -195,7 +210,11 @@ export function createLinkedInProvider(config: LinkedInConfig, fetchFn: FetchLik
     return rows;
   }
 
-  async function partialUpdate(account: ProviderAccount, externalId: string, set: Record<string, unknown>) {
+  async function partialUpdate(
+    account: ProviderAccount,
+    externalId: string,
+    set: Record<string, unknown>,
+  ) {
     await call<void>(account.token, `/adAccounts/${account.externalId}/adCampaigns/${externalId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-RestLi-Method': 'PARTIAL_UPDATE' },
@@ -230,22 +249,39 @@ export function createLinkedInProvider(config: LinkedInConfig, fetchFn: FetchLik
         }).toString(),
       });
       if (!response.ok) throw await apiError(response);
-      const tokenResult = (await response.json()) as { access_token: string; expires_in?: number; scope?: string };
+      const tokenResult = (await response.json()) as {
+        access_token: string;
+        expires_in?: number;
+        scope?: string;
+      };
       const token = tokenResult.access_token;
-      const scopes = tokenResult.scope ? tokenResult.scope.split(/[ ,]+/).filter(Boolean) : LINKEDIN_SCOPES;
+      const scopes = tokenResult.scope
+        ? tokenResult.scope.split(/[ ,]+/).filter(Boolean)
+        : LINKEDIN_SCOPES;
 
-      const accounts = await allPages<LiAccount>(token, '/adAccounts?q=search&search=(status:(values:List(ACTIVE)))');
+      const accounts = await allPages<LiAccount>(
+        token,
+        '/adAccounts?q=search&search=(status:(values:List(ACTIVE)))',
+      );
       return {
         token,
-        expiresAt: tokenResult.expires_in ? new Date(Date.now() + tokenResult.expires_in * 1000) : null,
-        accounts: accounts.map(
-          (a): ExternalAccount => ({ externalId: String(a.id), name: a.name, currency: a.currency, scopes }),
-        ),
+        expiresAt: tokenResult.expires_in
+          ? new Date(Date.now() + tokenResult.expires_in * 1000)
+          : null,
+        accounts: accounts.map((a): ExternalAccount => ({
+          externalId: String(a.id),
+          name: a.name,
+          currency: a.currency,
+          scopes,
+        })),
       };
     },
 
     async listCampaigns(account: ProviderAccount): Promise<ExternalCampaign[]> {
-      const campaigns = await allPages<LiCampaign>(account.token, `/adAccounts/${account.externalId}/adCampaigns?q=search`);
+      const campaigns = await allPages<LiCampaign>(
+        account.token,
+        `/adAccounts/${account.externalId}/adCampaigns?q=search`,
+      );
       return campaigns
         .map((c) => mapLinkedInCampaign(c, account.currency))
         .filter((c): c is ExternalCampaign => c !== null);
@@ -278,20 +314,36 @@ export function createLinkedInProvider(config: LinkedInConfig, fetchFn: FetchLik
       return Promise.reject(new ProviderOperationUnsupportedError('creating a campaign'));
     },
 
-    async setStatus(account: ProviderAccount, externalId: string, status: 'live' | 'paused'): Promise<void> {
+    async setStatus(
+      account: ProviderAccount,
+      externalId: string,
+      status: 'live' | 'paused',
+    ): Promise<void> {
       await partialUpdate(account, externalId, { status: status === 'live' ? 'ACTIVE' : 'PAUSED' });
     },
 
-    async setBudget(account: ProviderAccount, externalId: string, budget: Money): Promise<void> {
+    async setBudget(
+      account: ProviderAccount,
+      externalId: string,
+      budget: Money,
+      budgetPeriod: BudgetPeriod,
+    ): Promise<void> {
+      // LinkedIn holds a lifetime or a daily budget; a monthly amount has no equivalent.
+      if (budgetPeriod === 'monthly') {
+        throw new Error('LinkedIn: budgets are a total for the campaign or daily, not monthly');
+      }
       // A currency label error must never multiply spending authority (catalog PA-57-03).
       if (budget.currency !== account.currency) {
         throw new Error(
           `LinkedIn: budget currency ${budget.currency} does not match account currency ${account.currency}`,
         );
       }
-      await partialUpdate(account, externalId, {
-        totalBudget: { amount: budget.amount.toFixed(2), currencyCode: budget.currency },
-      });
+      const amount = { amount: budget.amount.toFixed(2), currencyCode: budget.currency };
+      await partialUpdate(
+        account,
+        externalId,
+        budgetPeriod === 'total' ? { totalBudget: amount } : { dailyBudget: amount },
+      );
     },
   };
 }
@@ -300,7 +352,11 @@ async function apiError(response: Response): Promise<LinkedInApiError> {
   let serviceErrorCode: number | null = null;
   let message = response.statusText || 'request failed';
   try {
-    const body = (await response.json()) as { serviceErrorCode?: number; message?: string; error_description?: string };
+    const body = (await response.json()) as {
+      serviceErrorCode?: number;
+      message?: string;
+      error_description?: string;
+    };
     serviceErrorCode = body.serviceErrorCode ?? null;
     message = body.message ?? body.error_description ?? message;
   } catch {

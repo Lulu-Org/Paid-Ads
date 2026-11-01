@@ -65,14 +65,28 @@ export const envSchema = z
     LINKEDIN_CLIENT_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
     LINKEDIN_CLIENT_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
     // The monthly API version the connector is written against, e.g. 202610 (header LinkedIn-Version).
-    LINKEDIN_API_VERSION: z.preprocess(emptyToUndefined, z.string().regex(/^\d{6}$/).optional()),
+    LINKEDIN_API_VERSION: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^\d{6}$/)
+        .optional(),
+    ),
   })
   .superRefine((value, ctx) => {
     // A live LinkedIn connection needs the app credentials and an API version; never guess them.
     if (value.ADS_PROVIDER_LINKEDIN_ADS === 'live') {
-      for (const key of ['LINKEDIN_CLIENT_ID', 'LINKEDIN_CLIENT_SECRET', 'LINKEDIN_API_VERSION'] as const) {
+      for (const key of [
+        'LINKEDIN_CLIENT_ID',
+        'LINKEDIN_CLIENT_SECRET',
+        'LINKEDIN_API_VERSION',
+      ] as const) {
         if (value[key] === undefined) {
-          ctx.addIssue({ code: 'custom', path: [key], message: 'is required when ADS_PROVIDER_LINKEDIN_ADS=live' });
+          ctx.addIssue({
+            code: 'custom',
+            path: [key],
+            message: 'is required when ADS_PROVIDER_LINKEDIN_ADS=live',
+          });
         }
       }
     }

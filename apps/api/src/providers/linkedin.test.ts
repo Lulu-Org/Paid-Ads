@@ -61,8 +61,20 @@ describe('LinkedIn provider', () => {
 
   it('exchanges the code for a token and lists the active ad accounts', async () => {
     const { fn, calls } = fakeFetch(
-      { body: { access_token: 'token-abc', expires_in: 5184000, scope: 'r_ads,r_ads_reporting,rw_ads' } },
-      { body: { elements: [{ id: 507404993, name: 'Lulu Intelligence Page', currency: 'EUR', status: 'ACTIVE' }] } },
+      {
+        body: {
+          access_token: 'token-abc',
+          expires_in: 5184000,
+          scope: 'r_ads,r_ads_reporting,rw_ads',
+        },
+      },
+      {
+        body: {
+          elements: [
+            { id: 507404993, name: 'Lulu Intelligence Page', currency: 'EUR', status: 'ACTIVE' },
+          ],
+        },
+      },
     );
     const result = await createLinkedInProvider(config, fn).exchangeCode('auth-code');
 
@@ -78,7 +90,12 @@ describe('LinkedIn provider', () => {
     expect(result.token).toBe('token-abc');
     expect(result.expiresAt).toBeInstanceOf(Date);
     expect(result.accounts).toEqual([
-      { externalId: '507404993', name: 'Lulu Intelligence Page', currency: 'EUR', scopes: ['r_ads', 'r_ads_reporting', 'rw_ads'] },
+      {
+        externalId: '507404993',
+        name: 'Lulu Intelligence Page',
+        currency: 'EUR',
+        scopes: ['r_ads', 'r_ads_reporting', 'rw_ads'],
+      },
     ]);
   });
 
@@ -105,7 +122,9 @@ describe('LinkedIn provider', () => {
     const campaigns = await createLinkedInProvider(config, fn).listCampaigns(account);
 
     expect(calls).toHaveLength(2);
-    expect(calls[0]!.url).toBe(`${LINKEDIN_API_URL}/adAccounts/507404993/adCampaigns?q=search&pageSize=100`);
+    expect(calls[0]!.url).toBe(
+      `${LINKEDIN_API_URL}/adAccounts/507404993/adCampaigns?q=search&pageSize=100`,
+    );
     expect(calls[1]!.url).toContain('pageToken=page-2');
     expect(campaigns.map((c) => [c.externalId, c.status])).toEqual([
       ['1001', 'live'],
@@ -114,6 +133,7 @@ describe('LinkedIn provider', () => {
     expect(campaigns[0]).toMatchObject({
       objective: 'LEAD_GENERATION',
       budget: { amount: 2500, currency: 'EUR' },
+      budgetPeriod: 'total',
       startAt: new Date(Date.UTC(2026, 9, 1)),
     });
     // No budget at all: zero in the account currency, not a made-up amount.
@@ -146,7 +166,9 @@ describe('LinkedIn provider', () => {
 
     const url = calls[0]!.url;
     expect(url).toContain('q=analytics&pivot=CAMPAIGN&timeGranularity=DAILY');
-    expect(url).toContain('dateRange=(start:(year:2026,month:10,day:1),end:(year:2026,month:10,day:30))');
+    expect(url).toContain(
+      'dateRange=(start:(year:2026,month:10,day:1),end:(year:2026,month:10,day:30))',
+    );
     expect(url).toContain('accounts=List(urn%3Ali%3AsponsoredAccount%3A507404993)');
     expect(days).toEqual([
       {
@@ -154,6 +176,7 @@ describe('LinkedIn provider', () => {
         date: new Date(Date.UTC(2026, 9, 30)),
         impressions: 1200,
         clicks: 48,
+        calls: 0,
         conversions: 8,
         leads: 5,
         spend: { amount: 96.4, currency: 'EUR' },
@@ -163,26 +186,57 @@ describe('LinkedIn provider', () => {
   });
 
   it('pauses, resumes and sets the total budget with partial updates', async () => {
-    const { fn, calls } = fakeFetch({ status: 204 }, { status: 204 }, { status: 204 });
+    const { fn, calls } = fakeFetch(
+      { status: 204 },
+      { status: 204 },
+      { status: 204 },
+      { status: 204 },
+    );
     const provider = createLinkedInProvider(config, fn);
     await provider.setStatus(account, '1001', 'paused');
     await provider.setStatus(account, '1001', 'live');
-    await provider.setBudget(account, '1001', { amount: 3000, currency: 'EUR' });
+    await provider.setBudget(account, '1001', { amount: 3000, currency: 'EUR' }, 'total');
+    await provider.setBudget(account, '1001', { amount: 100, currency: 'EUR' }, 'daily');
 
     expect(calls[0]!.url).toBe(`${LINKEDIN_API_URL}/adAccounts/507404993/adCampaigns/1001`);
     expect(calls[0]!.init!.method).toBe('POST');
     expect(header(calls[0]!, 'X-RestLi-Method')).toBe('PARTIAL_UPDATE');
-    expect(JSON.parse(calls[0]!.init!.body as string)).toEqual({ patch: { $set: { status: 'PAUSED' } } });
-    expect(JSON.parse(calls[1]!.init!.body as string)).toEqual({ patch: { $set: { status: 'ACTIVE' } } });
+    expect(JSON.parse(calls[0]!.init!.body as string)).toEqual({
+      patch: { $set: { status: 'PAUSED' } },
+    });
+    expect(JSON.parse(calls[1]!.init!.body as string)).toEqual({
+      patch: { $set: { status: 'ACTIVE' } },
+    });
     expect(JSON.parse(calls[2]!.init!.body as string)).toEqual({
       patch: { $set: { totalBudget: { amount: '3000.00', currencyCode: 'EUR' } } },
     });
+    expect(JSON.parse(calls[3]!.init!.body as string)).toEqual({
+      patch: { $set: { dailyBudget: { amount: '100.00', currencyCode: 'EUR' } } },
+    });
+  });
+
+  it('refuses a monthly budget without calling LinkedIn', async () => {
+    const { fn, calls } = fakeFetch();
+    await expect(
+      createLinkedInProvider(config, fn).setBudget(
+        account,
+        '1001',
+        { amount: 3000, currency: 'EUR' },
+        'monthly',
+      ),
+    ).rejects.toThrow(/not monthly/);
+    expect(calls).toHaveLength(0);
   });
 
   it('refuses a budget in another currency without calling LinkedIn', async () => {
     const { fn, calls } = fakeFetch();
     await expect(
-      createLinkedInProvider(config, fn).setBudget(account, '1001', { amount: 3000, currency: 'USD' }),
+      createLinkedInProvider(config, fn).setBudget(
+        account,
+        '1001',
+        { amount: 3000, currency: 'USD' },
+        'total',
+      ),
     ).rejects.toThrow(/does not match account currency EUR/);
     expect(calls).toHaveLength(0);
   });
@@ -207,7 +261,9 @@ describe('LinkedIn provider', () => {
     expect((rateLimited as LinkedInApiError).retryable).toBe(true);
     expect((rateLimited as LinkedInApiError).serviceErrorCode).toBe(101);
 
-    const forbidden = (await provider.listCampaigns(account).catch((e: unknown) => e)) as LinkedInApiError;
+    const forbidden = (await provider
+      .listCampaigns(account)
+      .catch((e: unknown) => e)) as LinkedInApiError;
     expect(forbidden.status).toBe(403);
     expect(forbidden.retryable).toBe(false);
     expect(forbidden.message).toContain('Not enough permissions');
@@ -216,7 +272,9 @@ describe('LinkedIn provider', () => {
 
 describe('LinkedIn mapping', () => {
   it('maps finished campaigns to ended and skips pending deletion', () => {
-    expect(mapLinkedInCampaign({ id: 1, name: 'x', status: 'COMPLETED' }, 'EUR')?.status).toBe('ended');
+    expect(mapLinkedInCampaign({ id: 1, name: 'x', status: 'COMPLETED' }, 'EUR')?.status).toBe(
+      'ended',
+    );
     expect(mapLinkedInCampaign({ id: 1, name: 'x', status: 'PENDING_DELETION' }, 'EUR')).toBeNull();
     expect(mapLinkedInCampaign({ id: 1, name: 'x', status: 'SOMETHING_NEW' }, 'EUR')).toBeNull();
   });

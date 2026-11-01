@@ -2,7 +2,6 @@ import {
   approvalInboxQuerySchema,
   idParamSchema,
   approvalRequestCreateSchema,
-  type ApprovalRequest,
   type ApprovalInboxQuery,
   type ApprovalRequestCreateInput,
 } from '@lulu/shared';
