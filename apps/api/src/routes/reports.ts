@@ -2,7 +2,7 @@ import {
   idParamSchema,
   libraryApiQuerySchema,
   reportCreateSchema,
-  reportRunQuerySchema,
+  reportRunHttpQuerySchema,
   reportUpdateSchema,
   type LibraryApiQuery,
   type ReportCreateInput,
@@ -55,7 +55,7 @@ reportsRouter.post(
 reportsRouter.get(
   '/run',
   requirePermission('reports', 'view'),
-  validate({ query: reportRunQuerySchema }),
+  validate({ query: reportRunHttpQuerySchema }),
   asyncHandler(async (req, res) =>
     ok(res, await runReport(requireContext(req), req.query as unknown as ReportRunQuery)),
   ),
@@ -86,7 +86,11 @@ reportsRouter.patch(
   asyncHandler(async (req, res) =>
     ok(
       res,
-      await updateReport(requireContext(req), req.params.id as string, req.body as ReportUpdateInput),
+      await updateReport(
+        requireContext(req),
+        req.params.id as string,
+        req.body as ReportUpdateInput,
+      ),
     ),
   ),
 );

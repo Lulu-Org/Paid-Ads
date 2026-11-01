@@ -57,10 +57,18 @@ export async function createApproval(
   const campaign = await scoped.campaign.findFirst({ where: { id: approvalInput.campaignId } });
   if (campaign === null) {
     throw AppError.validation([
-      { path: 'campaignId', code: 'invalid_campaign', message: 'errors.validation.invalid_campaign' },
+      {
+        path: 'campaignId',
+        code: 'invalid_campaign',
+        message: 'errors.validation.invalid_campaign',
+      },
     ]);
   }
-  const open = await loadOpenApprovalRequest(ctx.workspaceId, approvalInput.campaignId, approvalInput.kind);
+  const open = await loadOpenApprovalRequest(
+    ctx.workspaceId,
+    approvalInput.campaignId,
+    approvalInput.kind,
+  );
   if (open !== null) return { approval: toApprovalRequestDto(open), existing: true };
 
   const row = await scoped.approvalRequest.create({

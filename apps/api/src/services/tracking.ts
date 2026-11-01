@@ -81,13 +81,13 @@ export async function createConversionEvent(
 ): Promise<ConversionEvent> {
   const row = await scopedDb(ctx.workspaceId).conversionEvent.create({
     data: {
-        workspaceId: ctx.workspaceId,
-        name: input.name,
-        source: input.source,
-        valueAmount: input.value === null ? null : input.value.amount,
-        valueCurrency: input.value === null ? null : input.value.currency,
-        platforms: input.platforms,
-        health: 'needs_attention',
+      workspaceId: ctx.workspaceId,
+      name: input.name,
+      source: input.source,
+      valueAmount: input.value === null ? null : input.value.amount,
+      valueCurrency: input.value === null ? null : input.value.currency,
+      platforms: input.platforms,
+      health: 'needs_attention',
     },
   });
   return toConversionEventDto(row);

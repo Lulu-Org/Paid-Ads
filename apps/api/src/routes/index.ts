@@ -15,6 +15,7 @@ import { approvalsRouter } from './approvals';
 import { approvalPolicyRouter, spendLimitRouter } from './controls';
 import { automationsRouter } from './automations';
 import { reportsRouter } from './reports';
+import { billingRouter, operationsRouter, teamRouter } from './operations';
 
 export const apiRouter = Router();
 
@@ -43,4 +44,7 @@ apiRouter.use('/spend-limit', spendLimitRouter);
 apiRouter.use('/approval-policy', approvalPolicyRouter);
 apiRouter.use('/reports', reportsRouter);
 apiRouter.use('/automations', automationsRouter);
+apiRouter.use('/operations', operationsRouter);
+apiRouter.use('/team', teamRouter);
+apiRouter.use('/billing', billingRouter);
 // Remaining Paid Ads routers mount here (docs/api.md): /ad-accounts, /audiences, /creatives, ...

@@ -16,4 +16,6 @@ export * from "./overview-logic";
 export * from "./planning";
 export * from "./planning-logic";
 export * from "./reporting";
+export * from "./reports-api";
 export * from "./approvals-api";
+export * from "./operations-api";

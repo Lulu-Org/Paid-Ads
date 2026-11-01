@@ -529,6 +529,171 @@ const overviewPaths: OpenApiPaths = {
   },
 };
 
+const opsErrors = {
+  '401': errorResponse('Missing, invalid or expired token.'),
+  '403': errorResponse('FORBIDDEN.'),
+};
+
+const opsPaths: OpenApiPaths = {
+  '/api/v1/operations': {
+    get: {
+      operationId: 'getOperations',
+      summary: 'Operations summary',
+      description:
+        'Sync health, connected providers, last sync, jobs and success rate for the day of the newest sync run, open incidents, latest webhook events and the reconciled share. Needs integrations: view.',
+      tags: ['Operations'],
+      security: bearer,
+      responses: { '200': dataResponse('The summary.', 'OperationsSummary'), ...opsErrors },
+    },
+  },
+  '/api/v1/operations/sync-runs': {
+    get: {
+      operationId: 'listSyncRuns',
+      summary: 'Sync history',
+      description: 'Sync runs, newest first. Needs integrations: view.',
+      tags: ['Operations'],
+      security: bearer,
+      parameters: [
+        { name: 'page', in: 'query', required: false, schema: { type: 'integer', minimum: 1 } },
+        {
+          name: 'pageSize',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', minimum: 1, maximum: 100 },
+        },
+      ],
+      responses: {
+        '200': listDataResponse('A page of sync runs.', 'SyncRun'),
+        '400': errorResponse('Invalid query.'),
+        ...opsErrors,
+      },
+    },
+  },
+  '/api/v1/operations/incidents/{id}/retry': {
+    post: {
+      operationId: 'retryIncident',
+      summary: 'Retry an incident',
+      description:
+        'Queues ads.sync again for the platform’s connected account and returns the updated summary. Only rate_limited and sync_failed incidents retry; others answer 409, as does a platform with no connected account. Needs integrations: edit.',
+      tags: ['Operations'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The updated summary.', 'OperationsSummary'),
+        ...opsErrors,
+        '404': errorResponse('Incident not found.'),
+        '409': errorResponse('The incident needs a person, or no account is connected.'),
+      },
+    },
+  },
+  '/api/v1/operations/reconcile': {
+    post: {
+      operationId: 'reconcileOperations',
+      summary: 'Reconcile with the platforms',
+      description:
+        'Recomputes the reconciled share and returns the summary. Until the providers (C0) exist, the share is the part of live and paused campaigns linked to a platform campaign. Needs integrations: edit.',
+      tags: ['Operations'],
+      security: bearer,
+      responses: { '200': dataResponse('The updated summary.', 'OperationsSummary'), ...opsErrors },
+    },
+  },
+  '/api/v1/team': {
+    get: {
+      operationId: 'listTeam',
+      summary: 'Team',
+      description:
+        'Teammates with Paid Ads role, channel scope and creative approval right. Needs settings: view.',
+      tags: ['Team'],
+      security: bearer,
+      responses: {
+        '200': {
+          description: 'The team.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['data'],
+                properties: { data: { type: 'array', items: { $ref: schemaRef('TeamMember') } } },
+              },
+            },
+          },
+        },
+        ...opsErrors,
+      },
+    },
+  },
+  '/api/v1/team/invitations': {
+    post: {
+      operationId: 'inviteTeammate',
+      summary: 'Invite a teammate',
+      description:
+        'Invites by email with a role other than owner. A person with no account gets one that cannot sign in until a password is set. Answers 409 if already in the team. Needs settings: edit.',
+      tags: ['Team'],
+      security: bearer,
+      requestBody: jsonBody('TeamInviteInput'),
+      responses: {
+        '201': dataResponse('The invited teammate.', 'TeamMember'),
+        '400': errorResponse('Invalid body, including the owner role.'),
+        ...opsErrors,
+        '409': errorResponse('Already in the team.'),
+      },
+    },
+  },
+  '/api/v1/team/{userId}': {
+    patch: {
+      operationId: 'updateTeamMember',
+      summary: 'Update a teammate',
+      description:
+        'Changes role, channel scope or creative approval. The owner cannot be changed (403). Needs settings: edit.',
+      tags: ['Team'],
+      security: bearer,
+      parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+      requestBody: jsonBody('TeamMemberUpdateInput'),
+      responses: {
+        '200': dataResponse('The updated teammate.', 'TeamMember'),
+        '400': errorResponse('Invalid body.'),
+        ...opsErrors,
+        '404': errorResponse('Teammate not found.'),
+      },
+    },
+  },
+  '/api/v1/billing/payment-method': {
+    get: {
+      operationId: 'getPaymentMethod',
+      summary: 'Payment method',
+      description:
+        'Status, card brand and last four digits only; status is missing when none is set. Needs billing: view.',
+      tags: ['Billing'],
+      security: bearer,
+      responses: { '200': dataResponse('The payment method.', 'PaymentMethod'), ...opsErrors },
+    },
+  },
+  '/api/v1/billing/statements': {
+    get: {
+      operationId: 'listStatements',
+      summary: 'Statements',
+      description: 'Monthly charges per platform, newest month first. Needs billing: view.',
+      tags: ['Billing'],
+      security: bearer,
+      responses: {
+        '200': {
+          description: 'Statements.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['data'],
+                properties: { data: { type: 'array', items: { $ref: schemaRef('Statement') } } },
+              },
+            },
+          },
+        },
+        ...opsErrors,
+      },
+    },
+  },
+};
+
 const platformEnum = ['google_lsa', 'google_ads', 'meta_ads', 'linkedin_ads'];
 
 const libraryListParameters = [
@@ -869,6 +1034,316 @@ const libraryPaths: OpenApiPaths = {
   },
 };
 
+const controlPaths: OpenApiPaths = {
+  '/api/v1/approvals': {
+    get: {
+      operationId: 'listApprovals',
+      summary: 'List approval requests',
+      description: 'Approval requests, newest first. Filter: status. Needs billing: view.',
+      tags: ['Approvals'],
+      security: bearer,
+      parameters: [
+        {
+          name: 'status',
+          in: 'query',
+          required: false,
+          schema: { enum: ['pending', 'approved', 'rejected'] },
+        },
+        { name: 'page', in: 'query', required: false, schema: { type: 'integer', minimum: 1 } },
+        {
+          name: 'pageSize',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', minimum: 1, maximum: 100 },
+        },
+      ],
+      responses: {
+        '200': listDataResponse('A page of approval requests.', 'ApprovalRequest'),
+        '400': errorResponse('Invalid query.'),
+        ...authErrors,
+      },
+    },
+    post: {
+      operationId: 'createApproval',
+      summary: 'Ask for an approval',
+      description:
+        'Creates a request for a campaign. An open request for the same kind and campaign is returned (200) instead of a second one (201). Needs campaigns: edit.',
+      tags: ['Approvals'],
+      security: bearer,
+      requestBody: jsonBody('ApprovalRequestCreateInput'),
+      responses: {
+        '200': dataResponse('The existing open request.', 'ApprovalRequest'),
+        '201': dataResponse('The new request.', 'ApprovalRequest'),
+        '400': errorResponse('Invalid body or a campaign outside the workspace.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/approvals/{id}/approve': {
+    post: {
+      operationId: 'approveApproval',
+      summary: 'Approve a request',
+      description:
+        'Approves a pending request. A person cannot approve their own (403). An approved budget_change applies the budget and queues ads.push; an approved creative request approves the creative. A request already decided answers 409. Needs billing: approve.',
+      tags: ['Approvals'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The approved request.', 'ApprovalRequest'),
+        ...authErrors,
+        '404': errorResponse('Request not found.'),
+        '409': errorResponse('The request was already decided.'),
+      },
+    },
+  },
+  '/api/v1/approvals/{id}/reject': {
+    post: {
+      operationId: 'rejectApproval',
+      summary: 'Reject a request',
+      description:
+        'Rejects a pending request. A person cannot reject their own (403); one already decided answers 409. Needs billing: approve.',
+      tags: ['Approvals'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The rejected request.', 'ApprovalRequest'),
+        ...authErrors,
+        '404': errorResponse('Request not found.'),
+        '409': errorResponse('The request was already decided.'),
+      },
+    },
+  },
+  '/api/v1/spend-limit': {
+    get: {
+      operationId: 'getSpendLimit',
+      summary: 'Spend limit',
+      description:
+        'Monthly limit, alert share and notify flag, plus spend used in the month of the newest synced day. Needs billing: view.',
+      tags: ['Billing'],
+      security: bearer,
+      responses: { '200': dataResponse('The spend limit.', 'SpendLimit'), ...authErrors },
+    },
+    put: {
+      operationId: 'updateSpendLimit',
+      summary: 'Update the spend limit',
+      description: 'alertAt must be 0.7, 0.8 or 0.9, otherwise 400. Needs billing: edit.',
+      tags: ['Billing'],
+      security: bearer,
+      requestBody: jsonBody('SpendLimitUpdateInput'),
+      responses: {
+        '200': dataResponse('The spend limit.', 'SpendLimit'),
+        '400': errorResponse('Invalid body or alert share.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/approval-policy': {
+    get: {
+      operationId: 'getApprovalPolicy',
+      summary: 'Approval policy',
+      description: 'Scope, threshold and approver role. Needs billing: view.',
+      tags: ['Billing'],
+      security: bearer,
+      responses: { '200': dataResponse('The policy.', 'ApprovalPolicy'), ...authErrors },
+    },
+    put: {
+      operationId: 'updateApprovalPolicy',
+      summary: 'Update the approval policy',
+      description: 'Replaces the policy. Needs billing: edit.',
+      tags: ['Billing'],
+      security: bearer,
+      requestBody: jsonBody('ApprovalPolicy'),
+      responses: {
+        '200': dataResponse('The policy.', 'ApprovalPolicy'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/reports': {
+    get: {
+      operationId: 'listReports',
+      summary: 'List saved reports',
+      description:
+        'Saved and scheduled reports. Filter: q (name). Sort: name (default) or createdAt, with - for descending. Needs reports: view.',
+      tags: ['Reports'],
+      security: bearer,
+      parameters: libraryListParameters,
+      responses: {
+        '200': listDataResponse('A page of reports.', 'Report'),
+        '400': errorResponse('Invalid query.'),
+        ...authErrors,
+      },
+    },
+    post: {
+      operationId: 'createReport',
+      summary: 'Save a report',
+      description: 'Needs reports: create.',
+      tags: ['Reports'],
+      security: bearer,
+      requestBody: jsonBody('ReportCreateInput'),
+      responses: {
+        '201': dataResponse('The saved report.', 'Report'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/reports/run': {
+    get: {
+      operationId: 'runAdHocReport',
+      summary: 'Run an ad hoc report',
+      description:
+        'KPIs with change against the period before, and spend, leads, conversions, revenue and ROAS per channel. platforms is comma separated; empty means all. from after to answers 400. Needs reports: view.',
+      tags: ['Reports'],
+      security: bearer,
+      parameters: [
+        { name: 'from', in: 'query', required: true, schema: { type: 'string', format: 'date' } },
+        { name: 'to', in: 'query', required: true, schema: { type: 'string', format: 'date' } },
+        { name: 'platforms', in: 'query', required: false, schema: { type: 'string' } },
+      ],
+      responses: {
+        '200': dataResponse('The report numbers.', 'ReportRun'),
+        '400': errorResponse('Invalid range or platform.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/reports/{id}': {
+    get: {
+      operationId: 'getReport',
+      summary: 'Report detail',
+      description: 'Another workspace’s report answers 404. Needs reports: view.',
+      tags: ['Reports'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The report.', 'Report'),
+        ...authErrors,
+        '404': errorResponse('Report not found.'),
+      },
+    },
+    patch: {
+      operationId: 'updateReport',
+      summary: 'Update a report',
+      description: 'Needs reports: edit.',
+      tags: ['Reports'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      requestBody: jsonBody('ReportUpdateInput'),
+      responses: {
+        '200': dataResponse('The updated report.', 'Report'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+        '404': errorResponse('Report not found.'),
+      },
+    },
+    delete: {
+      operationId: 'deleteReport',
+      summary: 'Delete a report',
+      description: 'Soft-deletes the report. Needs reports: delete.',
+      tags: ['Reports'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '204': { description: 'Deleted.' },
+        ...authErrors,
+        '404': errorResponse('Report not found.'),
+      },
+    },
+  },
+  '/api/v1/reports/{id}/run': {
+    get: {
+      operationId: 'runSavedReport',
+      summary: 'Run a saved report',
+      description:
+        'Runs the report’s view over its last rangeDays days up to the newest synced day. The compare option is stored, but the run always compares with the previous period. Needs reports: view.',
+      tags: ['Reports'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '200': dataResponse('The report numbers.', 'ReportRun'),
+        ...authErrors,
+        '404': errorResponse('Report not found.'),
+      },
+    },
+  },
+  '/api/v1/automations': {
+    get: {
+      operationId: 'listAutomations',
+      summary: 'List automation rules',
+      description:
+        'Rules. Filter: q (name). Sort: name (default) or createdAt, with - for descending. Needs automations: view.',
+      tags: ['Automations'],
+      security: bearer,
+      parameters: libraryListParameters,
+      responses: {
+        '200': listDataResponse('A page of rules.', 'AutomationRule'),
+        '400': errorResponse('Invalid query.'),
+        ...authErrors,
+      },
+    },
+    post: {
+      operationId: 'createAutomation',
+      summary: 'Create an automation rule',
+      description:
+        'Stores a rule. Evaluating rules belongs to a worker, and budget actions must create an approval request instead of acting. Needs automations: create.',
+      tags: ['Automations'],
+      security: bearer,
+      requestBody: jsonBody('AutomationRuleCreateInput'),
+      responses: {
+        '201': dataResponse('The new rule.', 'AutomationRule'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/automations/activity': {
+    get: {
+      operationId: 'listAutomationActivity',
+      summary: 'Automation activity',
+      description: 'What the rules did, newest first. Needs automations: view.',
+      tags: ['Automations'],
+      security: bearer,
+      parameters: libraryListParameters,
+      responses: {
+        '200': listDataResponse('A page of activity.', 'AutomationActivity'),
+        '400': errorResponse('Invalid query.'),
+        ...authErrors,
+      },
+    },
+  },
+  '/api/v1/automations/{id}': {
+    patch: {
+      operationId: 'updateAutomation',
+      summary: 'Update an automation rule',
+      description: 'Needs automations: edit.',
+      tags: ['Automations'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      requestBody: jsonBody('AutomationRuleUpdateInput'),
+      responses: {
+        '200': dataResponse('The updated rule.', 'AutomationRule'),
+        '400': errorResponse('Invalid body.'),
+        ...authErrors,
+        '404': errorResponse('Rule not found.'),
+      },
+    },
+    delete: {
+      operationId: 'deleteAutomation',
+      summary: 'Delete an automation rule',
+      description: 'Soft-deletes the rule. Needs automations: delete.',
+      tags: ['Automations'],
+      security: bearer,
+      parameters: [campaignIdParameter],
+      responses: {
+        '204': { description: 'Deleted.' },
+        ...authErrors,
+        '404': errorResponse('Rule not found.'),
+      },
+    },
+  },
+};
 
 export const paths: OpenApiPaths = {
   '/health': {
@@ -965,5 +1440,9 @@ export const paths: OpenApiPaths = {
   ...adAccountPaths,
   ...campaignPaths,
   ...overviewPaths,
-  ...libraryPaths
+  ...libraryPaths,
+  ...libraryPaths,
+  ...opsPaths,
+  ...controlPaths,
+  ...opsPaths,
 };

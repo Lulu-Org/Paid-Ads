@@ -1,9 +1,10 @@
 import {
-  approvalRequestSchema,
   approvalInboxQuerySchema,
   idParamSchema,
+  approvalRequestCreateSchema,
   type ApprovalRequest,
   type ApprovalInboxQuery,
+  type ApprovalRequestCreateInput,
 } from '@lulu/shared';
 import { Router } from 'express';
 import { asyncHandler } from '../lib/asyncHandler';
@@ -39,9 +40,12 @@ approvalsRouter.get(
 approvalsRouter.post(
   '/',
   requirePermission('campaigns', 'edit'),
-  validate({ body: approvalRequestSchema }),
+  validate({ body: approvalRequestCreateSchema }),
   asyncHandler(async (req, res) => {
-    const result = await createApproval(requireContext(req), req.body as ApprovalRequest);
+    const result = await createApproval(
+      requireContext(req),
+      req.body as ApprovalRequestCreateInput,
+    );
     return result.existing ? ok(res, result.approval) : created(res, result.approval);
   }),
 );

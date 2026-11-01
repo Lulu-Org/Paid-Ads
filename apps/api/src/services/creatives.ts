@@ -65,7 +65,11 @@ async function decorate(workspaceId: string, rows: CreativeRow[]): Promise<Creat
 // Files go to local disk for now (UPLOAD_DIR, served at /uploads). Render disks are ephemeral,
 // so real object storage is a follow-up; only saveFile changes when that lands.
 async function saveFile(workspaceId: string, file: Express.Multer.File): Promise<string> {
-  const ext = path.extname(file.originalname).toLowerCase().replace(/[^.a-z0-9]/g, '').slice(0, 8);
+  const ext = path
+    .extname(file.originalname)
+    .toLowerCase()
+    .replace(/[^.a-z0-9]/g, '')
+    .slice(0, 8);
   const dir = path.join(process.env.UPLOAD_DIR ?? 'uploads', workspaceId);
   await mkdir(dir, { recursive: true });
   const fileName = `${randomUUID()}${ext}`;
@@ -120,7 +124,7 @@ export async function createCreative(
       name: input.name,
       type: input.type,
       fileUrl,
-      meta: (input.meta ?? {}),
+      meta: input.meta ?? {},
     },
   });
   return toCreativeListItem(row, 0, false);
