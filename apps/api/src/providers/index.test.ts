@@ -16,14 +16,6 @@ describe('provider registry', () => {
     expect(getAdsProvider('google_ads').platform).toBe('google_ads');
   });
 
-  it('fails fast when a platform is set to live before its connector exists', async () => {
-    vi.stubEnv('ADS_PROVIDER_META_ADS', 'live');
-    const { assertProviderConfiguration, getAdsProvider } = await import('./index');
-
-    expect(() => getAdsProvider('meta_ads')).toThrow(/No live provider is implemented/);
-    expect(() => assertProviderConfiguration()).toThrow(/ADS_PROVIDER_META_ADS=simulated/);
-  });
-
   it('returns the live Google LSA provider when its credentials are set', async () => {
     vi.stubEnv('ADS_PROVIDER_GOOGLE_LSA', 'live');
     vi.stubEnv('GOOGLE_ADS_DEVELOPER_TOKEN', 'developer-token');
@@ -37,7 +29,7 @@ describe('provider registry', () => {
     expect(() => assertProviderConfiguration()).not.toThrow();
   });
 
-  it('knows that live Google LSA cannot create campaigns', async () => {
+  it('knows which live connectors cannot create campaigns', async () => {
     const { campaignCreationSupported } = await import('./index');
 
     expect(campaignCreationSupported('google_lsa', 'simulated')).toBe(true);
@@ -76,6 +68,40 @@ describe('provider registry', () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     await expect(import('./index')).rejects.toThrow('exit 1');
     expect(String(log.mock.calls[0]?.[0])).toMatch(/GOOGLE_ADS_CLIENT_ID/);
+    exit.mockRestore();
+    log.mockRestore();
+  });
+
+  it('uses the live Meta connector when configured', async () => {
+    vi.stubEnv('ADS_PROVIDER_META_ADS', 'live');
+    vi.stubEnv('META_APP_ID', 'app-123');
+    vi.stubEnv('META_APP_SECRET', 'secret-456');
+    vi.stubEnv('API_PUBLIC_URL', 'https://api.example.com/');
+    const { assertProviderConfiguration, getAdsProvider, providerModeFor } =
+      await import('./index');
+
+    expect(providerModeFor('meta_ads')).toBe('live');
+    expect(getAdsProvider('meta_ads').platform).toBe('meta_ads');
+    expect(() => assertProviderConfiguration()).not.toThrow();
+    const url = new URL(getAdsProvider('meta_ads').authorizeUrl('state'));
+    expect(url.hostname).toBe('www.facebook.com');
+    expect(url.pathname).toBe('/v26.0/dialog/oauth');
+    expect(url.searchParams.get('client_id')).toBe('app-123');
+    expect(url.searchParams.get('redirect_uri')).toBe(
+      'https://api.example.com/api/v1/ad-accounts/callback/meta_ads',
+    );
+  });
+
+  it('refuses to start Meta live without its app credentials', async () => {
+    vi.stubEnv('ADS_PROVIDER_META_ADS', 'live');
+    vi.stubEnv('META_APP_ID', '');
+    // The env check stops the process before any provider is built.
+    const exit = vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`exit ${String(code)}`);
+    });
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    await expect(import('./index')).rejects.toThrow('exit 1');
+    expect(String(log.mock.calls[0]?.[0])).toMatch(/META_APP_ID/);
     exit.mockRestore();
     log.mockRestore();
   });
