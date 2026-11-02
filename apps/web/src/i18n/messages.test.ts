@@ -23,8 +23,20 @@ describe("translation files", () => {
     expect(keys(load(code)).sort()).toEqual(base);
   });
 
-  it.each(config.locales.map((l) => l.code))("%s has no empty strings", (code) => {
-    const flat = keys(load(code)).map((path) => path.split(".").reduce((o, k) => o[k], load(code)));
-    expect(flat.filter((v) => typeof v !== "string" || v.trim() === "")).toEqual([]);
-  });
+  it.each(config.locales.map((l) => l.code))(
+  "%s has no empty strings",
+  (code) => {
+    const messages = load(code);
+
+    const flat = keys(messages).map((path) =>
+      path.split(".").reduce((o, k) => o[k], messages)
+    );
+
+    expect(
+      flat.filter(
+        (v) => typeof v !== "string" || v.trim() === ""
+      )
+    ).toEqual([]);
+  }
+);
 });

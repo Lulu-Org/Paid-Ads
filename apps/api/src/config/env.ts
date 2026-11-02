@@ -38,8 +38,8 @@ export const envSchema = z
     ),
     AI_PROVIDER: z.preprocess(emptyToUndefined, z.string().default('simulated')),
     AI_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
-    // Per-platform provider mode. Google LSA (C1), Google Ads (C2) and LinkedIn (C4) are
-    // live-capable; `live` fails fast for Meta until C3.
+    // Per-platform provider mode. Google LSA (C1), Google Ads (C2), Meta (C3) and LinkedIn (C4) are live-capable.;
+    //  `live` fails fast for Meta until C3.
     ADS_PROVIDER_GOOGLE_LSA: providerMode(),
     ADS_PROVIDER_GOOGLE_ADS: providerMode(),
     ADS_PROVIDER_META_ADS: providerMode(),
@@ -61,6 +61,17 @@ export const envSchema = z
     ),
     // Public base URL of this API, used to build the OAuth callback URL.
     API_PUBLIC_URL: z.preprocess(emptyToUndefined, z.url().optional()),
+    // Meta Marketing API app (C3). Needed only when ADS_PROVIDER_META_ADS=live.
+    META_APP_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+    META_APP_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+    // Graph API version the way Meta writes it, e.g. v26.0.
+    META_API_VERSION: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^v\d+\.\d+$/, 'must look like v26.0')
+        .default('v26.0'),
+    ),
     // LinkedIn Marketing API app (C4). Needed only when ADS_PROVIDER_LINKEDIN_ADS=live.
     LINKEDIN_CLIENT_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
     LINKEDIN_CLIENT_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
@@ -86,6 +97,18 @@ export const envSchema = z
             code: 'custom',
             path: [key],
             message: 'is required when ADS_PROVIDER_LINKEDIN_ADS=live',
+          });
+        }
+      }
+    }
+    // A live Meta connection needs the app credentials; never guess them.
+    if (value.ADS_PROVIDER_META_ADS === 'live') {
+      for (const key of ['META_APP_ID', 'META_APP_SECRET'] as const) {
+        if (value[key] === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [key],
+            message: 'is required when ADS_PROVIDER_META_ADS=live',
           });
         }
       }

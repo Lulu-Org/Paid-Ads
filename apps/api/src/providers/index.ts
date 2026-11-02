@@ -4,12 +4,14 @@ import { GoogleAdsProvider } from './googleAds';
 import { GoogleAdsClient } from './googleLsaClient';
 import { GoogleLsaProvider } from './googleLsa';
 import { createLinkedInProvider } from './linkedin';
+import { MetaAdsProvider } from './meta';
+import { MetaGraphClient } from './metaClient';
 import { simulatedProviders } from './simulated';
 import type { AdsProvider } from './types';
 
-// Per-platform provider registry. C1 adds the live Google LSA connector, C2 Google Ads and C4
-// LinkedIn; C3 adds Meta. A platform configured as `live` without a connector fails fast instead of
-// falling back to sample data.
+// Per-platform provider registry. C1 adds the live Google LSA connector, C2 Google Ads, C3 Meta and
+// C4 LinkedIn. A platform configured as `live` without a connector fails fast instead of falling
+// back to sample data.
 
 export function providerModeFor(platform: AdPlatform): AdsProviderMode {
   switch (platform) {
@@ -40,6 +42,10 @@ function linkedInCredentialsError(): Error {
   return new Error(
     'ADS_PROVIDER_LINKEDIN_ADS=live requires LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET and LINKEDIN_API_VERSION',
   );
+}
+
+function metaCredentialsError(): Error {
+  return new Error('ADS_PROVIDER_META_ADS=live requires META_APP_ID and META_APP_SECRET');
 }
 
 // Google LSA and Google Ads share the same Google Cloud OAuth client, so one client (and its access
@@ -113,6 +119,27 @@ function getLinkedInProvider(): AdsProvider {
   return liveLinkedInProvider;
 }
 
+let liveMetaProvider: AdsProvider | null = null;
+
+function getMetaProvider(): AdsProvider {
+  if (liveMetaProvider !== null) return liveMetaProvider;
+
+  const { META_APP_ID, META_APP_SECRET } = env;
+  if (META_APP_ID === undefined || META_APP_SECRET === undefined) {
+    throw metaCredentialsError();
+  }
+
+  liveMetaProvider = new MetaAdsProvider({
+    client: new MetaGraphClient({
+      appId: META_APP_ID,
+      appSecret: META_APP_SECRET,
+      apiVersion: env.META_API_VERSION,
+    }),
+    apiPublicUrl: env.API_PUBLIC_URL,
+  });
+  return liveMetaProvider;
+}
+
 export function getAdsProvider(platform: AdPlatform): AdsProvider {
   if (providerModeFor(platform) === 'simulated') {
     return simulatedProviders[platform];
@@ -122,6 +149,9 @@ export function getAdsProvider(platform: AdPlatform): AdsProvider {
   }
   if (platform === 'google_ads') {
     return getGoogleAdsProvider();
+  }
+  if (platform === 'meta_ads') {
+    return getMetaProvider();
   }
   if (platform === 'linkedin_ads') {
     return getLinkedInProvider();
@@ -133,7 +163,8 @@ export function getAdsProvider(platform: AdPlatform): AdsProvider {
  * Whether launching a draft can create the campaign remotely. Neither the Google Ads API (standalone
  * Local Services or a campaign without ad groups) nor our LinkedIn connector (campaign group,
  * targeting and creatives are not modeled yet) can create campaigns, so a live draft on those
- * platforms must already have a remote campaign.
+ * platforms must already have a remote campaign. Meta can: it creates a paused campaign and the push
+ * worker applies status and budget.
  */
 export function campaignCreationSupported(
   platform: AdPlatform,
@@ -153,6 +184,10 @@ export function assertProviderConfiguration(): void {
     }
     if (platform === 'google_ads') {
       getGoogleAdsProvider();
+      continue;
+    }
+    if (platform === 'meta_ads') {
+      getMetaProvider();
       continue;
     }
     if (platform === 'linkedin_ads') {
